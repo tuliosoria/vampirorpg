@@ -22,7 +22,7 @@ import type {
   EscribaInput,
   CanoneEscrito,
 } from "./client";
-import type { NpcDynamic, CanonSubmission, CanonProposal, CanonReview } from "@vampiro/content";
+import type { NpcDynamic, CanonSubmission, CanonProposal, CanonReview, ClaFicha } from "@vampiro/content";
 import {
   ApiError,
   type ApiErrorCode,
@@ -529,6 +529,19 @@ export class HttpApiClient implements ApiClient {
   async getWiki(): Promise<WikiEntry[]> {
     const res = await this.request<{ entries: WikiEntry[] }>("/api/wiki");
     return res.entries;
+  }
+
+  async listCla(): Promise<ClaFicha[]> {
+    const res = await this.request<{ fichas: ClaFicha[] }>("/api/cla");
+    return res.fichas;
+  }
+
+  async adminSaveCla(token: string, ficha: Partial<ClaFicha> & { name: string }): Promise<ClaFicha> {
+    return this.request<ClaFicha>("/api/admin/cla", { method: "POST", body: ficha, token });
+  }
+
+  async adminDeleteCla(token: string, key: string): Promise<void> {
+    await this.request<void>("/api/admin/cla/delete", { method: "POST", body: { key }, token });
   }
 
   async getChronicle(): Promise<string> {

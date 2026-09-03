@@ -37,3 +37,4 @@ export * from "./lore/houseAssets.js";
 export * from "./lore/mencoes.js";
 export * from "./lore/biographies.js";
 
+export * from "./canon/fichas.js";

@@ -171,3 +171,12 @@ export function canonImageKey(imageId: string, extension: string): string {
 export function isCanonImageKey(key: string): boolean {
   return /^canon\/[A-Za-z0-9-]+\/original\.(png|jpg|webp)$/.test(key);
 }
+
+/** Uma ficha de clã do cânone editável, por chave de clã. */
+export function claFichaSk(key: string): string {
+  return `${claFichaPrefix()}${key}`;
+}
+
+export function claFichaPrefix(): string {
+  return "CANONCLA#";
+}

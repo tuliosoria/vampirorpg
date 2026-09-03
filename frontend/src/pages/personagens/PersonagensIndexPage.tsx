@@ -133,7 +133,7 @@ export function PersonagensIndexPage() {
         <Box>
           <Typography variant="h4">Personagens da Cidade</Typography>
           <Typography variant="body2" color="text.secondary">
-            Quem move o reino — líderes, magos e mãos por trás de cada Casa e Ordem.
+            Quem move a Cidade — a corte, os clãs e as mãos que trabalham por eles.
           </Typography>
         </Box>
 

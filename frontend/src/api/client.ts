@@ -1,3 +1,4 @@
+import type { ClaFicha } from "@vampiro/content";
 import type {
   CampaignSummary,
   HouseExample,
@@ -280,6 +281,10 @@ export interface ApiClient {
   getVisualAsset(id: string): Promise<VisualAsset>;
   canonizeAsset(id: string, input?: { canonicalName?: string; entityType?: string }): Promise<{ id: string; canonicalLevel: CanonicalLevel }>;
   getWiki(): Promise<WikiEntry[]>;
+  /** As fichas de clã — o mundo que o Narrador escreveu. */
+  listCla(): Promise<ClaFicha[]>;
+  adminSaveCla(token: string, ficha: Partial<ClaFicha> & { name: string }): Promise<ClaFicha>;
+  adminDeleteCla(token: string, key: string): Promise<void>;
   /** Crônica pública da campanha, usada para saber quem já morreu. */
   getChronicle(): Promise<string>;
   createAccountAndHouse(input: CreateHouseInput): Promise<CreateAccountResult>;

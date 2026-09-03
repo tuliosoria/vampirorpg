@@ -52,6 +52,9 @@ const lockedDashboard: AdminDashboard = {
 function makeClient(dashboard: AdminDashboard = draftDashboard): ApiClient {
   return {
     getCampaign: vi.fn(),
+    listCla: vi.fn().mockResolvedValue([]),
+    adminSaveCla: vi.fn(),
+    adminDeleteCla: vi.fn(),
     getHouseExample: vi.fn(),
     createAccountAndHouse: vi.fn(),
     generateHouseImage: vi.fn().mockResolvedValue({ image: "data:image/png;base64,ZZ" }),
@@ -467,10 +470,14 @@ describe("AdminPage", () => {
     await screen.findByRole("heading", { name: /painel do turno 2/i });
     expect(screen.getByRole("heading", { name: /compor turno/i })).toBeInTheDocument();
 
-    // Duas fileiras: o grupo diz onde estou, a seção diz qual ferramenta.
+    // Duas fileiras: o grupo diz onde estou, a seção diz qual ferramenta. A
+    // Cidade abre nos Clãs, porque sem clã cadastrado nada mais tem a quem
+    // pertencer.
     await goToTab(/^a cidade$/i);
-    expect(screen.getByRole("heading", { name: /bíblia do mundo/i })).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: /compor turno/i })).not.toBeInTheDocument();
+
+    await goToTab(/^bíblia$/i);
+    expect(screen.getByRole("heading", { name: /bíblia do mundo/i })).toBeInTheDocument();
 
     await goToTab(/^prompts$/i);
     expect(screen.getByRole("heading", { name: /prompts de imagem/i })).toBeInTheDocument();

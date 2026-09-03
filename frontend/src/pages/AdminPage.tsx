@@ -15,6 +15,7 @@ import { useApi } from "../api/ApiProvider";
 import { clearAdminToken, loadAdminToken, saveAdminToken } from "../auth/adminSession";
 import { LoadingState } from "../components/LoadingState";
 import { Layout } from "../components/Layout";
+import { AdminClaFichasTab } from "../components/admin/AdminClaFichasTab";
 import { AdminRegistroTab } from "../components/admin/AdminRegistroTab";
 import { PainelDePendencias } from "../components/admin/PainelDePendencias";
 import { AdminTurnoTab } from "../components/admin/AdminTurnoTab";
@@ -304,6 +305,8 @@ export function AdminPage() {
         )}
         {group.value === "clas" && section === "relacoes" && token && <AdminRelationsTab adminToken={token} />}
         {group.value === "clas" && section === "vivos" && token && <AdminLivingTab adminToken={token} busy={busy} />}
+
+        {group.value === "mundo" && section === "clas" && token && <AdminClaFichasTab adminToken={token} />}
 
         {group.value === "mundo" && section === "registro" && token && <AdminRegistroTab adminToken={token} />}
 

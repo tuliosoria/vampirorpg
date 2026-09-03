@@ -52,6 +52,9 @@ import {
   spyCost,
   type WorldFact,
   PENDENCIAS_VAZIAS,
+  chaveDeCla,
+  fichaVazia,
+  type ClaFicha,
 } from "@vampiro/content";
 import {
   ApiError,
@@ -1059,6 +1062,25 @@ export class MockApiClient implements ApiClient {
     if (i >= 0) this.npcDynamics[i] = state;
     else this.npcDynamics.push(state);
     return state;
+  }
+
+  /** O mundo que o Narrador escreveu, em memória. */
+  private clas: ClaFicha[] = [];
+
+  async listCla(): Promise<ClaFicha[]> {
+    return [...this.clas];
+  }
+
+  async adminSaveCla(_token: string, ficha: Partial<ClaFicha> & { name: string }): Promise<ClaFicha> {
+    const key = ficha.key ?? chaveDeCla(ficha.name);
+    const salva: ClaFicha = { ...fichaVazia(key, ficha.name), ...ficha, key, updatedAt: new Date().toISOString() };
+    const i = this.clas.findIndex((c) => c.key === key);
+    if (i === -1) this.clas.push(salva); else this.clas[i] = salva;
+    return salva;
+  }
+
+  async adminDeleteCla(_token: string, key: string): Promise<void> {
+    this.clas = this.clas.filter((c) => c.key !== key);
   }
 
   async getWiki(): Promise<WikiEntry[]> {

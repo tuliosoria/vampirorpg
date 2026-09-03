@@ -1,5 +1,7 @@
 import type { HandlerRequest, HandlerResponse } from "./types/domain";
 import { HttpError } from "./types/domain";
+import { garantirCanon } from "./canon/aplicar";
+import { listCla, saveCla, removeCla } from "./routes/claRoutes";
 import { getCampaign, getHouseExample, createAccountAndHouse, login, getGallery, getWiki, getChronicle, generateHouseImage, type Deps } from "./routes/publicRoutes";
 import { getGame, submitOrder } from "./routes/playerRoutes";
 import { escribaPreview, escribaPublicar } from "./routes/escribaRoutes";
@@ -35,6 +37,10 @@ function r(method: string, path: string, handler: Handler): Route {
 
 const routes: Route[] = [
   r("GET", "/api/campaign", getCampaign),
+  // O cânone dos clãs: leitura pública porque o site inteiro depende dela.
+  r("GET", "/api/cla", listCla),
+  r("POST", "/api/admin/cla", saveCla),
+  r("POST", "/api/admin/cla/delete", removeCla),
   r("GET", "/api/house-example", getHouseExample),
   r("GET", "/api/gallery", getGallery),
   r("GET", "/api/wiki", getWiki),
@@ -148,6 +154,10 @@ const routes: Route[] = [
 
 export async function route(deps: Deps, req: HandlerRequest): Promise<HandlerResponse> {
   try {
+    // O mundo entra antes da rota. A Lambda sobe com o cânone vazio, e uma
+    // carta redigida nesse instante sairia sem saber que a Cidade tem clãs.
+    await garantirCanon(deps.doc, deps.config.tableName, deps.config.campaignId);
+
     for (const route of routes) {
       if (route.method !== req.method) continue;
       const match = route.pattern.exec(req.path);

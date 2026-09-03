@@ -98,7 +98,7 @@ export function CasaPage() {
         {leader && (
           <Card>
             <CardContent>
-              <Typography variant="overline" color="text.secondary">Quem responde pela Casa</Typography>
+              <Typography variant="overline" color="text.secondary">Quem responde pelo clã</Typography>
               <Typography variant="h6">
                 {leader.leaderName}
                 {leader.dead && <Chip size="small" color="default" label="morto" sx={{ ml: 1 }} />}
@@ -118,7 +118,7 @@ export function CasaPage() {
         {perfil && (
           <Card>
             <CardContent>
-              <Typography variant="h6" gutterBottom>O que a Casa tem</Typography>
+              <Typography variant="h6" gutterBottom>O que o clã tem</Typography>
               <Stack spacing={1.5}>
                 <Fact label="Sangue" value={perfil.wealth} />
                 <Fact label="Influência" value={perfil.resources} />

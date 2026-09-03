@@ -30,7 +30,7 @@ export const ADMIN_GROUPS: AdminGroup[] = [
     value: "clas",
     label: "Personagens",
     sections: [
-      { value: "clas", label: "Clãs" },
+      { value: "clas", label: "Jogadores" },
       { value: "relacoes", label: "Relações" },
       { value: "vivos", label: "Vivos" },
     ],
@@ -39,6 +39,9 @@ export const ADMIN_GROUPS: AdminGroup[] = [
     value: "mundo",
     label: "A Cidade",
     sections: [
+      // Primeiro o que existe, depois o que se escreve sobre isso: sem clã
+      // cadastrado, verbete e imagem não têm a quem pertencer.
+      { value: "clas", label: "Clãs" },
       { value: "biblia", label: "Bíblia" },
       // O registro fica em Mundo e não em Turno: ele NASCE no turno, mas é
       // consultado e podado fora dele, quando algo numa carta soou errado.
