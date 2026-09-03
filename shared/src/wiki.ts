@@ -73,7 +73,7 @@ export interface WikiGroup {
 export const WIKI_GROUPS: WikiGroup[] = [
   {
     id: "cidade",
-    label: "A Cidade",
+    label: "Ruas e Corte",
     blurb: "Quem manda, quem divide o mapa e onde tudo isso fica.",
     sections: ["visao-geral", "corte", "clas", "seitas", "bairros", "lugares", "dinheiro", "mortais"],
   },

@@ -323,7 +323,7 @@ describe("AdminPage", () => {
 
   it("keeps drafted resolution visible after the AI action returns", async () => {
     const client = makeClient(lockedDashboard);
-    sessionStorage.setItem("ravenloft.admin", "admin-token");
+    sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
       <ApiProvider client={client}>
         <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
@@ -342,7 +342,7 @@ describe("AdminPage", () => {
 
   it("shows each house's submitted order while resolving a locked turn", async () => {
     const client = makeClient(lockedDashboard);
-    sessionStorage.setItem("ravenloft.admin", "admin-token");
+    sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
       <ApiProvider client={client}>
         <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
@@ -358,7 +358,7 @@ describe("AdminPage", () => {
 
   it("resets the campaign after confirming in the dialog", async () => {
     const client = makeClient();
-    sessionStorage.setItem("ravenloft.admin", "admin-token");
+    sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
       <ApiProvider client={client}>
         <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
@@ -379,7 +379,7 @@ describe("AdminPage", () => {
 
   it("creates a house and shows the generated access code", async () => {
     const client = makeClient();
-    sessionStorage.setItem("ravenloft.admin", "admin-token");
+    sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
       <ApiProvider client={client}>
         <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
@@ -390,11 +390,11 @@ describe("AdminPage", () => {
 
     await screen.findByRole("heading", { name: /painel do turno 2/i });
     await goToTab(/personagens/i);
-    await screen.findByRole("heading", { name: /gerenciar casas/i });
+    await screen.findByRole("heading", { name: /gerenciar personagens/i });
     await userEvent.click(screen.getByRole("button", { name: /adicionar casa/i }));
 
     await userEvent.type(screen.getByLabelText(/nome de exibição do jogador/i), "Novo Jogador");
-    await userEvent.type(screen.getByLabelText(/nome da casa/i), "Casa Corvo");
+    await userEvent.type(screen.getByLabelText(/nome do personagem/i), "Casa Corvo");
     await userEvent.click(screen.getByRole("button", { name: /^criar casa$/i }));
 
     await waitFor(() =>
@@ -408,7 +408,7 @@ describe("AdminPage", () => {
 
   it("updates a house after editing", async () => {
     const client = makeClient();
-    sessionStorage.setItem("ravenloft.admin", "admin-token");
+    sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
       <ApiProvider client={client}>
         <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
@@ -419,7 +419,7 @@ describe("AdminPage", () => {
 
     await screen.findByRole("heading", { name: /painel do turno 2/i });
     await goToTab(/personagens/i);
-    await screen.findByRole("heading", { name: /gerenciar casas/i });
+    await screen.findByRole("heading", { name: /gerenciar personagens/i });
     await userEvent.click(screen.getByRole("button", { name: /^editar$/i }));
     await userEvent.click(screen.getByRole("button", { name: /salvar alterações/i }));
 
@@ -433,7 +433,7 @@ describe("AdminPage", () => {
 
   it("deletes a house after confirming in the dialog", async () => {
     const client = makeClient();
-    sessionStorage.setItem("ravenloft.admin", "admin-token");
+    sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
       <ApiProvider client={client}>
         <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
@@ -444,7 +444,7 @@ describe("AdminPage", () => {
 
     await screen.findByRole("heading", { name: /painel do turno 2/i });
     await goToTab(/personagens/i);
-    await screen.findByRole("heading", { name: /gerenciar casas/i });
+    await screen.findByRole("heading", { name: /gerenciar personagens/i });
     await userEvent.click(screen.getByRole("button", { name: /^deletar$/i }));
 
     const confirm = await screen.findByRole("button", { name: /sim, deletar/i });
@@ -455,7 +455,7 @@ describe("AdminPage", () => {
 
   it("switches between tabs and hides other panels", async () => {
     const client = makeClient();
-    sessionStorage.setItem("ravenloft.admin", "admin-token");
+    sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
       <ApiProvider client={client}>
         <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
@@ -479,7 +479,7 @@ describe("AdminPage", () => {
 
   it("não carrega mais as abas mortas de Galeria e Senhas", async () => {
     const client = makeClient();
-    sessionStorage.setItem("ravenloft.admin", "admin-token");
+    sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
       <ApiProvider client={client}>
         <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
@@ -496,7 +496,7 @@ describe("AdminPage", () => {
 
   it("opens the tab from the ?tab= query param", async () => {
     const client = makeClient();
-    sessionStorage.setItem("ravenloft.admin", "admin-token");
+    sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
       <ApiProvider client={client}>
         <MemoryRouter initialEntries={["/admin?tab=casas"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
@@ -506,12 +506,12 @@ describe("AdminPage", () => {
     );
 
     await screen.findByRole("heading", { name: /painel do turno 2/i });
-    expect(await screen.findByRole("heading", { name: /gerenciar casas/i })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: /gerenciar personagens/i })).toBeInTheDocument();
   });
 
   it("falls back to the turnos tab for an unknown or disabled tab param", async () => {
     const client = makeClient();
-    sessionStorage.setItem("ravenloft.admin", "admin-token");
+    sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
       <ApiProvider client={client}>
         <MemoryRouter initialEntries={["/admin?tab=galeria"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>

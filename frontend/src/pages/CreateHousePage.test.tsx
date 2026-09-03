@@ -30,7 +30,7 @@ describe("CreateHousePage", () => {
     await userEvent.type(screen.getByLabelText(/nome de exibição/i), "Elira");
     await userEvent.click(screen.getByRole("button", { name: "Próximo" }));
 
-    await userEvent.type(await screen.findByLabelText(/nome da casa/i), "Casa Nevasca");
+    await userEvent.type(await screen.findByLabelText(/nome do personagem/i), "Casa Nevasca");
     await userEvent.type(screen.getByLabelText(/lema/i), "Sob a neve, resistimos.");
 
     expect(screen.getByRole("button", { name: "Próximo" })).toBeDisabled();
@@ -49,7 +49,7 @@ describe("CreateHousePage", () => {
     await userEvent.type(screen.getByLabelText(/nome de exibição/i), "Elira");
     await userEvent.click(screen.getByRole("button", { name: "Próximo" }));
 
-    await userEvent.type(await screen.findByLabelText(/nome da casa/i), "Casa Nevasca");
+    await userEvent.type(await screen.findByLabelText(/nome do personagem/i), "Casa Nevasca");
     await userEvent.type(screen.getByLabelText(/lema/i), "Sob a neve, resistimos.");
     await userEvent.type(screen.getByLabelText(/líder/i), "Dama Elira");
     await userEvent.type(screen.getByLabelText(/herdeiro/i), "Tomas");
@@ -89,7 +89,7 @@ describe("CreateHousePage", () => {
     await userEvent.type(screen.getByLabelText(/nome de exibição/i), "Elira");
     await userEvent.click(screen.getByRole("button", { name: "Próximo" }));
 
-    await userEvent.type(await screen.findByLabelText(/nome da casa/i), "Casa Nevasca");
+    await userEvent.type(await screen.findByLabelText(/nome do personagem/i), "Casa Nevasca");
     await userEvent.type(screen.getByLabelText(/lema/i), "Sob a neve, resistimos.");
     await userEvent.type(screen.getByLabelText(/líder/i), "Dama Elira");
     await userEvent.type(screen.getByLabelText(/herdeiro/i), "Tomas");

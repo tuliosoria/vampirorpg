@@ -213,7 +213,7 @@ export function HouseProjectsPanel({ playerToken, houseName, categoria, excluirC
             {active.length === 0 && recommended.length > 0 && (
               <Box>
                 <Alert severity="info" sx={{ mb: 1 }}>
-                  Sua Casa ainda não tem projetos ativos. Comece por um dos projetos recomendados para sua especialidade.
+                  Seu personagem ainda não tem projetos ativos. Comece por um dos projetos recomendados para sua especialidade.
                 </Alert>
                 <Typography variant="subtitle1" fontWeight="bold" gutterBottom>Projetos recomendados para sua Casa</Typography>
                 <Stack spacing={2}>
@@ -268,7 +268,7 @@ export function HouseProjectsPanel({ playerToken, houseName, categoria, excluirC
               <Box>
                 {energiaLivre < 0 && (
                   <Alert severity="warning" sx={{ mb: 1 }}>
-                    Sua Casa tem {energiaTotal} de Energia por turno, e você distribuiu {energiaGasta}.
+                    Seu personagem tem {energiaTotal} de Energia por turno, e você distribuiu {energiaGasta}.
                   </Alert>
                 )}
                 <Button variant="contained" disabled={busy || energiaLivre < 0 || energiaGasta === 0}

@@ -46,7 +46,7 @@ function Secao({ titulo, resumo, children }: { titulo: string; resumo?: string; 
 /**
  * Tudo que se faz para rodar um turno, na ordem em que se faz.
  *
- * O Mestre lê o que as Casas escreveram, despacha as cartas que estão paradas
+ * O Mestre lê o que os personagens escreveram, despacha as cartas que estão paradas
  * esperando ele, e só então escreve o resultado. Antes isso eram três abas
  * separadas — Correspondência, Projetos e Turnos — e ele se perdia entre elas
  * no meio de uma única sessão de trabalho.
@@ -90,21 +90,21 @@ export function AdminTurnoTab(props: {
         onPublished={onDraftPublished}
       />
 
-      <Secao titulo="Correspondência" resumo="o que as Casas escreveram">
+      <Secao titulo="Correspondência" resumo="o que os personagens escreveram">
         <CartasDoMundo adminToken={adminToken} />
         <AdminCorrespondenceTab adminToken={adminToken} />
       </Secao>
 
       <Secao
-        titulo="Projetos das Casas"
+        titulo="Empreitadas dos personagens"
         resumo={pendingProjects > 0 ? `${pendingProjects} esperando você` : "nada parado"}
       >
         <AdminProjectsTab adminToken={adminToken} busy={props.busy} onError={onError} />
       </Secao>
 
-      {/* Antes de escrever o turno: o que as Casas mandaram perguntar. O que
+      {/* Antes de escrever o turno: o que os personagens mandaram perguntar. O que
           voltar daqui costuma virar informação privada de alguém. */}
-      <Secao titulo="Espiões esperando resposta" resumo="o que as Casas mandaram perguntar">
+      <Secao titulo="Espiões esperando resposta" resumo="o que os personagens mandaram perguntar">
         {/* `runAction` sem ação recarrega o painel: é o caminho já existente
             para o aviso dourado recontar depois de uma operação sair da fila. */}
         <AdminSpyTab adminToken={adminToken} onChanged={() => void props.runAction(async () => {})} />
@@ -139,7 +139,7 @@ function CartasDoMundo({ adminToken }: { adminToken: string }) {
       setAviso(
         enviadas === 0
           ? "Nenhuma carta saiu. Ou todos os pares já estão conversando neste turno, ou a IA não respondeu a tempo."
-          : `${enviadas} ${enviadas === 1 ? "Casa escreveu" : "Casas escreveram"} aos jogadores. Elas já aparecem abaixo.`,
+          : `${enviadas} ${enviadas === 1 ? "personagem escreveu" : "personagens escreveram"} aos jogadores. Elas já aparecem abaixo.`,
       );
     } catch (e) {
       setAviso(e instanceof Error ? e.message : "Falha ao enviar as cartas.");
@@ -152,7 +152,7 @@ function CartasDoMundo({ adminToken }: { adminToken: string }) {
     <Stack spacing={1} sx={{ mb: 2 }}>
       <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
         <Button variant="outlined" disabled={busy} onClick={() => void enviar()}>
-          {busy ? "As Casas estão escrevendo…" : "Mandar o mundo escrever"}
+          {busy ? "A Cidade está escrevendo…" : "Mandar o mundo escrever"}
         </Button>
         <Typography variant="caption" color="text.secondary">
           Três Casas NPC procuram os jogadores. Isto também acontece sozinho ao abrir um turno.

@@ -20,9 +20,16 @@ import { useApi } from "../../api/ApiProvider";
 export function AdminLivingTab({ adminToken, busy }: { adminToken: string; busy: boolean }) {
   const npcs = useMemo(() => addressableNpcs().sort((a, b) => a.name.localeCompare(b.name)), []);
   const api = useApi();
-  const [selected, setSelected] = useState<NpcIdentity>(npcs[0]);
+  // A crônica nasce sem elenco, e esta aba assumia que sempre há um primeiro
+  // NPC: `npcs[0].affiliation` num vazio derrubava o painel inteiro do
+  // Narrador, não só a aba. Enquanto ninguém foi cadastrado não há o que
+  // editar, e a tela diz isso.
+  const primeiro: NpcIdentity | null = npcs[0] ?? null;
+  const [selected, setSelected] = useState<NpcIdentity | null>(primeiro);
   const [byKey, setByKey] = useState<Record<string, NpcDynamic>>({});
-  const [draft, setDraft] = useState<NpcDynamic>(emptyDynamic(npcs[0].affiliation, npcs[0].id));
+  const [draft, setDraft] = useState<NpcDynamic>(
+    primeiro ? emptyDynamic(primeiro.affiliation, primeiro.id) : emptyDynamic("", ""),
+  );
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -46,6 +53,7 @@ export function AdminLivingTab({ adminToken, busy }: { adminToken: string; busy:
   // Preenche os campos; não zera o "salvo" aqui, senão salvar (que atualiza
   // byKey) apagaria o aviso de sucesso na hora.
   useEffect(() => {
+    if (!selected) return;
     setDraft(byKey[key(selected)] ?? emptyDynamic(selected.affiliation, selected.id));
   }, [selected, byKey]);
 
@@ -75,7 +83,7 @@ export function AdminLivingTab({ adminToken, busy }: { adminToken: string; busy:
   // Entidades sem relação registrada ainda, para o Mestre poder criar uma —
   // é o que a aba plana fazia com "percepções", agora no modelo rico.
   const [addEntity, setAddEntity] = useState("");
-  const missingEntities = SEATS.filter((s) => s.key !== selected.affiliation && !draft.relations[s.key]);
+  const missingEntities = SEATS.filter((s) => s.key !== selected?.affiliation && !draft.relations[s.key]);
   const addRelation = () => {
     if (!addEntity) return;
     setDraft((d) => ({ ...d, relations: { ...d.relations, [addEntity]: { trust: 50, respect: 50, fear: 20, resentment: 10, obligation: 20, summary: "" } } }));
@@ -83,6 +91,15 @@ export function AdminLivingTab({ adminToken, busy }: { adminToken: string; busy:
   };
 
   const relationEntries = Object.entries(draft.relations);
+
+  if (!selected) {
+    return (
+      <Alert severity="info">
+        Ainda não há personagem nenhum na crônica. Cadastre os clãs e o elenco no Canônico; o estado vivo
+        aparece aqui assim que existir alguém para ter opinião.
+      </Alert>
+    );
+  }
 
   return (
     <Stack spacing={2}>
@@ -97,7 +114,7 @@ export function AdminLivingTab({ adminToken, busy }: { adminToken: string; busy:
         select
         label="Personagem"
         value={key(selected)}
-        onChange={(e) => setSelected(npcs.find((n) => key(n) === e.target.value) ?? npcs[0])}
+        onChange={(e) => setSelected(npcs.find((n) => key(n) === e.target.value) ?? primeiro)}
         sx={{ maxWidth: 360 }}
       >
         {npcs.map((n) => (

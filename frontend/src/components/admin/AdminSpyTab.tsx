@@ -44,7 +44,7 @@ export function AdminSpyTab({ adminToken, onChanged }: {
   const resolver = async (id: string, outcome: "SUCESSO" | "FRACASSO") => {
     const report = (relatos[id] ?? "").trim();
     if (!report) {
-      setErro("Escreva o que a Casa descobriu, ou o que deu errado.");
+      setErro("Escreva o que o personagem descobriu, ou o que deu errado.");
       return;
     }
     setOcupado(id);
@@ -95,7 +95,7 @@ export function AdminSpyTab({ adminToken, onChanged }: {
 
             <TextField
               label="O que voltou"
-              placeholder="O que a Casa descobriu, ou o que deu errado e quem ficou sabendo."
+              placeholder="O que o personagem descobriu, ou o que deu errado e quem ficou sabendo."
               value={relatos[o.id] ?? ""}
               onChange={(e) => setRelatos((r) => ({ ...r, [o.id]: e.target.value }))}
               multiline

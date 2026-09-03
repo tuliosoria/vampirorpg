@@ -24,7 +24,7 @@ describe("HouseForm", () => {
     const onChange = vi.fn();
     render(<HouseForm value={baseValue()} onChange={onChange} section="identity" />);
 
-    await userEvent.type(screen.getByLabelText(/nome da casa/i), "X");
+    await userEvent.type(screen.getByLabelText(/nome do personagem/i), "X");
 
     expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ name: "Casa TesteX" }));
   });

@@ -377,7 +377,7 @@ export function GamePage() {
             <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems={{ xs: "flex-start", sm: "center" }}>
               <Crest emblem={game.house.emblem} name={game.house.name} />
               <Box sx={{ flexGrow: 1 }}>
-                <Typography variant="h1">Sua Casa</Typography>
+                <Typography variant="h1">Seu personagem</Typography>
                 <Typography variant="h2">{game.house.name}</Typography>
                 <Typography sx={{ color: "text.secondary", mb: 2 }}>{game.house.motto}</Typography>
                 <AttributeBars attributes={game.house.attributes} seatKey={seatKeyForHouseId(game.house.name)} />
@@ -387,10 +387,10 @@ export function GamePage() {
                   </Typography>
                 )}
                 <Box sx={{ mt: 2 }}>
-                  <Typography variant="subtitle2" fontWeight="bold">Ativos da Casa</Typography>
+                  <Typography variant="subtitle2" fontWeight="bold">Posses do personagem</Typography>
                   {ativos.length === 0 ? (
                     <Typography variant="caption" display="block" color="text.secondary">
-                      Sua Casa ainda não tem ativos. Cartas concluídas deixam construções e instituições permanentes.
+                      Seu personagem ainda não tem ativos. Cartas concluídas deixam construções e instituições permanentes.
                     </Typography>
                   ) : (
                     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 0.5 }}>

@@ -37,7 +37,7 @@ describe("índice da crônica", () => {
   it("mostra os grupos que têm conteúdo", async () => {
     await setup();
 
-    expect(await screen.findByText("A Cidade")).toBeInTheDocument();
+    expect(await screen.findByText("Ruas e Corte")).toBeInTheDocument();
     expect(screen.getByText("Sangue e Mistério")).toBeInTheDocument();
   });
 

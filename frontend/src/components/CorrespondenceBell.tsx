@@ -59,7 +59,7 @@ function Sino({ playerToken }: { playerToken: string }) {
 
   if (cartas.length === 0) return null;
 
-  const rotulo = cartas.length === 1 ? "Uma Casa escreveu para você" : `${cartas.length} Casas escreveram para você`;
+  const rotulo = cartas.length === 1 ? "Alguém escreveu para você" : `${cartas.length} personagens escreveram para você`;
 
   const abrir = (houseKey: string) => {
     setAnchor(null);

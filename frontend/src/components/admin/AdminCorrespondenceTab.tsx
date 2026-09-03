@@ -80,7 +80,7 @@ export function AdminCorrespondenceTab({ adminToken }: { adminToken: string }) {
     <Stack spacing={2}>
       <Box>
         <Typography variant="body2" color="text.secondary">
-          Tudo que as Casas escreveram e o que lhes foi respondido, do turno mais recente para o mais antigo.
+          Tudo que os personagens escreveram e o que lhes foi respondido, do turno mais recente para o mais antigo.
           {totalCartas > 0 && ` ${totalCartas} carta${totalCartas > 1 ? "s" : ""} enviada${totalCartas > 1 ? "s" : ""} até agora.`}
         </Typography>
       </Box>
@@ -89,12 +89,12 @@ export function AdminCorrespondenceTab({ adminToken }: { adminToken: string }) {
         <TextField
           select
           size="small"
-          label="Casa remetente"
+          label="Quem escreveu"
           value={filtroCasa}
           onChange={(e) => setFiltroCasa(e.target.value)}
           sx={{ maxWidth: 260 }}
         >
-          <MenuItem value="todas">Todas as Casas</MenuItem>
+          <MenuItem value="todas">Todos</MenuItem>
           {casas.map((c) => <MenuItem key={c} value={c}>{c}</MenuItem>)}
         </TextField>
       )}

@@ -42,10 +42,19 @@ export function HeroVideo({ children }: { children: ReactNode }) {
         display: "flex",
         alignItems: "flex-end",
         overflow: "hidden",
+        // O chão do hero é desenhado, não emprestado do vídeo.
+        //
+        // A crônica nasce sem mídia, e um hero que só existia quando o vídeo
+        // carregava deixava seiscentos pixels de preto no topo da home — que é
+        // exatamente o que faz um site parecer quebrado. O oxblood profundo
+        // sobe pela esquerda como uma luz baixa; o poster entra por cima
+        // quando existir, e some sem deixar buraco quando não existir.
         backgroundColor: brand.base,
-        backgroundImage: `url(${POSTER})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
+        backgroundImage:
+          `url(${POSTER}), ` +
+          `radial-gradient(95% 78% at 22% 82%, ${brand.oxblood} 0%, ${brand.oxbloodDeep} 38%, ${brand.base} 78%)`,
+        backgroundSize: "cover, cover",
+        backgroundPosition: "center, center",
       }}
     >
       {showVideo && (
@@ -79,8 +88,8 @@ export function HeroVideo({ children }: { children: ReactNode }) {
           position: "absolute",
           inset: 0,
           background:
-            `linear-gradient(to top, ${brand.base} 4%, rgba(14,16,19,0.86) 28%, rgba(14,16,19,0.35) 62%, rgba(14,16,19,0.55) 100%),` +
-            "radial-gradient(120% 90% at 50% 40%, transparent 40%, rgba(0,0,0,0.55) 100%)",
+            `linear-gradient(to top, ${brand.base} 1%, rgba(16,16,16,0.6) 22%, transparent 55%),` +
+            "radial-gradient(120% 90% at 50% 30%, transparent 45%, rgba(0,0,0,0.45) 100%)",
         }}
       />
 

@@ -13,11 +13,20 @@ interface Particle {
   color: number[];
 }
 
+/**
+ * A cor do ar da Cidade.
+ *
+ * Eram quatro azuis-acinzentados — a bruma fria de um reino no inverno. Sobre
+ * um canvas quase preto e quente eles não leem como névoa: leem como sujeira
+ * cinzenta na tela. O ar aqui é outro: sódio das ruas, poeira e o vermelho que
+ * atravessa o cenário, sempre mais claro que a base para que a partícula
+ * exista sem virar mancha.
+ */
 const COLORS = [
-  [200, 210, 225],
-  [170, 185, 205],
-  [150, 165, 190],
-  [130, 150, 180],
+  [138, 74, 82],
+  [112, 52, 62],
+  [146, 104, 88],
+  [92, 66, 72],
 ];
 
 /**
@@ -53,7 +62,7 @@ export function Fog() {
         r: 24 + Math.random() * 64,
         vx: (Math.random() - 0.5) * 0.22,
         vy: -0.05 - Math.random() * 0.18,
-        alpha: 0.05 + Math.random() * 0.13,
+        alpha: 0.03 + Math.random() * 0.07,
         phase: Math.random() * Math.PI * 2,
         twinkle: 0.4 + Math.random() * 0.9,
         color,

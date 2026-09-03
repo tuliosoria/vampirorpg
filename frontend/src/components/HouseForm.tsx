@@ -49,7 +49,7 @@ export function HouseForm({
     <Stack spacing={2}>
       {showIdentity && (
         <>
-          <TextField label="Nome da Casa" value={value.name} onChange={(event) => update("name", event.target.value.slice(0, 60))} required />
+          <TextField label="Nome do personagem" value={value.name} onChange={(event) => update("name", event.target.value.slice(0, 60))} required />
           <TextField label="Lema" value={value.motto} onChange={(event) => update("motto", event.target.value.slice(0, 120))} required />
           <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
             <FormControl fullWidth>
@@ -99,7 +99,7 @@ export function HouseForm({
                 ))}
               </Select>
             </FormControl>
-            <Crest emblem={value.emblem} name={value.name || "Casa sem nome"} />
+            <Crest emblem={value.emblem} name={value.name || "Personagem sem nome"} />
           </Stack>
           <TextField label="Líder" value={value.leaderName} onChange={(event) => update("leaderName", event.target.value)} required />
           <TextField label="Herdeiro" value={value.heirName} onChange={(event) => update("heirName", event.target.value)} required />
@@ -111,7 +111,7 @@ export function HouseForm({
 
           {example && (
             <Accordion>
-              <AccordionSummary>Ver exemplo: Casa Vargen</AccordionSummary>
+              <AccordionSummary>Ver exemplo: Vasco Aranha</AccordionSummary>
               <AccordionDetails>
                 <Stack spacing={1}>
                   <Typography variant="h3">{example.name}</Typography>

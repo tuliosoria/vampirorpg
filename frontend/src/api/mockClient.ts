@@ -305,7 +305,7 @@ export class MockApiClient implements ApiClient {
       id: "cidade-noturna",
       title: "a Cidade",
       introduction:
-        "Casas nobres isoladas pela neve precisam sobreviver a uma ameaça que retorna dos túmulos.",
+        "A corte da Cidade se equilibra sobre uma trégua que ninguém assinou.",
     };
   }
 
@@ -521,7 +521,7 @@ export class MockApiClient implements ApiClient {
     this.requireAdmin(token);
     this.requireTurnStatus("LOCKED");
     return {
-      publicResult: "As Casas resistem à primeira noite, mas a neve fica mais escura.",
+      publicResult: "A corte atravessa a primeira noite, e alguém já conta os ausentes.",
       houseResults: Object.fromEntries(
         Array.from(this.houses.values()).map((house) => [
           house.houseId,
@@ -1399,7 +1399,7 @@ export class MockApiClient implements ApiClient {
 
   async enhanceCustomProject(playerToken: string, input: EnhanceCardInput): Promise<CustomCardDraft> {
     this.requirePlayer(playerToken);
-    const title = clampText(input.title || "Projeto da Casa", CARD_TITLE_MAX);
+    const title = clampText(input.title || "Empreitada do personagem", CARD_TITLE_MAX);
     const description = clampText(input.body, CARD_DESCRIPTION_MAX);
     return {
       title,

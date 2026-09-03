@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { clearAdminToken, loadAdminToken, saveAdminToken } from "./adminSession";
 
-const KEY = "ravenloft.admin";
+const KEY = "vampirorpg.admin";
 
 /** Um token no formato do servidor: payload base64url assinado. */
 function tokenExpiringIn(ms: number): string {

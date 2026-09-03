@@ -24,7 +24,7 @@ const TIPO_ROTULO: Record<string, string> = {
 /**
  * Aliança e acordo são mútuos; recusa, ameaça e promessa têm um autor só.
  *
- * O rótulo dizia "com Casa Karasoy" para todos, e uma promessa listada assim
+ * O rótulo dizia "com o Clã Brujah" para todos, e uma promessa listada assim
  * parece feita ENTRE as duas Casas — foi exatamente essa leitura que confundiu:
  * um registro de promessa apareceu na ficha de Solarion e ninguém sabia quem
  * tinha prometido o quê a quem.
@@ -93,7 +93,7 @@ export function PactsPanel({ playerToken, onChanged }: { playerToken: string; on
   return (
     <Card component="section">
       <CardContent>
-        <Typography variant="h2" gutterBottom>O que sua Casa firmou</Typography>
+        <Typography variant="h2" gutterBottom>O que você firmou</Typography>
         {erro && <Alert severity="error" sx={{ mb: 1 }} onClose={() => setErro(null)}>{erro}</Alert>}
 
         <Tabs value={aba} onChange={(_e, v) => setAba(v)} variant="scrollable" scrollButtons="auto" sx={{ mb: 2 }}>

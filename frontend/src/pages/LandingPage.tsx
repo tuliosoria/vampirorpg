@@ -15,7 +15,7 @@ import { useApi } from "../api/ApiProvider";
 import { Layout } from "../components/Layout";
 import { LoadingState } from "../components/LoadingState";
 import { HeroVideo } from "../components/HeroVideo";
-import { layout } from "../theme";
+import { brand, layout } from "../theme";
 import type { CampaignSummary } from "../types/api";
 
 const STEPS: { title: string; text: string }[] = [
@@ -53,11 +53,11 @@ const DESTAQUES = 3;
  * verificável por captura, já que o hero ocupa a altura da janela inteira e
  * nenhum tamanho de viewport revelaria o que vem abaixo dele.
  */
-function Band({ id, children }: { id?: string; children: React.ReactNode }) {
-  return (
+function Band({ id, ground, children }: { id?: string; ground?: boolean; children: React.ReactNode }) {
+  const miolo = (
     <Container
-      id={id}
-      component="section"
+      id={ground ? undefined : id}
+      component={ground ? "div" : "section"}
       maxWidth={false}
       // `alignSelf: center` é o que realmente centraliza aqui, e `mx: auto`
       // sozinho não bastava — foi a primeira tentativa e ela falhou em
@@ -75,6 +75,35 @@ function Band({ id, children }: { id?: string; children: React.ReactNode }) {
     >
       {children}
     </Container>
+  );
+
+  if (!ground) return miolo;
+
+  /**
+   * A seção sangrada em oxblood, que é o gesto do cenário.
+   *
+   * O fundo atravessa a largura inteira e o texto fica branco por cima; o
+   * miolo continua preso à mesma coluna das demais faixas, senão a linha de
+   * leitura cresceria só aqui. O contraste do oxblood contra o canvas é de
+   * 1,13:1 — perto de nada —, então a seção não pode depender de borda para
+   * existir: ela se anuncia pelo espaço em volta e pela troca de temperatura.
+   */
+  return (
+    <Box
+      id={id}
+      component="section"
+      sx={{
+        width: "100%",
+        backgroundColor: brand.oxblood,
+        color: "#ffffff",
+        py: { xs: 8, md: 12 },
+        scrollMarginTop: 80,
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      {miolo}
+    </Box>
   );
 }
 
@@ -179,7 +208,7 @@ export function LandingPage() {
             sx={{
               display: "grid",
               gap: 0,
-              gridTemplateColumns: { xs: "1fr", sm: "repeat(3, 1fr)" },
+              gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)" },
               borderTop: 1,
               borderColor: "divider",
             }}
@@ -210,6 +239,10 @@ export function LandingPage() {
           </Box>
         </Band>
 
+        {/* A crônica nasce sem clã nenhum. Um título com uma fileira vazia
+            embaixo não é uma seção: é um buraco que o leitor lê como defeito.
+            Enquanto o Narrador não cadastrar ninguém, a seção não existe. */}
+        {SEATS.length > 0 && (
         <Band id="clas">
           <Stack
             direction="row"
@@ -250,6 +283,7 @@ export function LandingPage() {
             })}
           </Box>
         </Band>
+        )}
 
         <Band id="como-se-joga">
           <SectionTitle>Como se joga</SectionTitle>
@@ -260,13 +294,10 @@ export function LandingPage() {
               gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", lg: "repeat(4, 1fr)" },
             }}
           >
-            {STEPS.map((step, i) => (
+            {STEPS.map((step) => (
               <Card key={step.title} component="section">
                 <CardContent sx={{ p: 3 }}>
-                  <Typography variant="overline" sx={{ color: "primary.main" }}>
-                    {String(i + 1).padStart(2, "0")}
-                  </Typography>
-                  <Typography variant="h4" sx={{ mt: 1, mb: 1.5 }}>
+                  <Typography variant="h4" sx={{ mb: 1.5 }}>
                     {step.title}
                   </Typography>
                   <Typography variant="body2" sx={{ color: "text.secondary" }}>
@@ -278,24 +309,27 @@ export function LandingPage() {
           </Box>
         </Band>
 
-        <Band>
-          <Box
-            sx={{
-              borderTop: 1,
-              borderBottom: 1,
-              borderColor: "divider",
-              py: { xs: 6, md: 8 },
-              textAlign: "center",
-            }}
-          >
-            <Typography variant="h2" sx={{ mb: 2 }}>
+        <Band ground>
+          <Box sx={{ textAlign: "center" }}>
+            <Typography variant="h2" sx={{ mb: 2, color: "#ffffff" }}>
               A Cidade não espera o amanhecer.
             </Typography>
-            <Typography sx={{ color: "text.secondary", maxWidth: 560, mx: "auto", mb: 4 }}>
+            {/* Secundário tingido do próprio vermelho, não cinza: cinza sobre
+                oxblood suja a cor e cai para fora do tom da seção. */}
+            <Typography sx={{ color: "#e8c7ce", maxWidth: 560, mx: "auto", mb: 4 }}>
               Escolha um clã antes que escolham por você.
             </Typography>
             <Stack direction={{ xs: "column", sm: "row" }} spacing={2} justifyContent="center">
-              <Button component={RouterLink} to="/criar" size="large">
+              <Button
+                component={RouterLink}
+                to="/criar"
+                size="large"
+                sx={{
+                  backgroundColor: "#ffffff",
+                  color: brand.oxblood,
+                  "&:hover": { backgroundColor: "#e8c7ce" },
+                }}
+              >
                 Criar seu vampiro
               </Button>
             </Stack>

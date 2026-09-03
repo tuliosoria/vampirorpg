@@ -28,7 +28,7 @@ import { Layout } from "../components/Layout";
 import { resizeImageFile, resizeDataUrl } from "../utils/imageResize";
 import { ApiError, type CreateAccountResult, type CreateHouseInput, type HouseExample } from "../types/api";
 
-const steps = ["Conta", "Identidade da Casa", "Imagens da Casa", "Atributos", "Revisão"];
+const steps = ["Conta", "Identidade do personagem", "Imagens do personagem", "Atributos", "Revisão"];
 const initialAttributes: Attributes = { riqueza: 2, recursos: 3, soldados: 2, controle: 3 };
 const initialEmblem: Emblem = {
   icon: EMBLEM_ICONS[0],
@@ -239,9 +239,9 @@ export function CreateHousePage() {
         <Stack spacing={2}>
           <Typography variant="h2">Revisão</Typography>
           <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-            <Crest emblem={form.emblem} name={form.name || "Casa sem nome"} size={72} />
+            <Crest emblem={form.emblem} name={form.name || "Personagem sem nome"} size={72} />
             <Box>
-              <Typography variant="h3">{form.name || "Casa sem nome"}</Typography>
+              <Typography variant="h3">{form.name || "Personagem sem nome"}</Typography>
               <Typography sx={{ color: "text.secondary" }}>{form.motto || "Sem lema"}</Typography>
               <Typography>Jogador: {displayName}</Typography>
             </Box>

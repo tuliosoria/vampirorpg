@@ -121,6 +121,6 @@ describe("abrir uma Casa vinda do sino", () => {
 
   it("não abre nada quando ninguém foi pedido", async () => {
     await montarCom();
-    expect(await screen.findByText(/Escolha uma Casa para escrever/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Escolha a quem escrever/i)).toBeInTheDocument();
   });
 });

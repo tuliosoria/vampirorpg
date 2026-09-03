@@ -202,7 +202,7 @@ describe("GamePage", () => {
     });
     await irPara(/Noites/i);
 
-    expect(await screen.findByText("Mudanças na sua Casa")).toBeInTheDocument();
+    expect(await screen.findByText("Mudanças no seu personagem")).toBeInTheDocument();
     expect(screen.getByText("Máscara 3 → 2 (−1)")).toBeInTheDocument();
   });
 
@@ -270,7 +270,7 @@ describe("GamePage", () => {
     await client.adminComposeTurn("mock-admin-token", {
       publicEvent: "**o centro velho** treme sob *sinos distantes*.\n\nAs estradas se fecham.",
       privateInfo: {
-        [account.houseId]: "Sua Casa ouve **um segredo** nas *catacumbas*.",
+        [account.houseId]: "Seu personagem ouve **um segredo** nas *catacumbas*.",
       },
     });
     await client.adminOpenTurn("mock-admin-token");
@@ -337,7 +337,7 @@ describe("GamePage", () => {
     await setup();
     await irPara(/Meu personagem/i);
 
-    expect(await screen.findByText(/Sua Casa ainda não tem ativos/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Seu personagem ainda não tem ativos/i)).toBeInTheDocument();
   });
 
   it("mostra um chip por ativo da Casa", async () => {
@@ -374,7 +374,7 @@ describe("GamePage", () => {
     await client.adminLockTurn("mock-admin-token");
     await client.adminApplyResolution("mock-admin-token", {
       publicResult: "A linha aguentou.",
-      houseResults: { [account.houseId]: "Sua Casa perdeu poucos." },
+      houseResults: { [account.houseId]: "Seu personagem perdeu poucos." },
       attributeDeltas: {},
       discoveries: [],
     });
@@ -392,7 +392,7 @@ describe("GamePage", () => {
 
     expect(await screen.findByText(/está preparando o próximo turno/i)).toBeInTheDocument();
     expect(screen.getByText("A linha aguentou.")).toBeInTheDocument();
-    expect(screen.getByText("Sua Casa perdeu poucos.")).toBeInTheDocument();
+    expect(screen.getByText("Seu personagem perdeu poucos.")).toBeInTheDocument();
   });
 
   it("leva o link antigo de ?aba=historico para a aba Noites", async () => {

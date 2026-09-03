@@ -83,7 +83,7 @@ export function AdminHousesTab({ dashboard, busy, runAction }: AdminHousesTabPro
       });
       setNewHouseCode(res);
       setShowCreate(false);
-    }, "Casa criada.");
+    }, "Personagem criado.");
   }
 
   function toggleEdit(house: House) {
@@ -101,7 +101,7 @@ export function AdminHousesTab({ dashboard, busy, runAction }: AdminHousesTabPro
     if (!editForm) return;
     void runAction(
       (adminToken) => api.adminUpdateHouse(adminToken, { houseId, ...editForm }),
-      "Casa atualizada.",
+      "Personagem atualizado.",
     );
     setEditingHouseId(null);
     setEditForm(null);
@@ -111,7 +111,7 @@ export function AdminHousesTab({ dashboard, busy, runAction }: AdminHousesTabPro
     if (!deleteTarget) return;
     const target = deleteTarget;
     setDeleteTarget(null);
-    void runAction((adminToken) => api.adminDeleteHouse(adminToken, target.houseId), "Casa removida.");
+    void runAction((adminToken) => api.adminDeleteHouse(adminToken, target.houseId), "Personagem removido.");
   }
 
   return (
@@ -120,7 +120,7 @@ export function AdminHousesTab({ dashboard, busy, runAction }: AdminHousesTabPro
         <CardContent>
           <Stack spacing={2}>
             <Stack direction="row" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={1}>
-              <Typography variant="h2">Gerenciar Casas</Typography>
+              <Typography variant="h2">Gerenciar personagens</Typography>
               <Button variant="outlined" disabled={busy} onClick={openCreate}>
                 Adicionar Casa
               </Button>
@@ -128,7 +128,7 @@ export function AdminHousesTab({ dashboard, busy, runAction }: AdminHousesTabPro
 
             {showCreate && (
               <Box sx={{ border: "1px solid", borderColor: "divider", borderRadius: 1, p: 2 }}>
-                <Typography variant="h3" gutterBottom>Nova Casa</Typography>
+                <Typography variant="h3" gutterBottom>Novo personagem</Typography>
                 <Stack spacing={2}>
                   <TextField
                     label="Nome de exibição do jogador"
@@ -187,7 +187,7 @@ export function AdminHousesTab({ dashboard, busy, runAction }: AdminHousesTabPro
       </Card>
 
       <Dialog open={Boolean(deleteTarget)} onClose={() => setDeleteTarget(null)}>
-        <DialogTitle>Deletar Casa?</DialogTitle>
+        <DialogTitle>Remover personagem?</DialogTitle>
         <DialogContent>
           <DialogContentText>
             Isso vai apagar permanentemente a Casa <strong>{deleteTarget?.name}</strong>, a conta do jogador
@@ -205,7 +205,7 @@ export function AdminHousesTab({ dashboard, busy, runAction }: AdminHousesTabPro
       </Dialog>
 
       <Dialog open={Boolean(newHouseCode)} onClose={() => setNewHouseCode(null)}>
-        <DialogTitle>Casa criada</DialogTitle>
+        <DialogTitle>Personagem criado</DialogTitle>
         <DialogContent>
           <DialogContentText gutterBottom>
             Entregue este código de acesso ao jogador. É o login da Casa.

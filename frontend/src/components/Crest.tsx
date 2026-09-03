@@ -14,7 +14,7 @@ const ICON_GLYPHS: Record<EmblemIcon, string> = {
 export function Crest({ emblem, name, size = 96 }: { emblem: Emblem; name?: string; size?: number }) {
   return (
     <Box
-      aria-label={name ? `Brasão de ${name}` : "Brasão da casa"}
+      aria-label={name ? `Brasão de ${name}` : "Símbolo do clã"}
       role="img"
       sx={{
         width: size,

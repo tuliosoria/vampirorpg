@@ -1,32 +1,40 @@
 import { createTheme, responsiveFontSizes } from "@mui/material/styles";
 
 /**
- * Design system da Cidade.
+ * Design system da Cidade — horror gótico contemporâneo.
  *
- * A direção é fria e de alto contraste: base grafite, texto osso, e um único
- * acento dourado que aparece em três lugares e só neles — botão primário,
- * item ativo de navegação e link inline. Todo o resto é grafite e osso, para
- * que a imagem carregue a página em vez da cor.
+ * A direção vem da linguagem visual do World of Darkness: canvas quase preto,
+ * texto branco, e o oxblood `#430017` como chão de seção sangrada de largura
+ * total. Todos os três valores saíram medidos da referência, não estimados.
  *
- * O acento começou carmesim, para manter um fio de continuidade com a
- * identidade anterior enquanto a tipografia mudava inteira. Não sobreviveu à
- * medição: `#c2323c` sobre `#0e1013` dá 3,46:1, abaixo do piso de 4,5:1 que
- * texto e link exigem — vermelho escuro sobre preto é justamente o par que a
- * intuição erra. O ouro, que já era a secundária do tema antigo, dá 7,92:1 e
- * mantém a ligação com a heráldica das Casas.
+ * A regra que não é óbvia, e que define o uso do vermelho: `#430017` contra
+ * `#101010` dá 1,13:1. Como preenchimento de card ele simplesmente some. Na
+ * referência funciona porque a seção ocupa a largura inteira e é lida pelo
+ * conteúdo e pela troca de temperatura, não por uma borda. Então oxblood é
+ * chão de seção, com texto branco por cima (16,79:1) — nunca fundo de card,
+ * nunca borda, nunca texto.
+ *
+ * Para o que é interativo sobre o canvas o oxblood não serve: vermelho escuro
+ * sobre preto é justamente o par que a intuição erra. O acento é um vermelho
+ * claro o bastante para passar como texto — `#e05561` dá 5,11:1, contra os
+ * 3,46:1 de um carmesim de brasão.
  */
 
-const sans = '"Inter Tight", system-ui, -apple-system, "Segoe UI", sans-serif';
+const sans = '"Source Sans 3", "Source Sans Pro", system-ui, -apple-system, "Segoe UI", sans-serif';
 
 export const brand = {
-  base: "#0e1013",
-  surface: "#15181c",
-  raised: "#1c2026",
-  text: "#e8e6e1",
-  muted: "#9aa0a6",
-  line: "#262b31",
-  accent: "#c8a24b",
-  accentDim: "#a8853a",
+  base: "#101010",
+  surface: "#1a1518",
+  raised: "#221a1e",
+  text: "#f4f1f1",
+  /** Quente, não cinza: sobre superfície tingida, secundário cinza suja a cor. */
+  muted: "#b0a5a8",
+  line: "#332a2e",
+  accent: "#e05561",
+  accentDim: "#d64b56",
+  /** Só como chão de seção sangrada, com texto branco. Ver o comentário acima. */
+  oxblood: "#430017",
+  oxbloodDeep: "#2c000f",
 } as const;
 
 /**
@@ -46,10 +54,10 @@ export const space = {
 export const layout = {
   maxWidth: 1200,
   /** Duração única de transição; movimento aqui é acento, não espetáculo. */
-  motion: "160ms ease-out",
+  motion: "160ms cubic-bezier(0.16, 1, 0.3, 1)",
 } as const;
 
-/** O gesto que dá a frieza: caixa alta, peso, e muito espacejamento. */
+/** O gesto do cenário: caixa alta, peso, e muito espacejamento. */
 const label = {
   fontFamily: sans,
   fontWeight: 700,
@@ -62,25 +70,20 @@ export const theme = responsiveFontSizes(
     palette: {
       mode: "dark",
       background: { default: brand.base, paper: brand.surface },
-      // Tinta, não branco: texto branco sobre o ouro dá 2,41:1 e some. Sobre
-      // a base escura o ouro dá 7,92:1, contra os 3,46:1 do carmesim que ele
-      // substituiu — que reprovava no piso de 4,5:1 para texto e link.
-      primary: { main: brand.accent, dark: brand.accentDim, contrastText: brand.base },
+      primary: { main: brand.accent, dark: brand.accentDim, contrastText: "#160408" },
       secondary: { main: brand.text, contrastText: brand.base },
-      error: { main: "#c05a5a", dark: "#7c2b2b" },
-      warning: { main: "#c7913f" },
+      error: { main: "#ef6b73", dark: "#8c1f28" },
+      warning: { main: "#d1a24a" },
       text: { primary: brand.text, secondary: brand.muted },
       divider: brand.line,
     },
     shape: { borderRadius: 2 },
     typography: {
       fontFamily: sans,
-      // Escala de razão 1.25. O h1 usa clamp porque o título do hero precisa
-      // encher a tela grande sem estourar a estreita.
-      h1: { fontFamily: sans, fontWeight: 800, fontSize: "clamp(2.5rem, 6vw, 5rem)", lineHeight: 1.02, letterSpacing: "-0.01em", textTransform: "uppercase" },
-      h2: { fontFamily: sans, fontWeight: 800, fontSize: "2.25rem", lineHeight: 1.12, letterSpacing: "-0.005em" },
-      h3: { fontFamily: sans, fontWeight: 700, fontSize: "1.5rem", lineHeight: 1.2 },
-      h4: { fontFamily: sans, fontWeight: 700, fontSize: "1.125rem", lineHeight: 1.3 },
+      h1: { fontFamily: sans, fontWeight: 700, fontSize: "clamp(2.5rem, 6vw, 5rem)", lineHeight: 1.02, letterSpacing: "0.02em", textTransform: "uppercase" },
+      h2: { fontFamily: sans, fontWeight: 700, fontSize: "2.25rem", lineHeight: 1.12, letterSpacing: "0.01em", textTransform: "uppercase" },
+      h3: { fontFamily: sans, fontWeight: 700, fontSize: "1.5rem", lineHeight: 1.2, letterSpacing: "0.01em" },
+      h4: { fontFamily: sans, fontWeight: 600, fontSize: "1.125rem", lineHeight: 1.3 },
       subtitle1: { fontFamily: sans, fontWeight: 400, fontSize: "1.125rem", color: brand.muted },
       body1: { fontSize: "1rem", lineHeight: 1.7 },
       body2: { fontSize: "0.9375rem", lineHeight: 1.65 },
@@ -92,16 +95,30 @@ export const theme = responsiveFontSizes(
         styleOverrides: {
           body: {
             backgroundColor: brand.base,
-            // Sem gradientes decorativos: a base é chapada de propósito, para
-            // que o contraste venha da imagem e da tipografia.
             backgroundImage: "none",
           },
+          /**
+           * As superfícies que o navegador desenha por conta própria.
+           *
+           * Seleção, cursor, barra de rolagem e anel de foco vêm com o padrão
+           * do sistema, que não pertence a design system nenhum. Vestir os
+           * quatro é o sinal mais barato de que a página foi construída.
+           */
+          "::selection": { backgroundColor: brand.oxblood, color: "#ffffff" },
+          html: { caretColor: brand.accent, scrollbarColor: `${brand.line} ${brand.base}`, scrollbarWidth: "thin" },
+          "::-webkit-scrollbar": { width: 10, height: 10 },
+          "::-webkit-scrollbar-track": { background: brand.base },
+          "::-webkit-scrollbar-thumb": { background: brand.line, border: `2px solid ${brand.base}` },
+          "::-webkit-scrollbar-thumb:hover": { background: brand.raised },
+          ":focus-visible": { outline: `2px solid ${brand.accent}`, outlineOffset: 2 },
+          /** Números de tabela alinhados por coluna: atributos e censo são dados. */
+          "table, [data-numeric]": { fontVariantNumeric: "tabular-nums" },
         },
       },
       MuiButton: {
         defaultProps: { variant: "contained", disableElevation: true },
         styleOverrides: {
-          root: { minHeight: 48, borderRadius: 2, paddingInline: 24, transition: `background-color ${layout.motion}, border-color ${layout.motion}` },
+          root: { minHeight: 48, borderRadius: 2, paddingInline: 24, transition: `background-color ${layout.motion}, border-color ${layout.motion}, color ${layout.motion}` },
           containedPrimary: {
             backgroundColor: brand.accent,
             "&:hover": { backgroundColor: brand.accentDim },
@@ -109,9 +126,9 @@ export const theme = responsiveFontSizes(
           outlined: {
             borderColor: brand.line,
             color: brand.text,
-            "&:hover": { borderColor: brand.text, backgroundColor: "rgba(232,230,225,0.06)" },
+            "&:hover": { borderColor: brand.accent, backgroundColor: "rgba(224,85,97,0.08)" },
           },
-          text: { color: brand.text, "&:hover": { backgroundColor: "rgba(232,230,225,0.06)" } },
+          text: { color: brand.text, "&:hover": { backgroundColor: "rgba(224,85,97,0.08)" } },
         },
       },
       MuiCard: {
@@ -157,7 +174,11 @@ export const theme = responsiveFontSizes(
       },
       MuiLink: {
         styleOverrides: {
-          root: { color: brand.accent, textDecorationColor: "rgba(200,162,75,0.45)" },
+          root: {
+            color: brand.accent,
+            textDecorationColor: "rgba(224,85,97,0.4)",
+            textUnderlineOffset: "0.2em",
+          },
         },
       },
       MuiTextField: { defaultProps: { fullWidth: true, variant: "outlined" } },

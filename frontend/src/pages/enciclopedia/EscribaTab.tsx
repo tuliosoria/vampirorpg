@@ -270,7 +270,7 @@ export function EscribaTab({ casas }: { casas: CasaDoSeletor[] }) {
           select
           fullWidth
           label="Casa"
-          helperText="Muito do que você escreve não pertence a Casa alguma."
+          helperText="Muito do que você escreve não pertence a clã algum."
           value={campos.houseId}
           onChange={(e) => set("houseId", e.target.value)}
         >

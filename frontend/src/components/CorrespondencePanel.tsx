@@ -95,10 +95,10 @@ export function CorrespondencePanel({ playerToken, houseName, abrirCasa }: Corre
       const r = await api.respondToPact(playerToken, { factId, aceitar });
       setPactoAviso(
         r.aceito
-          ? `Pacto firmado.${r.ativo ? ` Sua Casa ganhou: ${r.ativo}.` : ""}` +
+          ? `Pacto firmado.${r.ativo ? ` Seu personagem ganhou: ${r.ativo}.` : ""}` +
             (r.custoPolitico?.length
               ? ` Custou com ${r.custoPolitico.map((c) => c.casa).join(", ")}.`
-              : " As relações entre as duas Casas mudaram.")
+              : " As relações entre os dois mudaram.")
           : "Proposta recusada. Fica registrado.",
       );
       await load();
@@ -301,7 +301,7 @@ export function CorrespondencePanel({ playerToken, houseName, abrirCasa }: Corre
 
         <Box>
           {!selected ? (
-            <Typography color="text.secondary">Escolha uma Casa para escrever.</Typography>
+            <Typography color="text.secondary">Escolha a quem escrever.</Typography>
           ) : (
             <Stack spacing={2}>
               <Box>
@@ -327,7 +327,7 @@ export function CorrespondencePanel({ playerToken, houseName, abrirCasa }: Corre
                     selected={addressee === null}
                     onClick={() => setAddressee(null)}
                     name="A chancelaria"
-                    role="Resposta oficial da Casa"
+                    role="Resposta oficial do clã"
                   />
                   {selected.people.map((p) => (
                     <PersonOption

@@ -42,7 +42,7 @@ export function CasasPage() {
   return (
     <MundoLayout>
       <Stack spacing={2}>
-        <Typography variant="h4">As Casas da Cidade</Typography>
+        <Typography variant="h4">Os clãs da Cidade</Typography>
         <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "1fr 1fr 1fr", xl: "repeat(4, 1fr)" } }}>
           {SEATS.map((seat) => (
             <Card key={seat.key}>

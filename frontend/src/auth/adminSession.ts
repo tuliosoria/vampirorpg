@@ -1,4 +1,4 @@
-const KEY = "ravenloft.admin";
+const KEY = "vampirorpg.admin";
 
 /**
  * O login do GM vive em localStorage, não em sessionStorage.

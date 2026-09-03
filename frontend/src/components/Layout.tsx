@@ -86,7 +86,7 @@ export function Layout({
               noWrap
               sx={{ fontSize: "1.15rem", lineHeight: 1.2, letterSpacing: "0.02em" }}
             >
-              a Cidade
+              A Cidade
             </Typography>
           </Box>
           <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 0.5 }}>
@@ -107,7 +107,7 @@ export function Layout({
         <Box sx={{ width: 280 }} role="navigation">
           <Box sx={{ px: 2, py: 2 }}>
             <Typography variant="h3" sx={{ fontSize: "1.1rem" }}>
-              a Cidade
+              A Cidade
             </Typography>
             <Typography variant="caption" sx={{ color: "text.secondary" }}>
               A cidade não sabe quem manda depois que escurece

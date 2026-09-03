@@ -48,7 +48,7 @@ describe("CorrespondenceBell", () => {
     expect(screen.queryByRole("link")).not.toBeInTheDocument();
   });
 
-  it("avisa e leva ao turno quando uma Casa escreveu", async () => {
+  it("avisa e leva ao turno quando uma personagem escreveu", async () => {
     const client = new MockApiClient();
     savePlayerSession({ playerToken: "t", houseId: "h", displayName: "P" } as never);
     vi.spyOn(client, "countIncomingLetters").mockResolvedValue({
@@ -59,7 +59,7 @@ describe("CorrespondenceBell", () => {
       ],
     });
     await montar(client);
-    await userEvent.click(await screen.findByRole("button", { name: /2 Casas escreveram para você/i }));
+    await userEvent.click(await screen.findByRole("button", { name: /2 personagens escreveram para você/i }));
 
     // Quem escreveu, e não só quantas: um "2" apontava para o palheiro.
     expect(await screen.findByText(/Capitã Solano — Clã Brujah/)).toBeInTheDocument();
@@ -86,7 +86,7 @@ describe("o clique leva à conversa", () => {
       remetentes: [{ houseKey: "cla-gangrel", houseName: "Clã Gangrel", person: null, preview: "Recusamos a torre.", turnNumber: 7 }],
     });
     await montar(client);
-    await userEvent.click(await screen.findByRole("button", { name: /Uma Casa escreveu/i }));
+    await userEvent.click(await screen.findByRole("button", { name: /Alguém escreveu para você/i }));
     await userEvent.click(await screen.findByText(/Clã Gangrel/));
 
     const rota = await screen.findByTestId("rota");

@@ -4,7 +4,7 @@ export interface PlayerSession {
   displayName: string;
 }
 
-const KEY = "ravenloft.player";
+const KEY = "vampirorpg.player";
 
 export function savePlayerSession(session: PlayerSession): void {
   sessionStorage.setItem(KEY, JSON.stringify(session));

@@ -84,7 +84,7 @@ export function MencoesDoVerbete({ mencoes }: { mencoes: Mencoes }) {
       <Typography variant="subtitle2" fontWeight="bold">
         Neste verbete
       </Typography>
-      <Lista titulo="Casas citadas" destinos={casas} indice="/clas" />
+      <Lista titulo="Clãs citados" destinos={casas} indice="/clas" />
       <Lista titulo="Quem aparece" destinos={personagens} indice="/personagens" />
     </Stack>
   );

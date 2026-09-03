@@ -52,12 +52,15 @@ describe("HeroVideo", () => {
   });
 
   // Sem vídeo o hero não pode virar um retângulo preto atrás do texto.
-  it("mostra o poster de fundo mesmo sem vídeo", () => {
+  // O hero tem chão próprio: a crônica nasce sem mídia, e o degradê oxblood
+  // sustenta a seção sozinho. O poster entra por cima quando existir.
+  it("desenha o chão do hero mesmo sem vídeo nem poster", () => {
     mockMedia("prefers-reduced-motion");
     const { container } = render(<HeroVideo>conteúdo</HeroVideo>);
 
-    const section = container.querySelector("section");
-    expect(section).toHaveStyle({ backgroundImage: "url(/hero-poster.jpg)" });
+    const fundo = getComputedStyle(container.querySelector("section")!).backgroundImage;
+    expect(fundo).toContain("/hero-poster.jpg");
+    expect(fundo).toContain("radial-gradient");
   });
 
   it("renderiza o conteúdo por cima", () => {

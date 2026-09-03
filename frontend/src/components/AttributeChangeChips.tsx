@@ -24,7 +24,7 @@ export function AttributeChangeChips({ changes }: { changes: TurnHistoryAttribut
   if (changes.length === 0) return null;
   return (
     <Stack spacing={1} sx={{ mb: 1 }}>
-      <Typography variant="h3">Mudanças na sua Casa</Typography>
+      <Typography variant="h3">Mudanças no seu personagem</Typography>
       <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap", gap: 1 }}>
         {changes.map((change) => (
           <Chip

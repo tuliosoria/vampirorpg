@@ -100,7 +100,7 @@ export function SpyPanel({ playerToken, onChanged }: { playerToken: string; onCh
               label="Sobre quem (opcional)"
               value={alvo}
               onChange={(e) => setAlvo(e.target.value)}
-              helperText="Deixe em branco para perguntar sobre o mundo, e não sobre uma Casa."
+              helperText="Deixe em branco para perguntar sobre a Cidade, e não sobre alguém."
             >
               <MenuItem value="">Ninguém em especial</MenuItem>
               {SEATS.map((s) => <MenuItem key={s.key} value={s.key}>{s.name}</MenuItem>)}

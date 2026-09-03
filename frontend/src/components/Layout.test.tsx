@@ -131,7 +131,7 @@ describe("drawer", () => {
 
     await userEvent.click(screen.getByRole("button", { name: "Abrir navegação" }));
 
-    expect(screen.getByText("A Cidade")).toBeInTheDocument();
+    expect(screen.getByText("Ruas e Corte")).toBeInTheDocument();
     expect(screen.getByText("Sangue e Mistério")).toBeInTheDocument();
   });
 });

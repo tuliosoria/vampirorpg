@@ -77,7 +77,7 @@ describe("entrada do jogador", () => {
       await userEvent.click(within(formulario).getByRole("button", { name: "Entrar" }));
     });
 
-    // /game virou abas: o "Sua Casa" foi para dentro de uma delas, e quem
+    // /game virou abas: o "Seu personagem" foi para dentro de uma delas, e quem
     // identifica a página agora é o cabeçalho fixo com o nome da Casa e a aba
     // do turno — que é onde o jogador precisa cair ao entrar.
     expect(await screen.findByRole("heading", { name: "Casa Nevasca" })).toBeInTheDocument();
