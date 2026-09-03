@@ -65,7 +65,7 @@ export function HistoriasPage() {
         <Box>
           <Typography variant="h4">Histórias Contadas</Typography>
           <Typography variant="body2" color="text.secondary">
-            As crônicas da Cidade, narradas. Dê o play e ouça o reino se contar.
+            As crônicas da Cidade, narradas. Dê o play e ouça a Cidade se contar.
           </Typography>
         </Box>
 

@@ -1,7 +1,10 @@
 /**
- * As Histórias Contadas: verbetes da Enciclopédia narrados em áudio. Lista
- * curada — os arquivos vivem no S3. Quando forem muitas, dá para migrar isto
- * para um registro no backend.
+ * As Histórias Contadas: verbetes da crônica narrados em áudio.
+ *
+ * Nasce vazia. As narrações que viviam aqui eram de outra campanha, num bucket
+ * que não é o desta — deixá-las seria servir a história de outro mundo com o
+ * nome deste. Quem grava as da Cidade é o Narrador; a lista é curada à mão até
+ * serem muitas o bastante para virar um registro no banco.
  */
 export interface HistoriaContada {
   id: string;
@@ -16,57 +19,4 @@ export interface HistoriaContada {
   duration?: string;
 }
 
-const BUCKET = "https://ravenloft-images-825081952316.s3.us-east-1.amazonaws.com";
-
-export const HISTORIAS: HistoriaContada[] = [
-  {
-    id: "resumo-dos-turnos",
-    title: "Resumo dos Turnos Até Agora",
-    description:
-      "Onde a campanha está: o silêncio de Rimewatch, os mortos que não ficam enterrados, o sino no gelo que vibrou sozinho diante do Conselho — e a votação sobre a coroação de Alic que o ataque a o centro velho interrompeu.",
-    audioUrl: `${BUCKET}/audio/cidade-resumo.mp3`,
-    voice: "Fenrir",
-    section: "crise-atual",
-    duration: "6 min",
-  },
-  {
-    id: "introducao",
-    title: "a Cidade — Introdução para um Novo Jogador",
-    description:
-      "Comece por aqui. As névoa que cercam a ilha, o centro velho e as Casas que sustentam o reino, os Colossos enterrados no gelo, o preço da magia — e a pergunta que percorre as Cinco Estradas agora que o inverno chegou cedo.",
-    audioUrl: `${BUCKET}/audio/cidade-introducao.mp3`,
-    voice: "Fenrir",
-    section: "visao-geral",
-    duration: "23 min",
-  },
-  {
-    id: "as-guerras",
-    title: "As Guerras do Reino",
-    description:
-      "A segunda história da Cidade — a que não foi escrita pelos vencedores. Das Cinco Bandeiras ao Primeiro Refúgio, passando pelo Inverno das Cinzas, o Tempo sem Nomes e os dragões que caíram do céu.",
-    audioUrl: `${BUCKET}/audio/cidade-guerras.mp3`,
-    voice: "Fenrir",
-    section: "guerras",
-    duration: "23 min",
-  },
-  {
-    id: "colossos",
-    title: "Quando as Montanhas Caminharam",
-    description:
-      "Um veterano de Droskar explica a um visitante do Sul por que as muralhas do Norte são tão grossas. Ghor-Malak, Velkaith, Orzugan e Saer-Ith — os quatro Colossos da névoa, e a pergunta que ninguém quer fazer: por que pararam?",
-    audioUrl: `${BUCKET}/audio/cidade-colossos.mp3`,
-    voice: "Fenrir",
-    section: "criaturas",
-    duration: "21 min",
-  },
-  {
-    id: "ordem-dos-tres",
-    title: "A Ordem dos Três e os Vinte e Sete Magos",
-    description:
-      "Magia na Cidade não é poder: é uma dívida. A Torre de Véspera, o Trino de três vozes num só corpo, as Sete Refrações — e o preço que cada um dos vinte e sete pagou para chegar até ali.",
-    audioUrl: `${BUCKET}/audio/cidade-ordem-dos-tres.mp3`,
-    voice: "Fenrir",
-    section: "disciplinas",
-    duration: "29 min",
-  },
-];
+export const HISTORIAS: HistoriaContada[] = [];

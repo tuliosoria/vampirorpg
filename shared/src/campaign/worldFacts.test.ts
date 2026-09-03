@@ -97,8 +97,8 @@ describe("o bloco de prompt", () => {
     expect(out).toContain("[Turno 6] Casa Khazdrun: Khazdrun enviou cem homens");
   });
 
-  it("chama de reino o fato que não tem partes", () => {
-    expect(describeFacts([fato({ parties: [] })], nome)).toContain("o reino:");
+  it("chama de Cidade o fato que não tem partes", () => {
+    expect(describeFacts([fato({ parties: [] })], nome)).toContain("a Cidade:");
   });
 
   // Um cabeçalho sem fato debaixo ensina o modelo a ignorar a seção.

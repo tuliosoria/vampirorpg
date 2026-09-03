@@ -1,4 +1,26 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
+
+/**
+ * As narrações da crônica nascem vazias, e a lista real não serve de fixture.
+ *
+ * O que estes testes exercitam é o player: o recado quando o MP3 não baixa, o
+ * link para o verbete de origem, a âncora. Isso é comportamento, e comportamento
+ * precisa de dados — que vêm daqui, inventados, e não do que o Narrador gravar.
+ */
+vi.mock("./historias", async (original) => ({
+  ...(await original<typeof import("./historias")>()),
+  HISTORIAS: [
+    {
+      id: "a-primeira-noite",
+      title: "A Primeira Noite",
+      description: "Como a corte se formou, contado por quem sobrou dela.",
+      audioUrl: "https://exemplo.invalido/audio/primeira-noite.mp3",
+      voice: "Fenrir",
+      section: "historia",
+      duration: "8 min",
+    },
+  ],
+}));
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 // A lateral do Mundo passou a carregar a crônica, então toda página do Mundo
@@ -65,7 +87,7 @@ describe("HistoriasPage", () => {
     // O link do verbete aponta para /historias#introducao. O React Router usa
     // pushState, e o navegador não rola para o fragmento em pushState: sem
     // isto o leitor cai no topo da lista e tem de procurar.
-    const alvo = HISTORIAS.find((h) => h.section === "visao-geral")!;
+    const alvo = HISTORIAS.find((h) => h.section === "historia")!;
     const rolou: string[] = [];
     Element.prototype.scrollIntoView = function () {
       rolou.push(this.id);

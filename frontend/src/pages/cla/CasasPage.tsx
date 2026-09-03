@@ -12,7 +12,7 @@ import { MundoLayout } from "../../components/MundoLayout";
 import { formatPopulation } from "./dossier";
 
 /**
- * As dezesseis potências, com brasão, para chegar à página de cada uma.
+ * Os clãs da Cidade, com símbolo, para chegar à página de cada um.
  *
  * Os brasões vêm do acervo; o resto é cânone compilado, então a lista aparece
  * inteira mesmo se o acervo não responder.

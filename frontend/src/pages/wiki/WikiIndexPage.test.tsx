@@ -77,7 +77,7 @@ describe("índice da crônica", () => {
     });
 
     expect(await screen.findByText(/Ainda não há verbetes/)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Conhecer as dezesseis Casas/ })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: /Conhecer os clãs/ })).toHaveAttribute(
       "href",
       "/clas",
     );

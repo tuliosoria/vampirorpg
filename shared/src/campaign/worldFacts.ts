@@ -136,7 +136,7 @@ export function selectFactsForTurn(facts: readonly WorldFact[], limit = TURN_FAC
 export function describeFacts(facts: readonly WorldFact[], nomeDaSede: (key: string) => string): string | null {
   if (facts.length === 0) return null;
   const linhas = facts.map((f) => {
-    const quem = f.parties.length ? f.parties.map(nomeDaSede).join(", ") : "o reino";
+    const quem = f.parties.length ? f.parties.map(nomeDaSede).join(", ") : "a Cidade";
     return `- [Turno ${f.turnNumber}] ${quem}: ${f.summary}`;
   });
   return `O QUE JÁ ACONTECEU E NÃO SE DISCUTE. Isto é registro da campanha, não boato — trate como fato assentado e nunca contradiga:\n${linhas.join("\n")}`;

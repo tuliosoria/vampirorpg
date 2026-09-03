@@ -6,6 +6,7 @@ import { fullCodex } from "@vampiro/content";
 import { ApiProvider } from "../api/ApiProvider";
 import { MockApiClient } from "../api/mockClient";
 import { WikiPage } from "./WikiPage";
+import { HISTORIAS } from "./historias/historias";
 
 async function setup(client: MockApiClient, path = "/cidade/clas") {
   await act(async () => {
@@ -279,13 +280,26 @@ A Casa protege **rotas antigas**.
       return client;
     }
 
+    // A ligação existia só no sentido Histórias -> crônica: quem estava lendo o
+    // verbete nunca ficava sabendo que havia narração. A lista real nasce
+    // vazia, então quem prova a ligação é uma narração inventada aqui.
     it("oferece o áudio quando a seção é narrada", async () => {
-      // "visao-geral" tem 23 minutos de narração, e até agora quem lia a
-      // página não tinha como descobrir isso.
-      await setup(await comVerbeteEm("visao-geral"), "/cidade/visao-geral");
-
-      const link = await screen.findByRole("link", { name: /Ouvir a narração/i });
-      expect(link).toHaveAttribute("href", "/historias#introducao");
+      HISTORIAS.push({
+        id: "a-primeira-noite",
+        title: "A Primeira Noite",
+        description: "",
+        audioUrl: "https://exemplo.invalido/a.mp3",
+        voice: "Fenrir",
+        section: "visao-geral",
+        duration: "8 min",
+      });
+      try {
+        await setup(await comVerbeteEm("visao-geral"), "/cidade/visao-geral");
+        const link = await screen.findByRole("link", { name: /Ouvir a narração/i });
+        expect(link).toHaveAttribute("href", "/historias#a-primeira-noite");
+      } finally {
+        HISTORIAS.length = 0;
+      }
     });
 
     it("não oferece áudio quando a seção não tem narração", async () => {

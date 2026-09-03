@@ -61,12 +61,12 @@ export function WikiIndexPage() {
         <Stack spacing={2} sx={{ maxWidth: "60ch" }}>
           <Typography variant="h2">A crônica da Cidade</Typography>
           <Typography sx={{ color: "text.secondary" }}>
-            Ainda não há verbetes. A crônica é escrita turno a turno: cada evento resolvido pelo mestre
-            vira registro aqui.
+            Ainda não há verbetes. A crônica é escrita noite a noite: cada acontecimento que o Narrador
+            resolve vira registro aqui.
           </Typography>
           <Box>
             <Link component={RouterLink} to="/clas">
-              Conhecer as dezesseis Casas
+              Conhecer os clãs
             </Link>
           </Box>
         </Stack>

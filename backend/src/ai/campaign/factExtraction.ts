@@ -19,7 +19,7 @@ export function factExtractionSystemPrompt(): string {
     "2. Toda entrada precisa de uma CITAÇÃO LITERAL do texto — copiada caractere por caractere, com pelo menos vinte caracteres. A citação é conferida contra o texto e a entrada é DESCARTADA se não bater.",
     "3. Opinião de personagem não é fato. Se alguém na cena ACHA, DESCONFIA ou ACUSA, isso não entra. Só entra o que o narrador afirma ter acontecido.",
     "4. Um resumo por fato, uma frase, com número, prazo e lugar quando o texto os der.",
-    "5. 'partes' são as Casas envolvidas, pelas chaves da lista. Deixe VAZIO quando o fato vale para o reino inteiro — um edito, uma data, uma coroação.",
+    "5. 'partes' são os clãs envolvidos, pelas chaves da lista. Deixe VAZIO quando o fato vale para a Cidade inteira — uma decisão da corte, uma data, uma sentença.",
     "6. Prefira poucos fatos densos a muitos fatos rasos. Uma cena inteira pode render um fato, ou nenhum.",
     "",
     `Chaves de Casa válidas: ${SEATS.map((s) => s.key).join(", ")}`,
@@ -61,7 +61,7 @@ export function turnBlocks(input: FactExtractionInput): FactBlock[] {
   const blocos: FactBlock[] = [];
   const publico = [input.publicEvent, input.publicResult].filter((t) => t?.trim()).join("\n\n");
   if (publico.trim()) {
-    blocos.push({ visibility: PUBLICO, rotulo: "O que o reino inteiro soube", texto: publico });
+    blocos.push({ visibility: PUBLICO, rotulo: "O que a Cidade inteira soube", texto: publico });
   }
   for (const [houseId, texto] of Object.entries(input.houseResults)) {
     const sede = input.seatOfHouseId(houseId);

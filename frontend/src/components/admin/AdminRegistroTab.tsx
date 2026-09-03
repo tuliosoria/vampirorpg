@@ -104,7 +104,7 @@ export function AdminRegistroTab({ adminToken }: { adminToken: string }) {
             <Chip
               size="small"
               variant="outlined"
-              label={f.parties.length ? f.parties.map(nomeDaSede).join(", ") : "o reino"}
+              label={f.parties.length ? f.parties.map(nomeDaSede).join(", ") : "a Cidade"}
             />
             {/* Quem pode saber. O Mestre precisa enxergar isto de relance: um
                 fato marcado como segredo de uma Casa nunca entra em carta, e um
