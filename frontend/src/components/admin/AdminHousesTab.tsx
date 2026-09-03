@@ -122,7 +122,7 @@ export function AdminHousesTab({ dashboard, busy, runAction }: AdminHousesTabPro
             <Stack direction="row" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={1}>
               <Typography variant="h2">Gerenciar personagens</Typography>
               <Button variant="outlined" disabled={busy} onClick={openCreate}>
-                Adicionar Casa
+                Adicionar personagem
               </Button>
             </Stack>
 

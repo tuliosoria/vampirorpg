@@ -105,20 +105,21 @@ export function GmBibleManager({ token }: { token: string }) {
           {error && <Alert severity="error">{error}</Alert>}
           {message && <Alert severity="success">{message}</Alert>}
 
+          {/* O botão que ficava aqui prometia carregar segredos de fábrica e
+              chamava uma semente que nasce vazia. Dizia "carregada" sem
+              carregar nada. */}
           {entries.length === 0 && (
             <Box sx={{ border: 1, borderColor: "divider", borderRadius: 1, p: 2 }}>
               <Typography variant="body2" sx={{ mb: 1.5 }}>
-                A Bíblia do Mestre está vazia. Carregue os segredos iniciais da Cidade (a verdade sobre
-                Othmar, a traição das Casas, as fases de revelação e as âncoras do o Príncipe).
+                Nada aqui vem pronto: os segredos desta crônica são os seus. É neste lugar, e só neste,
+                que vivem as conspirações em curso, quem está por trás de quê e o que você planeja
+                revelar em qual noite.
               </Typography>
-              <Button
-                variant="contained"
-                color="secondary"
-                disabled={busy}
-                onClick={() => void run(() => api.adminSeedGm(token), "Bíblia do Mestre carregada.")}
-              >
-                Carregar Bíblia do Mestre
-              </Button>
+              <Typography variant="body2" color="text.secondary">
+                A IA lê isto para saber o que os NPCs escondem, mas nunca entrega o conteúdo: não
+                aparece em carta, em verbete nem em página pública. Use <strong>Novo segredo</strong>
+                {" "}abaixo para escrever o primeiro.
+              </Typography>
             </Box>
           )}
 

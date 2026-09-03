@@ -116,20 +116,21 @@ export function WikiManager({ token }: { token: string }) {
           {error && <Alert severity="error">{error}</Alert>}
           {message && <Alert severity="success">{message}</Alert>}
 
+          {/* Havia aqui um botão que prometia carregar a cosmologia inicial e
+              chamava a semente. A semente agora nasce vazia — ele diria
+              "carregada" e não carregaria nada, que é pior do que não existir.
+              No lugar dele, o caminho que de fato escreve cânone. */}
           {entries.length === 0 && (
             <Box sx={{ border: 1, borderColor: "divider", borderRadius: 1, p: 2 }}>
               <Typography variant="body2" sx={{ mb: 1.5 }}>
-                A wiki está vazia. Carregue a cosmologia inicial da Cidade (Casas, cidades, o Príncipe,
-                névoa e histórias antigas) para começar. Depois é só editar como quiser.
+                A crônica nasce vazia: nada aqui vem de fábrica, e é você quem escreve a Cidade.
+                Use o <strong>Escriba</strong> para redigir um verbete solto e deixar a IA organizá-lo,
+                ou <strong>Novo verbete</strong> abaixo para escrever direto na seção que quiser.
               </Typography>
-              <Button
-                variant="contained"
-                color="secondary"
-                disabled={busy}
-                onClick={() => void run(() => api.adminSeedWiki(token), "História da Cidade carregada.")}
-              >
-                Carregar história da Cidade
-              </Button>
+              <Typography variant="body2" color="text.secondary">
+                Comece pelo que os jogadores precisam saber na primeira noite: quem manda na corte,
+                quais clãs dividem a Cidade e onde ficam.
+              </Typography>
             </Box>
           )}
 

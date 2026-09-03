@@ -391,7 +391,7 @@ describe("AdminPage", () => {
     await screen.findByRole("heading", { name: /painel do turno 2/i });
     await goToTab(/personagens/i);
     await screen.findByRole("heading", { name: /gerenciar personagens/i });
-    await userEvent.click(screen.getByRole("button", { name: /adicionar casa/i }));
+    await userEvent.click(screen.getByRole("button", { name: /adicionar personagem/i }));
 
     await userEvent.type(screen.getByLabelText(/nome de exibição do jogador/i), "Novo Jogador");
     await userEvent.type(screen.getByLabelText(/nome do personagem/i), "Casa Corvo");
