@@ -55,6 +55,13 @@ import {
   chaveDeCla,
   fichaVazia,
   type ClaFicha,
+  cidadeParaJogador,
+  bairroParaJogador,
+  personagemParaJogador,
+  localParaJogador,
+  tramasParaJogador,
+  contosParaJogador,
+  type Cidade,
 } from "@vampiro/content";
 import {
   ApiError,
@@ -80,6 +87,9 @@ import {
 } from "../types/api";
 import type {
   ApiClient,
+  ColecaoDoEstudio,
+  EstudioCompleto,
+  EstudioPublico,
   CreateVisualEntityInput,
   TurnImageKind,
   UpdateVisualEntityInput,
@@ -1067,13 +1077,61 @@ export class MockApiClient implements ApiClient {
   /** O mundo que o Narrador escreveu, em memória. */
   private clas: ClaFicha[] = [];
 
+  /**
+   * A cosmologia em memória, para o site rodar sem backend.
+   *
+   * Guarda tudo junto, como o banco, e projeta na saída — assim o modo mock
+   * exercita a mesma fronteira do segredo que a produção, em vez de fingir
+   * que ela existe.
+   */
+  private estudio: EstudioCompleto = {
+    cidade: { nome: "", descricao: "", segredos: "", atualizadoEm: "" },
+    bairros: [], personagens: [], locais: [], tramas: [], contos: [], clas: [],
+  };
+
+  async getEstudio(_token: string): Promise<EstudioCompleto> {
+    return { ...this.estudio, clas: [...this.clas] };
+  }
+
+  async getEstudioPublico(): Promise<EstudioPublico> {
+    const e = this.estudio;
+    return {
+      cidade: cidadeParaJogador(e.cidade),
+      bairros: e.bairros.map(bairroParaJogador),
+      personagens: e.personagens.map(personagemParaJogador),
+      locais: e.locais.map(localParaJogador),
+      tramas: tramasParaJogador(e.tramas),
+      contos: contosParaJogador(e.contos),
+      clas: this.clas.map(({ segredos: _s, ...publico }) => publico),
+    };
+  }
+
+  async saveEstudioItem<T>(_token: string, colecao: ColecaoDoEstudio, item: T): Promise<T> {
+    const lista = this.estudio[colecao] as { id: string }[];
+    const gravado = { ...(item as { id: string }), atualizadoEm: new Date().toISOString() };
+    const i = lista.findIndex((x) => x.id === gravado.id);
+    if (i === -1) lista.push(gravado); else lista[i] = gravado;
+    return gravado as T;
+  }
+
+  async deleteEstudioItem(_token: string, colecao: ColecaoDoEstudio, id: string): Promise<void> {
+    const lista = this.estudio[colecao] as { id: string }[];
+    const i = lista.findIndex((x) => x.id === id);
+    if (i !== -1) lista.splice(i, 1);
+  }
+
+  async saveCidade(_token: string, cidade: Cidade): Promise<Cidade> {
+    this.estudio.cidade = { ...cidade, atualizadoEm: new Date().toISOString() };
+    return this.estudio.cidade;
+  }
+
   async listCla(): Promise<ClaFicha[]> {
     return [...this.clas];
   }
 
   async adminSaveCla(_token: string, ficha: Partial<ClaFicha> & { name: string }): Promise<ClaFicha> {
     const key = ficha.key ?? chaveDeCla(ficha.name);
-    const salva: ClaFicha = { ...fichaVazia(key, ficha.name), ...ficha, key, updatedAt: new Date().toISOString() };
+    const salva: ClaFicha = { ...fichaVazia(key, ficha.name), ...ficha, key, atualizadoEm: new Date().toISOString() };
     const i = this.clas.findIndex((c) => c.key === key);
     if (i === -1) this.clas.push(salva); else this.clas[i] = salva;
     return salva;

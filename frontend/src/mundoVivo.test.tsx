@@ -42,31 +42,56 @@ describe("o mundo que o Narrador escreve", () => {
     expect(SEATS.map((s) => s.key)).toEqual(["cla-ventrue"]);
   });
 
-  it("um clã com líder vira destinatário de carta, sem mais nenhum passo", async () => {
+  it("um personagem marcado como quem responde vira destinatário de carta", async () => {
     const client = new MockApiClient();
-    await client.adminSaveCla("t", {
-      name: "Clã Ventrue",
-      lider: {
-        leaderName: "Vasco Aranha", title: "Príncipe", temperament: "", speechStyle: "",
-        wants: "", refuses: "", crownStance: "", interests: "",
+    await client.adminSaveCla("t", { name: "Clã Ventrue" });
+    await client.saveEstudioItem("t", "personagens", {
+      id: "vasco-aranha", nome: "Vasco Aranha", historia: "", tipo: "VAMPIRO",
+      claKey: "cla-ventrue", respondePeloCla: true, bairroId: null,
+      voz: {
+        titulo: "Príncipe", temperamento: "", comoFala: "", oQueQuer: "",
+        oQueRecusa: "", posturaComACorte: "", interesses: "",
       },
+      poder: "ALTO", objetivos: "", relacoes: [], atualizadoEm: "",
     });
 
-    aplicarCanon(await client.listCla());
+    const publico = await client.getEstudioPublico();
+    aplicarCanon(await client.listCla(), publico.personagens);
 
     expect(addressableNpcs().map((n) => n.name)).toContain("Vasco Aranha");
   });
 
-  it("o elenco da ficha vira o elenco do clã", async () => {
+  it("os personagens de um clã viram o elenco dele", async () => {
     const client = new MockApiClient();
-    await client.adminSaveCla("t", {
-      name: "Clã Nosferatu",
-      elenco: [{ name: "Rala", role: "Anciã", description: "Conhece os túneis.", wants: "Silêncio.", hides: "Que vende duas vezes." }],
+    await client.adminSaveCla("t", { name: "Clã Nosferatu" });
+    await client.saveEstudioItem("t", "personagens", {
+      id: "rala", nome: "Rala", historia: "Conhece os túneis.", tipo: "VAMPIRO",
+      claKey: "cla-nosferatu", respondePeloCla: false, bairroId: null, voz: null,
+      poder: "MEDIO", objetivos: "Silêncio.", relacoes: [], atualizadoEm: "",
     });
 
-    aplicarCanon(await client.listCla());
+    const publico = await client.getEstudioPublico();
+    aplicarCanon(await client.listCla(), publico.personagens);
 
     expect(houseRoster("cla-nosferatu").map((c) => c.name)).toEqual(["Rala"]);
+  });
+
+  /**
+   * A fronteira do segredo atravessa até o motor: o navegador monta o cânone
+   * com a projeção pública, então o objetivo de um personagem nunca chega ao
+   * bundle, mesmo alimentando o elenco.
+   */
+  it("o objetivo do personagem não chega ao navegador", async () => {
+    const client = new MockApiClient();
+    await client.adminSaveCla("t", { name: "Clã Nosferatu" });
+    await client.saveEstudioItem("t", "personagens", {
+      id: "rala", nome: "Rala", historia: "", tipo: "VAMPIRO",
+      claKey: "cla-nosferatu", respondePeloCla: false, bairroId: null, voz: null,
+      poder: "MEDIO", objetivos: "SEGREDO_QUE_NAO_PODE_VAZAR", relacoes: [], atualizadoEm: "",
+    });
+
+    const publico = await client.getEstudioPublico();
+    expect(JSON.stringify(publico)).not.toContain("SEGREDO_QUE_NAO_PODE_VAZAR");
   });
 
   // O provedor é quem fecha o ciclo no navegador: sem ele o bundle carrega com

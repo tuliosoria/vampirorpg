@@ -2,6 +2,7 @@ import type { HandlerRequest, HandlerResponse } from "./types/domain";
 import { HttpError } from "./types/domain";
 import { garantirCanon } from "./canon/aplicar";
 import { listCla, saveCla, removeCla } from "./routes/claRoutes";
+import { getEstudio, getEstudioPublico, salvarItem, removerItem, salvarCidade } from "./routes/estudioRoutes";
 import { getCampaign, getHouseExample, createAccountAndHouse, login, getGallery, getWiki, getChronicle, generateHouseImage, type Deps } from "./routes/publicRoutes";
 import { getGame, submitOrder } from "./routes/playerRoutes";
 import { escribaPreview, escribaPublicar } from "./routes/escribaRoutes";
@@ -41,6 +42,13 @@ const routes: Route[] = [
   r("GET", "/api/cla", listCla),
   r("POST", "/api/admin/cla", saveCla),
   r("POST", "/api/admin/cla/delete", removeCla),
+  // O Estúdio: a mesma cosmologia por duas portas. A pública devolve o que
+  // passou pela projeção; a do Narrador devolve tudo e exige sessão.
+  r("GET", "/api/estudio/publico", getEstudioPublico),
+  r("GET", "/api/admin/estudio", getEstudio),
+  r("PUT", "/api/admin/estudio/cidade", salvarCidade),
+  r("POST", "/api/admin/estudio/:colecao", salvarItem),
+  r("POST", "/api/admin/estudio/:colecao/delete", removerItem),
   r("GET", "/api/house-example", getHouseExample),
   r("GET", "/api/gallery", getGallery),
   r("GET", "/api/wiki", getWiki),

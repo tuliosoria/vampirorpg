@@ -180,3 +180,21 @@ export function claFichaSk(key: string): string {
 export function claFichaPrefix(): string {
   return "CANONCLA#";
 }
+
+/**
+ * As entidades do Estúdio, na partição da campanha.
+ *
+ * Um prefixo por coleção para que listar uma não varra as outras. A cidade é
+ * registro único e por isso não tem id no fim.
+ */
+export function cidadeSk(): string {
+  return "ESTUDIO#CIDADE";
+}
+
+export function estudioPrefix(colecao: string): string {
+  return `ESTUDIO#${colecao.toUpperCase()}#`;
+}
+
+export function estudioSk(colecao: string, id: string): string {
+  return `${estudioPrefix(colecao)}${id}`;
+}

@@ -40,8 +40,8 @@ function parseFicha(body: unknown): ClaFicha {
       : [],
     x: num(b.x, base.x),
     y: num(b.y, base.y),
-    lider: (b.lider as ClaFicha["lider"]) ?? null,
-    elenco: Array.isArray(b.elenco) ? (b.elenco as ClaFicha["elenco"]) : [],
+    descricao: typeof b.descricao === "string" ? b.descricao : "",
+    segredos: typeof b.segredos === "string" ? b.segredos : "",
     perfil: (b.perfil as ClaFicha["perfil"]) ?? null,
     dossie: (b.dossie as ClaFicha["dossie"]) ?? null,
   };

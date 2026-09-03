@@ -53,6 +53,14 @@ function makeClient(dashboard: AdminDashboard = draftDashboard): ApiClient {
   return {
     getCampaign: vi.fn(),
     listCla: vi.fn().mockResolvedValue([]),
+    getEstudioPublico: vi.fn(),
+    getEstudio: vi.fn().mockResolvedValue({
+      cidade: { nome: "", descricao: "", segredos: "", atualizadoEm: "" },
+      bairros: [], personagens: [], locais: [], tramas: [], contos: [], clas: [],
+    }),
+    saveEstudioItem: vi.fn(),
+    deleteEstudioItem: vi.fn(),
+    saveCidade: vi.fn(),
     adminSaveCla: vi.fn(),
     adminDeleteCla: vi.fn(),
     getHouseExample: vi.fn(),
@@ -473,7 +481,7 @@ describe("AdminPage", () => {
     // Duas fileiras: o grupo diz onde estou, a seção diz qual ferramenta. A
     // Cidade abre nos Clãs, porque sem clã cadastrado nada mais tem a quem
     // pertencer.
-    await goToTab(/^a cidade$/i);
+    await goToTab(/^estúdio$/i);
     expect(screen.queryByRole("heading", { name: /compor turno/i })).not.toBeInTheDocument();
 
     await goToTab(/^bíblia$/i);
@@ -498,7 +506,7 @@ describe("AdminPage", () => {
     await screen.findByRole("heading", { name: /painel do turno 2/i });
     expect(screen.queryByRole("tab", { name: /em breve/i })).not.toBeInTheDocument();
     // Quatro grupos no primeiro nível, no lugar das doze abas em fila.
-    expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Noite", "Personagens", "A Cidade", "Sistema"]);
+    expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Noite", "Personagens", "Estúdio", "Sistema"]);
   });
 
   it("opens the tab from the ?tab= query param", async () => {

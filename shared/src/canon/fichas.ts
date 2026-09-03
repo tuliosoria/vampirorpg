@@ -1,27 +1,26 @@
 import { SEATS, reindexSeats, type Seat } from "../diplomacy/geography.js";
-import { LEADER_PERSONAS, type LeaderPersona } from "../diplomacy/leaders.js";
+import { LEADER_PERSONAS } from "../diplomacy/leaders.js";
 import { HOUSE_CHARACTERS, type HouseCharacter } from "../lore/characters.js";
 import { HOUSE_PROFILE, type HouseProfile } from "../lore/houseProfile.js";
 import { HOUSE_CANON, type HouseCanon } from "../lore/houseCanon.js";
+import type { VozDePersonagem } from "../estudio/modelos.js";
 
 /**
- * A ficha de um clã — a unidade com que o Narrador constrói a Cidade.
+ * A ficha de um clã: o que é do clã, e não de quem o habita.
  *
- * É uma ficha só de propósito. O motor lê o cânone de cinco constantes
- * separadas (`SEATS`, `LEADER_PERSONAS`, `HOUSE_CHARACTERS`, `HOUSE_PROFILE`,
- * `HOUSE_CANON`), e no jogo de origem cada uma era um arquivo versionado à mão, o que
- * obrigava quem inventasse uma Casa a lembrar de cinco lugares. Aqui o Narrador
- * preenche uma ficha e `aplicarCanon` a distribui pelas cinco.
- *
- * Só `key` e `name` são obrigatórios: um clã pode entrar na Cidade sendo apenas
- * um nome no mapa e ganhar elenco, escassez e demografia depois. O que estiver
- * vazio simplesmente não alimenta a constante correspondente, e o sistema que
- * dependia dela fica quieto em vez de inventar.
+ * Guarda domínio, coordenada e escassez. O elenco e o líder saíram daqui e
+ * viraram derivados — são os personagens que apontam para esta chave, e aquele
+ * marcado como quem responde. Escrever a mesma pessoa em dois formulários era
+ * como o cânone de uma crônica se contradizia.
  */
 export interface ClaFicha {
   /** Chave canônica, em slug: `cla-ventrue`. É o id em todo o resto do motor. */
   key: string;
   name: string;
+  /** O que os jogadores sabem sobre este clã. */
+  descricao: string;
+  /** 🔒 O que o clã esconde. Nunca sai por rota de jogador. */
+  segredos: string;
 
   /** O endereço que identifica o domínio: refúgio, sede, ponto de encontro. */
   refugio: string;
@@ -36,10 +35,6 @@ export interface ClaFicha {
   x: number;
   y: number;
 
-  /** Quem responde pelo clã. Vazio = o clã não recebe carta. */
-  lider: LeaderPersona | null;
-  /** As figuras endereçáveis do clã, além do líder. */
-  elenco: HouseCharacter[];
   /**
    * O que o clã tem e o que lhe falta.
    *
@@ -51,23 +46,36 @@ export interface ClaFicha {
   /** Território, gente e força, para a oferta parar de ser chute. */
   dossie: HouseCanon | null;
 
-  updatedAt: string;
+  atualizadoEm: string;
+}
+
+/**
+ * O que `aplicarCanon` precisa saber de um personagem.
+ *
+ * Estruturalmente mínimo de propósito: o backend passa o personagem inteiro,
+ * com objetivos; o navegador passa a projeção pública, que não os tem. Os dois
+ * satisfazem este tipo, e é isso que garante que o cliente nunca receba um
+ * segredo só porque o motor precisava dele do outro lado.
+ */
+export interface PersonagemParaCanon {
+  id: string;
+  nome: string;
+  historia: string;
+  claKey: string | null;
+  respondePeloCla: boolean;
+  voz: VozDePersonagem | null;
+  /** 🔒 Só o backend preenche. */
+  objetivos?: string;
 }
 
 /** Uma ficha nova, com o mínimo preenchido e o resto por escrever. */
 export function fichaVazia(key: string, name: string): ClaFicha {
   return {
-    key,
-    name,
-    refugio: "",
-    outrosLugares: [],
-    x: 768,
-    y: 512,
-    lider: null,
-    elenco: [],
-    perfil: null,
-    dossie: null,
-    updatedAt: new Date().toISOString(),
+    key, name, descricao: "", segredos: "",
+    refugio: "", outrosLugares: [],
+    x: 768, y: 512,
+    perfil: null, dossie: null,
+    atualizadoEm: new Date().toISOString(),
   };
 }
 
@@ -82,28 +90,56 @@ export function chaveDeCla(name: string): string {
 }
 
 /**
- * Escreve as fichas nas constantes que o motor lê.
+ * Escreve o cânone nas constantes que o motor lê.
  *
- * Substitui o cânone inteiro a cada chamada, e não acumula: o Narrador que
- * apaga um clã precisa vê-lo sumir do mapa, e um `push` incremental deixaria
- * fantasmas para trás. É a mesma costura que os testes usam com `semearCanon`,
- * agora alimentada pelo banco em vez de por dados inventados.
+ * Substitui tudo a cada chamada, e não acumula: o Narrador que apaga um clã ou
+ * um personagem precisa vê-lo sumir do mapa e da lista de destinatários, e um
+ * `push` incremental deixaria fantasmas recebendo carta para sempre.
  *
  * O sub-projeto do cânone compilado troca isto por um objeto explícito nas
  * `Deps`. Enquanto o motor ler de módulo, é aqui que o mundo entra.
  */
-export function aplicarCanon(fichas: ClaFicha[]): void {
+export function aplicarCanon(clas: ClaFicha[], personagens: PersonagemParaCanon[] = []): void {
   limparCanonAplicado();
 
-  for (const f of fichas) {
+  for (const f of clas) {
     const seat: Seat = { key: f.key, name: f.name, seat: f.refugio, x: f.x, y: f.y };
     if (f.outrosLugares.length > 0) seat.otherCities = [...f.outrosLugares];
     SEATS.push(seat);
 
-    if (f.lider) LEADER_PERSONAS[f.key] = f.lider;
-    if (f.elenco.length > 0) HOUSE_CHARACTERS[f.key] = f.elenco;
     if (f.perfil) HOUSE_PROFILE[f.key] = f.perfil;
     if (f.dossie) HOUSE_CANON[f.key] = f.dossie;
+  }
+
+  const clasConhecidos = new Set(clas.map((c) => c.key));
+
+  for (const p of personagens) {
+    // Um personagem que aponta para um clã apagado não vira elenco fantasma.
+    if (!p.claKey || !clasConhecidos.has(p.claKey)) continue;
+
+    const figura: HouseCharacter = {
+      name: p.nome,
+      role: p.voz?.titulo ?? "",
+      description: p.historia,
+      wants: p.objetivos ?? "",
+      hides: "",
+    };
+    (HOUSE_CHARACTERS[p.claKey] ??= []).push(figura);
+
+    // Quem responde pelo clã dá a voz das cartas. Sem voz escrita não há o que
+    // encarnar, então o clã segue mudo em vez de responder como ninguém.
+    if (p.respondePeloCla && p.voz) {
+      LEADER_PERSONAS[p.claKey] = {
+        leaderName: p.nome,
+        title: p.voz.titulo,
+        temperament: p.voz.temperamento,
+        speechStyle: p.voz.comoFala,
+        wants: p.voz.oQueQuer,
+        refuses: p.voz.oQueRecusa,
+        crownStance: p.voz.posturaComACorte,
+        interests: p.voz.interesses,
+      };
+    }
   }
 
   reindexSeats();

@@ -22,7 +22,8 @@ import type {
   EscribaInput,
   CanoneEscrito,
 } from "./client";
-import type { NpcDynamic, CanonSubmission, CanonProposal, CanonReview, ClaFicha } from "@vampiro/content";
+import type { NpcDynamic, CanonSubmission, CanonProposal, CanonReview, ClaFicha, Cidade } from "@vampiro/content";
+import type { ColecaoDoEstudio, EstudioCompleto, EstudioPublico } from "./client";
 import {
   ApiError,
   type ApiErrorCode,
@@ -529,6 +530,26 @@ export class HttpApiClient implements ApiClient {
   async getWiki(): Promise<WikiEntry[]> {
     const res = await this.request<{ entries: WikiEntry[] }>("/api/wiki");
     return res.entries;
+  }
+
+  async getEstudioPublico(): Promise<EstudioPublico> {
+    return this.request<EstudioPublico>("/api/estudio/publico");
+  }
+
+  async getEstudio(token: string): Promise<EstudioCompleto> {
+    return this.request<EstudioCompleto>("/api/admin/estudio", { token });
+  }
+
+  async saveEstudioItem<T>(token: string, colecao: ColecaoDoEstudio, item: T): Promise<T> {
+    return this.request<T>(`/api/admin/estudio/${colecao}`, { method: "POST", body: item, token });
+  }
+
+  async deleteEstudioItem(token: string, colecao: ColecaoDoEstudio, id: string): Promise<void> {
+    await this.request<void>(`/api/admin/estudio/${colecao}/delete`, { method: "POST", body: { id }, token });
+  }
+
+  async saveCidade(token: string, cidade: Cidade): Promise<Cidade> {
+    return this.request<Cidade>("/api/admin/estudio/cidade", { method: "PUT", body: cidade, token });
   }
 
   async listCla(): Promise<ClaFicha[]> {

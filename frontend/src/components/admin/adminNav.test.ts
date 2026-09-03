@@ -48,7 +48,7 @@ describe("seções", () => {
 
   it("cai na primeira seção quando a pedida não existe naquele grupo", () => {
     expect(sectionOf("clas", "estudio")).toBe("clas");
-    expect(sectionOf("mundo", "inventada")).toBe("clas");
+    expect(sectionOf("mundo", "inventada")).toBe("estudio");
   });
 
   it("traz as ferramentas visuais para dentro do Mundo", () => {

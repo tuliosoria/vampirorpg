@@ -38,3 +38,5 @@ export * from "./lore/mencoes.js";
 export * from "./lore/biographies.js";
 
 export * from "./canon/fichas.js";
+export * from "./estudio/modelos.js";
+export * from "./estudio/projecoes.js";

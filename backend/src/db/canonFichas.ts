@@ -22,11 +22,11 @@ function strip(item: Record<string, unknown>): ClaFicha {
     // contamina toda distância que passar por ela sem nunca lançar erro.
     x: typeof item.x === "number" ? item.x : base.x,
     y: typeof item.y === "number" ? item.y : base.y,
-    lider: (item.lider as ClaFicha["lider"]) ?? null,
-    elenco: Array.isArray(item.elenco) ? (item.elenco as ClaFicha["elenco"]) : [],
+    descricao: typeof item.descricao === "string" ? item.descricao : "",
+    segredos: typeof item.segredos === "string" ? item.segredos : "",
     perfil: (item.perfil as ClaFicha["perfil"]) ?? null,
     dossie: (item.dossie as ClaFicha["dossie"]) ?? null,
-    updatedAt: typeof item.updatedAt === "string" ? item.updatedAt : "",
+    atualizadoEm: typeof item.atualizadoEm === "string" ? item.atualizadoEm : "",
   };
 }
 
@@ -44,7 +44,7 @@ export async function listClaFichas(
 export async function putClaFicha(
   doc: DynamoDBDocumentClient, table: string, campaignId: string, ficha: ClaFicha,
 ): Promise<ClaFicha> {
-  const gravada = { ...ficha, updatedAt: new Date().toISOString() };
+  const gravada = { ...ficha, atualizadoEm: new Date().toISOString() };
   await doc.send(new PutCommand({
     TableName: table,
     Item: { PK: campaignPk(campaignId), SK: claFichaSk(ficha.key), ...gravada },

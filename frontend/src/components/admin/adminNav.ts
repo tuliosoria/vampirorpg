@@ -35,10 +35,14 @@ export const ADMIN_GROUPS: AdminGroup[] = [
       { value: "vivos", label: "Vivos" },
     ],
   },
+  // O Estúdio é o painel editorial: as entidades primeiro, as ferramentas de
+  // imagem depois. O gerador que ocupava este nome virou "Imagens", que é o
+  // que ele sempre foi.
   {
     value: "mundo",
-    label: "A Cidade",
+    label: "Estúdio",
     sections: [
+      { value: "estudio", label: "Cosmologia" },
       // Primeiro o que existe, depois o que se escreve sobre isso: sem clã
       // cadastrado, verbete e imagem não têm a quem pertencer.
       { value: "clas", label: "Clãs" },
@@ -52,7 +56,7 @@ export const ADMIN_GROUPS: AdminGroup[] = [
       { value: "entidades", label: "Entidades" },
       // Escrever vem antes de ilustrar: o Escriba fica à esquerda do Estúdio.
       { value: "escriba", label: "Escriba" },
-      { value: "estudio", label: "Estúdio" },
+      { value: "imagens", label: "Imagens" },
     ],
   },
   { value: "sistema", label: "Sistema", sections: [] },

@@ -97,8 +97,9 @@ export function AdminClaFichasTab({ adminToken }: { adminToken: string }) {
     <Stack spacing={3}>
       <Box>
         <Typography variant="body2" color="text.secondary">
-          Cada clã aqui vira um ponto no mapa, um destinatário de carta e uma página pública. É desta
-          lista que saem as distâncias, os orçamentos de correspondência e quem a IA pode encarnar.
+          Cada clã aqui vira um ponto no mapa e uma página pública, e é desta lista que saem as
+          distâncias e o orçamento de correspondência. Quem <em>responde</em> pelo clã é um personagem:
+          cadastre-o na aba Personagens e marque-o como quem fala por ele.
         </Typography>
       </Box>
 
@@ -133,6 +134,21 @@ export function AdminClaFichasTab({ adminToken }: { adminToken: string }) {
                   onChange={(e) => set("key", e.target.value)}
                   helperText="Minúsculas, números e hífen. Ex.: cla-ventrue"
                 />
+                <Campo
+                  label="👁 Descrição — os jogadores leem"
+                  multiline
+                  minRows={3}
+                  value={draft.descricao}
+                  onChange={(e) => set("descricao", e.target.value)}
+                />
+                <Campo
+                  label="🔒 Segredos — só você"
+                  multiline
+                  minRows={3}
+                  value={draft.segredos}
+                  onChange={(e) => set("segredos", e.target.value)}
+                  helperText="Nunca sai por rota de jogador. A IA lê para saber o que o clã esconde."
+                />
               </Bloco>
 
               <Divider />
@@ -152,22 +168,6 @@ export function AdminClaFichasTab({ adminToken }: { adminToken: string }) {
                   <Campo label="X" type="number" value={draft.x} onChange={(e) => set("x", Number(e.target.value))} />
                   <Campo label="Y" type="number" value={draft.y} onChange={(e) => set("y", Number(e.target.value))} />
                 </Stack>
-              </Bloco>
-
-              <Divider />
-
-              <Bloco
-                titulo="Quem responde"
-                porque="Preencha e o clã passa a receber cartas, respondendo com esta voz. Deixe em branco e ele fica mudo — existe no mapa, mas ninguém escreve para ele."
-              >
-                <Campo label="Nome de quem lidera" value={draft.lider?.leaderName ?? ""} onChange={(e) => set("lider", { ...(draft.lider ?? vazioLider()), leaderName: e.target.value })} />
-                <Campo label="Cargo na corte" value={draft.lider?.title ?? ""} onChange={(e) => set("lider", { ...(draft.lider ?? vazioLider()), title: e.target.value })} />
-                <Campo label="Temperamento" multiline minRows={2} value={draft.lider?.temperament ?? ""} onChange={(e) => set("lider", { ...(draft.lider ?? vazioLider()), temperament: e.target.value })} />
-                <Campo label="Como fala" multiline minRows={2} value={draft.lider?.speechStyle ?? ""} onChange={(e) => set("lider", { ...(draft.lider ?? vazioLider()), speechStyle: e.target.value })} helperText="O que as frases dele fazem, não só o quanto ele é formal." />
-                <Campo label="O que quer" multiline minRows={2} value={draft.lider?.wants ?? ""} onChange={(e) => set("lider", { ...(draft.lider ?? vazioLider()), wants: e.target.value })} />
-                <Campo label="O que recusa" multiline minRows={2} value={draft.lider?.refuses ?? ""} onChange={(e) => set("lider", { ...(draft.lider ?? vazioLider()), refuses: e.target.value })} />
-                <Campo label="Postura diante da corte" multiline minRows={2} value={draft.lider?.crownStance ?? ""} onChange={(e) => set("lider", { ...(draft.lider ?? vazioLider()), crownStance: e.target.value })} />
-                <Campo label="Interesses do momento" multiline minRows={2} value={draft.lider?.interests ?? ""} onChange={(e) => set("lider", { ...(draft.lider ?? vazioLider()), interests: e.target.value })} />
               </Bloco>
 
               <Divider />
@@ -211,7 +211,7 @@ export function AdminClaFichasTab({ adminToken }: { adminToken: string }) {
                   <Box sx={{ flex: 1, minWidth: 0 }}>
                     <Typography fontWeight="bold">{f.name}</Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {[f.refugio, f.lider?.leaderName, f.elenco.length ? `${f.elenco.length} no elenco` : null]
+                      {[f.refugio, f.segredos ? "tem segredos" : null]
                         .filter(Boolean)
                         .join(" · ") || "só um nome no mapa, por enquanto"}
                     </Typography>
@@ -230,9 +230,6 @@ export function AdminClaFichasTab({ adminToken }: { adminToken: string }) {
   );
 }
 
-function vazioLider() {
-  return { leaderName: "", title: "", temperament: "", speechStyle: "", wants: "", refuses: "", crownStance: "", interests: "" };
-}
 
 function vazioPerfil() {
   return { wealth: "", resources: "", soldiers: "", control: "" };

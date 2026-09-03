@@ -1,4 +1,37 @@
-import type { ClaFicha } from "@vampiro/content";
+import type {
+  ClaFicha, Cidade, CidadePublica, Bairro, BairroPublico, Personagem, PersonagemPublico,
+  Local, LocalPublico, Trama, TramaPublica, Conto, ContoPublico,
+} from "@vampiro/content";
+
+export const COLECOES_DO_ESTUDIO = ["bairros", "personagens", "locais", "tramas", "contos"] as const;
+export type ColecaoDoEstudio = (typeof COLECOES_DO_ESTUDIO)[number];
+
+/** O que o Narrador vê: tudo, com os segredos. */
+export interface EstudioCompleto {
+  cidade: Cidade;
+  bairros: Bairro[];
+  personagens: Personagem[];
+  locais: Local[];
+  tramas: Trama[];
+  contos: Conto[];
+  clas: ClaFicha[];
+}
+
+/**
+ * O que o site mostra a quem não é Narrador.
+ *
+ * Os tipos são outros, e não o mesmo com menos campos: um componente que
+ * tentasse ler `objetivos` daqui não compila.
+ */
+export interface EstudioPublico {
+  cidade: CidadePublica;
+  bairros: BairroPublico[];
+  personagens: PersonagemPublico[];
+  locais: LocalPublico[];
+  tramas: TramaPublica[];
+  contos: ContoPublico[];
+  clas: Omit<ClaFicha, "segredos">[];
+}
 import type {
   CampaignSummary,
   HouseExample,
@@ -283,6 +316,13 @@ export interface ApiClient {
   getWiki(): Promise<WikiEntry[]>;
   /** As fichas de clã — o mundo que o Narrador escreveu. */
   listCla(): Promise<ClaFicha[]>;
+  /** A cosmologia do Estúdio, projetada — é o que o site inteiro consome. */
+  getEstudioPublico(): Promise<EstudioPublico>;
+  /** Tudo, cru. Exige sessão de Narrador. */
+  getEstudio(token: string): Promise<EstudioCompleto>;
+  saveEstudioItem<T>(token: string, colecao: ColecaoDoEstudio, item: T): Promise<T>;
+  deleteEstudioItem(token: string, colecao: ColecaoDoEstudio, id: string): Promise<void>;
+  saveCidade(token: string, cidade: Cidade): Promise<Cidade>;
   adminSaveCla(token: string, ficha: Partial<ClaFicha> & { name: string }): Promise<ClaFicha>;
   adminDeleteCla(token: string, key: string): Promise<void>;
   /** Crônica pública da campanha, usada para saber quem já morreu. */

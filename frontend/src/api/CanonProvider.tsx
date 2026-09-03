@@ -32,9 +32,13 @@ export function CanonProvider({ children }: { children: ReactNode }) {
 
   const carregar = useCallback(async () => {
     try {
-      aplicarCanon(await api.listCla());
+      // A projeção pública, e não a rota do Narrador: o motor do navegador é
+      // alimentado pelo mesmo objeto que qualquer visitante recebe, então um
+      // segredo não chega ao bundle nem por acidente.
+      const publico = await api.getEstudioPublico();
+      aplicarCanon(publico.clas as never, publico.personagens);
     } catch {
-      aplicarCanon([]);
+      aplicarCanon([], []);
     } finally {
       setPronto(true);
     }
