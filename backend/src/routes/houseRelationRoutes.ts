@@ -3,21 +3,24 @@ import type { HandlerRequest, HandlerResponse } from "../types/domain";
 import { HttpError } from "../types/domain";
 import { requireAdmin } from "../auth/adminAuth";
 import { listHouseRelations, putHouseRelation } from "../db/houseRelations";
-import { RELATIONS_DOC, SEATS, clampRelationValue, describeRelation, emptyHouseRelation, findDivergence, relationKey, seatOf } from "@vampiro/content";
+import { SEATS, clampRelationValue, describeRelation, emptyHouseRelation, findDivergence, relationKey, seatOf } from "@vampiro/content";
 import { relationsBetween } from "../ai/diplomacy/housePrompt";
+import { getWorldBible } from "../db/worldBible";
 
 const seatKeys = new Set(SEATS.map((s) => s.key));
 
 /**
  * A matriz que o Mestre edita.
  *
- * Devolve as dezesseis sedes e só os pares já definidos. O painel completa o
+ * Devolve os domínios cadastrados e só os pares já definidos. O painel completa o
  * resto com o padrão — mandar 240 pares médios pela rede seria pagar banda para
  * transportar a ausência de informação.
  */
 export async function adminListRelations(deps: Deps, req: HandlerRequest): Promise<HandlerResponse> {
   requireAdmin(deps.config, req);
   const relations = await listHouseRelations(deps.doc, deps.config.tableName, deps.config.campaignId);
+  // A história entre os clãs sai da Bíblia do Mundo, escrita pelo Narrador.
+  const lore = (await getWorldBible(deps.doc, deps.config.tableName, deps.config.campaignId))?.lore ?? "";
   return {
     status: 200,
     body: {
@@ -27,7 +30,7 @@ export async function adminListRelations(deps: Deps, req: HandlerRequest): Promi
       // divergência para saber se ela foi escolha ou esquecimento de um dial.
       relations: relations.map((r) => {
         const historia = relationsBetween(
-          RELATIONS_DOC,
+          lore,
           seatOf(r.fromKey)?.name ?? r.fromKey,
           seatOf(r.toKey)?.name ?? r.toKey,
         ).join(" ");

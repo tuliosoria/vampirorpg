@@ -59,7 +59,7 @@ export function pactAssetName(kind: PactKind, lugar: string | null): string {
 /**
  * O lugar citado no resumo do pacto.
  *
- * A carta nomeia a sede ("o posto de Raven's Cross"), e é dela que sai o nome
+ * A carta nomeia a sede ("o posto do Ferro-velho"), e é dela que sai o nome
  * do ativo. Procuramos entre as sedes conhecidas em vez de adivinhar por
  * pontuação: um resumo cita números, prazos e mercadorias, e qualquer heurística
  * de "primeira maiúscula" pegaria a coisa errada.
@@ -67,14 +67,14 @@ export function pactAssetName(kind: PactKind, lugar: string | null): string {
 export function placeInSummary(summary: string, seatNames: string[], excluir?: string | null): string | null {
   const texto = summary.toLowerCase();
   // A própria capital não conta. Um acordo cita as duas pontas da rota, e sem
-  // isto o pacto rendia "Entreposto em Solythar" a quem já governa Solythar —
+  // isto o pacto rendia "Entreposto em Banco Providência" a quem já governa Banco Providência —
   // um ativo que não diz nada e não pode ser tomado de ninguém.
   const proibido = excluir?.trim().toLowerCase();
   let achado: string | null = null;
   for (const nome of seatNames) {
     if (!nome || (proibido && nome.toLowerCase() === proibido)) continue;
     if (texto.includes(nome.toLowerCase())) {
-      // O nome mais longo ganha: "Raven's Cross" antes de "Raven".
+      // O nome mais longo ganha: "o Ferro-velho" antes de "Raven".
       if (!achado || nome.length > achado.length) achado = nome;
     }
   }
@@ -96,7 +96,7 @@ export function isAnswerable(kind: FactKind, status: string): boolean {
  *
  * Um teto de pactos seria uma regra artificial: "sua Casa só administra três".
  * A verdade da mesa é outra e mais interessante — você não pode se aliar a todo
- * mundo porque os seus aliados se odeiam. Fechar com Krythos afasta a Coroa;
+ * mundo porque os seus aliados se odeiam. Fechar com fora da cidade afasta a Coroa;
  * fechar com quem a Coroa persegue afasta quem serve à Coroa.
  *
  * A conta sai da própria matriz de relações, então o Mestre continua sendo o
@@ -114,8 +114,8 @@ export interface Fallout {
  * Quem se ofende quando `comQuem` fecha um pacto, e o quanto.
  *
  * Só olha inimizade declarada: relação intocada é médio, e médio não gera
- * ofensa. Uma Casa que não tem opinião sobre Krythos não se importa que você
- * negocie com Krythos.
+ * ofensa. Uma Casa que não tem opinião sobre fora da cidade não se importa que você
+ * negocie com fora da cidade.
  */
 export function politicalFallout(
   comQuem: string,

@@ -54,8 +54,8 @@ describe("CorrespondenceBell", () => {
     vi.spyOn(client, "countIncomingLetters").mockResolvedValue({
       cartas: 2, turnNumber: 7,
       remetentes: [
-        { houseKey: "cla-brujah", houseName: "Clã Brujah", person: "Capitã Solano", preview: "Prometi força a o centro velho.", turnNumber: 7 },
-        { houseKey: "corte-do-sangue", houseName: "Ordem do Sino", person: "Othran Sete-Tintas", preview: "A conta não fecha.", turnNumber: 7 },
+        { houseKey: "cla-brujah", houseName: "Clã Brujah", person: "Capitã Solano", preview: "Prometi força ao centro velho.", turnNumber: 7 },
+        { houseKey: "corte-do-sangue", houseName: "Corte do Sangue", person: "Othran Sete-Tintas", preview: "A conta não fecha.", turnNumber: 7 },
       ],
     });
     await montar(client);

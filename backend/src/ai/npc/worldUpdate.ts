@@ -114,7 +114,7 @@ export async function updateNpcWorld(deps: WorldUpdateDeps, turn: Turn): Promise
     let raw: string;
     try {
       // 1600, e não 600: o raciocínio sai do mesmo orçamento da resposta.
-      // Medido em seis chamadas reais — Lyra Euralune voltou `finish=length` e
+      // Medido em seis chamadas reais — Lyra Toreador voltou `finish=length` e
       // VAZIA a 600, e afetada a 1600. A resposta em si ocupa ~600 caracteres.
       raw = await deps.chat(IMPACT_SYSTEM_PROMPT, buildImpactUser({ identity: npc, dynamic, events: known.map((e) => e.description) }), true, 1600);
     } catch {

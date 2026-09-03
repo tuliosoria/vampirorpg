@@ -5,12 +5,12 @@ import { semearCanon, limparCanon } from "../test/fixtures.js";
 describe("characterId", () => {
   it("faz um slug estável do nome", () => {
     expect(characterId("All Marifh")).toBe("all-marifh");
-    expect(characterId("Selma Karasoy")).toBe("selma-karasoy");
+    expect(characterId("Solano Brujah")).toBe("solano-brujah");
   });
 
   it("descarta o cargo embutido depois da vírgula", () => {
-    expect(characterId("Lorde Marcien Auremont, Comandante da Cavalaria e Herdeiro de Aurivale"))
-      .toBe("lorde-marcien-auremont");
+    expect(characterId("Lorde Vasco Ouro, Comandante da Cavalaria e Herdeiro de Ferro-velho"))
+      .toBe("lorde-vasco-ouro");
   });
 
   it("dobra acentos", () => {

@@ -59,15 +59,15 @@ describe("parseResolution", () => {
   it("parses a valid resolution JSON payload including attribute deltas", () => {
     const result = parseResolution(JSON.stringify({
       publicResult: "a Cidade sobrevive a mais uma noite.",
-      houseResults: { "casa-vargen": "Os lobos mantêm a muralha." },
-      attributeDeltas: { "casa-vargen": { soldados: -1, controle: 1 } },
+      houseResults: { "cla-gangrel": "Os lobos mantêm a muralha." },
+      attributeDeltas: { "cla-gangrel": { soldados: -1, controle: 1 } },
       discoveries: ["Há luz sob o lago."],
     }));
 
     expect(result).toEqual({
       publicResult: "a Cidade sobrevive a mais uma noite.",
-      houseResults: { "casa-vargen": "Os lobos mantêm a muralha." },
-      attributeDeltas: { "casa-vargen": { soldados: -1, controle: 1 } },
+      houseResults: { "cla-gangrel": "Os lobos mantêm a muralha." },
+      attributeDeltas: { "cla-gangrel": { soldados: -1, controle: 1 } },
       discoveries: ["Há luz sob o lago."],
     });
   });
@@ -81,11 +81,11 @@ describe("parseResolution", () => {
     expect(() => parseResolution("null")).toThrow(HttpError);
     expect(() => parseResolution(JSON.stringify({
       publicResult: "Resultado",
-      houseResults: { "casa-vargen": 12 },
+      houseResults: { "cla-gangrel": 12 },
     }))).toThrow(HttpError);
     expect(() => parseResolution(JSON.stringify({
       publicResult: "Resultado",
-      attributeDeltas: { "casa-vargen": { reputacao: 1 } },
+      attributeDeltas: { "cla-gangrel": { reputacao: 1 } },
     }))).toThrow(HttpError);
     expect(() => parseResolution(JSON.stringify({
       publicResult: "Resultado",
@@ -160,12 +160,12 @@ describe("generateJson", () => {
 describe("parsePrivateInfo", () => {
   it("parses a houseId to text map", () => {
     const privateInfo = parsePrivateInfo(JSON.stringify({
-      "casa-vargen": "Batedores viram pegadas na névoa.",
+      "cla-gangrel": "Batedores viram pegadas na névoa.",
       "casa-miruna": "Um informante teme a capela congelada.",
     }));
 
     expect(privateInfo).toEqual({
-      "casa-vargen": "Batedores viram pegadas na névoa.",
+      "cla-gangrel": "Batedores viram pegadas na névoa.",
       "casa-miruna": "Um informante teme a capela congelada.",
     });
   });
@@ -177,6 +177,6 @@ describe("parsePrivateInfo", () => {
 
   it("throws HttpError when private info is not a string-only object", () => {
     expect(() => parsePrivateInfo("[]")).toThrow(HttpError);
-    expect(() => parsePrivateInfo(JSON.stringify({ "casa-vargen": 42 }))).toThrow(HttpError);
+    expect(() => parsePrivateInfo(JSON.stringify({ "cla-gangrel": 42 }))).toThrow(HttpError);
   });
 });

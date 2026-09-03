@@ -118,7 +118,7 @@ describe("WikiPage", () => {
     const { adminToken } = await client.adminLogin("admin-test");
     await client.adminCreateWikiEntry(adminToken, {
       section: "linhagens",
-      title: "Os Vinte e Sete Magos da Ordem dos Três",
+      title: "Os Vinte e Sete Magos da Corte do Sangue",
       body: "A Ordem mantém **vinte e sete magos** plenamente iniciados.",
       order: 0,
     });
@@ -126,7 +126,7 @@ describe("WikiPage", () => {
     await setup(client, "/cidade/linhagens");
 
     expect(await screen.findByRole("heading", { name: "Linhagens" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Os Vinte e Sete Magos da Ordem dos Três" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Os Vinte e Sete Magos da Corte do Sangue" })).toBeInTheDocument();
     expect(screen.getByText("vinte e sete magos").tagName.toLowerCase()).toBe("strong");
   });
 
@@ -173,7 +173,7 @@ describe("WikiPage", () => {
       title: "Clã Gangrel — Os Senhores do Céu",
       body: "Cavaleiros das alturas.",
       order: 0,
-      imageUrls: ["/houses/euralune.jpg", "/houses/euralune-2.jpg"],
+      imageUrls: ["/houses/toreador.jpg", "/houses/toreador-2.jpg"],
     } as never);
 
     await setup(client, "/cidade/clas");
@@ -197,7 +197,7 @@ A Casa protege **rotas antigas**.
 - Caminhos sob o deserto
 - Guardiãs da estrela`,
       order: 0,
-      imageUrls: ["/houses/karasoy.jpg"],
+      imageUrls: ["/houses/brujah.jpg"],
     });
 
     await setup(client, "/cidade/clas");

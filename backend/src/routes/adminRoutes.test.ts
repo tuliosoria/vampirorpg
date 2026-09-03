@@ -93,7 +93,7 @@ import * as gmDb from "../db/gm";
 
 const ADMIN_CODE = "admin-secret";
 const config: Config = {
-  tableName: "ravenloft-game",
+  tableName: "vampirorpg-game",
   campaignId: "cidade-noturna",
   adminCodeHash: hashCode(ADMIN_CODE),
   tokenSigningSecret: "secret",
@@ -142,13 +142,13 @@ function multipartBody(fields: Record<string, string>, file: { name: string; con
 }
 
 const house: House = {
-  houseId: "casa-vargen",
-  name: "Casa Vargen",
+  houseId: "cla-gangrel",
+  name: "Clã Gangrel",
   motto: "O Norte lembra.",
   emblem: { icon: "lobo", color1: "#3f3f46", color2: "#1e3a5f" },
   leaderName: "Aldric",
   heirName: "Sera",
-  castleName: "Droskar",
+  castleName: "Parque do Norte",
   townsText: "Vilas do norte.",
   historyText: "Uma casa antiga.",
   specialty: "Defesa.",
@@ -161,7 +161,7 @@ const composedTurn: Turn = {
   ...draftTurn,
   status: "OPEN",
   publicEvent: "A neve bloqueia as estradas.",
-  privateInfo: { "casa-vargen": "Rastros na névoa." },
+  privateInfo: { "cla-gangrel": "Rastros na névoa." },
 };
 
 beforeEach(() => {
@@ -200,7 +200,7 @@ describe("adminLogin", () => {
 describe("getDashboard", () => {
   it("returns the active turn, houses, and submissions", async () => {
     vi.mocked(turnsDb.getActiveTurn).mockResolvedValue(composedTurn);
-    vi.mocked(submissionsDb.listSubmissions).mockResolvedValue([{ houseId: "casa-vargen", orderText: "Ordem", submittedAt: "2026-01-03T00:00:00.000Z" }]);
+    vi.mocked(submissionsDb.listSubmissions).mockResolvedValue([{ houseId: "cla-gangrel", orderText: "Ordem", submittedAt: "2026-01-03T00:00:00.000Z" }]);
 
     const res = await getDashboard(deps, authReq());
 
@@ -209,7 +209,7 @@ describe("getDashboard", () => {
       turnId: 1,
       turnStatus: "OPEN",
       publicEvent: "A neve bloqueia as estradas.",
-      privateInfo: { "casa-vargen": "Rastros na névoa." },
+      privateInfo: { "cla-gangrel": "Rastros na névoa." },
       result: null,
       houses: [house],
     });
@@ -223,12 +223,12 @@ describe("getDashboard", () => {
 
 describe("composeTurn", () => {
   it("updates a draft turn", async () => {
-    const body = { publicEvent: "Evento", privateInfo: { "casa-vargen": "Segredo" } };
+    const body = { publicEvent: "Evento", privateInfo: { "cla-gangrel": "Segredo" } };
 
     const res = await composeTurn(deps, authReq({ method: "POST", body }));
 
     expect(res).toEqual({ status: 204, body: undefined });
-    expect(turnsDb.putTurn).toHaveBeenCalledWith(deps.doc, "ravenloft-game", "cidade-noturna", { ...draftTurn, ...body });
+    expect(turnsDb.putTurn).toHaveBeenCalledWith(deps.doc, "vampirorpg-game", "cidade-noturna", { ...draftTurn, ...body });
   });
 
   it("rejects when the active turn is not a draft", async () => {
@@ -246,10 +246,10 @@ describe("rascunho de turno", () => {
     const res = await saveTurnDraft(withToken, {
       method: "PUT", path: "/", pathParams: {},
       headers: { "x-draft-token": "seg-red-o" },
-      body: { publicEvent: "Drakorys rompe com a Coroa.", privateInfo: { "Casa do Ouro": "pista" }, note: "racional" },
+      body: { publicEvent: "Ravnos rompe com a Coroa.", privateInfo: { "Casa do Ouro": "pista" }, note: "racional" },
     } as never);
     expect(res.status).toBe(200);
-    expect((res.body as { publicEvent: string }).publicEvent).toBe("Drakorys rompe com a Coroa.");
+    expect((res.body as { publicEvent: string }).publicEvent).toBe("Ravnos rompe com a Coroa.");
   });
 
   it("recusa envio sem admin e sem token", async () => {
@@ -273,7 +273,7 @@ describe("rascunho de turno", () => {
   it("define a imagem do turno a partir de uma URL", async () => {
     const res = await setTurnImageUrl(deps, authReq({ method: "POST", body: { kind: "event", url: "https://x/kaelen.png" } }));
     expect(res).toEqual({ status: 200, body: { imageUrl: "https://x/kaelen.png" } });
-    expect(turnsDb.setTurnImage).toHaveBeenCalledWith(deps.doc, "ravenloft-game", "cidade-noturna", 1, "event", "https://x/kaelen.png");
+    expect(turnsDb.setTurnImage).toHaveBeenCalledWith(deps.doc, "vampirorpg-game", "cidade-noturna", 1, "event", "https://x/kaelen.png");
   });
 });
 
@@ -284,7 +284,7 @@ describe("turn status actions", () => {
     const res = await openTurn(deps, authReq({ method: "POST" }));
 
     expect(res).toEqual({ status: 204, body: undefined });
-    expect(turnsDb.setTurnStatus).toHaveBeenCalledWith(deps.doc, "ravenloft-game", "cidade-noturna", 1, "OPEN");
+    expect(turnsDb.setTurnStatus).toHaveBeenCalledWith(deps.doc, "vampirorpg-game", "cidade-noturna", 1, "OPEN");
   });
 
   it("rejects opening a draft turn with an empty public event", async () => {
@@ -306,7 +306,7 @@ describe("turn status actions", () => {
     const res = await lockTurn(deps, authReq({ method: "POST" }));
 
     expect(res).toEqual({ status: 204, body: undefined });
-    expect(turnsDb.setTurnStatus).toHaveBeenCalledWith(deps.doc, "ravenloft-game", "cidade-noturna", 1, "LOCKED");
+    expect(turnsDb.setTurnStatus).toHaveBeenCalledWith(deps.doc, "vampirorpg-game", "cidade-noturna", 1, "LOCKED");
   });
 
   it("rejects locking a non-open turn", async () => {
@@ -319,7 +319,7 @@ describe("turn status actions", () => {
     const res = await unlockTurn(deps, authReq({ method: "POST" }));
 
     expect(res).toEqual({ status: 204, body: undefined });
-    expect(turnsDb.setTurnStatus).toHaveBeenCalledWith(deps.doc, "ravenloft-game", "cidade-noturna", 1, "OPEN");
+    expect(turnsDb.setTurnStatus).toHaveBeenCalledWith(deps.doc, "vampirorpg-game", "cidade-noturna", 1, "OPEN");
   });
 
   it("rejects unlocking a non-locked turn", async () => {
@@ -361,10 +361,10 @@ describe("house CRUD", () => {
   it("updateHouse updates all fields and returns 204", async () => {
     const { displayName, ...fields } = houseBody;
     void displayName;
-    const res = await updateHouse(deps, authReq({ method: "POST", body: { houseId: "casa-vargen", ...fields } }));
+    const res = await updateHouse(deps, authReq({ method: "POST", body: { houseId: "cla-gangrel", ...fields } }));
 
     expect(res).toEqual({ status: 204, body: undefined });
-    expect(housesDb.updateHouseFull).toHaveBeenCalledWith(deps.doc, "ravenloft-game", "cidade-noturna", "casa-vargen", expect.objectContaining({ name: "Casa Nova" }));
+    expect(housesDb.updateHouseFull).toHaveBeenCalledWith(deps.doc, "vampirorpg-game", "cidade-noturna", "cla-gangrel", expect.objectContaining({ name: "Casa Nova" }));
   });
 
   it("updateHouse requires an admin token", async () => {
@@ -374,10 +374,10 @@ describe("house CRUD", () => {
   it("deleteHouse deletes and returns the deleted count", async () => {
     vi.mocked(housesDb.deleteHouseCascade).mockResolvedValue({ deleted: 3 });
 
-    const res = await deleteHouse(deps, authReq({ method: "POST", body: { houseId: "casa-vargen" } }));
+    const res = await deleteHouse(deps, authReq({ method: "POST", body: { houseId: "cla-gangrel" } }));
 
     expect(res).toEqual({ status: 200, body: { deleted: 3 } });
-    expect(housesDb.deleteHouseCascade).toHaveBeenCalledWith(deps.doc, "ravenloft-game", "cidade-noturna", "casa-vargen");
+    expect(housesDb.deleteHouseCascade).toHaveBeenCalledWith(deps.doc, "vampirorpg-game", "cidade-noturna", "cla-gangrel");
   });
 
   it("deleteHouse requires an admin token", async () => {
@@ -392,7 +392,7 @@ describe("resetCampaign", () => {
     const res = await resetCampaign(deps, authReq({ method: "POST", body: undefined }));
 
     expect(res).toEqual({ status: 200, body: { deleted: 5 } });
-    expect(campaignResetDb.resetCampaign).toHaveBeenCalledWith(deps.doc, "ravenloft-game", "cidade-noturna");
+    expect(campaignResetDb.resetCampaign).toHaveBeenCalledWith(deps.doc, "vampirorpg-game", "cidade-noturna");
   });
 
   it("requires an admin token", async () => {
@@ -425,7 +425,7 @@ describe("draftPublicEvent", () => {
         ...draftTurn,
         turnId: 1,
         status: "RESOLVED",
-        privateInfo: { "casa-vargen": leakedPrivateInfo },
+        privateInfo: { "cla-gangrel": leakedPrivateInfo },
         result: { publicResult: "A ponte brilhou.", houseResults: {}, attributeDeltas: {}, discoveries: [] },
       },
       { ...draftTurn, turnId: 2, publicEvent: "" },
@@ -449,7 +449,7 @@ describe("draftPublicEvent", () => {
         ...draftTurn,
         turnId: 1,
         status: "RESOLVED",
-        privateInfo: { "casa-vargen": longPrivateInfo },
+        privateInfo: { "cla-gangrel": longPrivateInfo },
         result: { publicResult: "A ponte brilhou.", houseResults: {}, attributeDeltas: {}, discoveries: [] },
       },
       { ...draftTurn, turnId: 2, publicEvent: "" },
@@ -465,7 +465,7 @@ describe("draftPublicEvent", () => {
 
   it("passes world lore, player Houses, Wiki and the last 5 resolved turns with submissions into the prompt", async () => {
     const chat = vi.fn<ChatFn>(async (_system: string, _user: string, _jsonMode: boolean) =>
-      JSON.stringify({ publicEvent: "Sinos tocam ao sul de Solythar." }),
+      JSON.stringify({ publicEvent: "Sinos tocam ao sul de Banco Providência." }),
     );
     vi.mocked(worldBibleDb.getWorldBible).mockResolvedValue({
       lore: "a Cidade é uma ilha cercada pela névoa.",
@@ -488,12 +488,12 @@ describe("draftPublicEvent", () => {
         turnId: i + 1,
         status: "RESOLVED",
         publicEvent: `Evento ${i + 1}`,
-        privateInfo: { "casa-vargen": `Privado ${i + 1}` },
+        privateInfo: { "cla-gangrel": `Privado ${i + 1}` },
         createdAt: "2026-01-01T00:00:00.000Z",
         result: {
           publicResult: `Resultado ${i + 1}`,
-          houseResults: { "casa-vargen": `Resultado privado ${i + 1}` },
-          attributeDeltas: { "casa-vargen": { soldados: -1 } },
+          houseResults: { "cla-gangrel": `Resultado privado ${i + 1}` },
+          attributeDeltas: { "cla-gangrel": { soldados: -1 } },
           discoveries: [`Descoberta ${i + 1}`],
         },
       })),
@@ -502,23 +502,23 @@ describe("draftPublicEvent", () => {
         turnId: 7,
         status: "LOCKED",
         publicEvent: "Evento bloqueado não resolvido.",
-        privateInfo: { "casa-vargen": "Privado bloqueado" },
+        privateInfo: { "cla-gangrel": "Privado bloqueado" },
       },
       { ...draftTurn, turnId: 8, status: "DRAFT" },
     ]);
     vi.mocked(submissionsDb.listSubmissions).mockImplementation(async (_doc, _table, _campaign, turnId) => [
-      { houseId: "casa-vargen", orderText: `Ordem ${turnId}`, submittedAt: "2026-01-02T00:00:00.000Z" },
+      { houseId: "cla-gangrel", orderText: `Ordem ${turnId}`, submittedAt: "2026-01-02T00:00:00.000Z" },
     ]);
 
     const res = await draftPublicEvent({ ...deps, chat }, authReq({ method: "POST" }));
 
-    expect(res).toEqual({ status: 200, body: { publicEvent: "Sinos tocam ao sul de Solythar." } });
-    expect(wikiDb.listWikiEntries).toHaveBeenCalledWith(deps.doc, "ravenloft-game", "cidade-noturna");
+    expect(res).toEqual({ status: 200, body: { publicEvent: "Sinos tocam ao sul de Banco Providência." } });
+    expect(wikiDb.listWikiEntries).toHaveBeenCalledWith(deps.doc, "vampirorpg-game", "cidade-noturna");
     expect(submissionsDb.listSubmissions).toHaveBeenCalledTimes(5);
-    expect(submissionsDb.listSubmissions).not.toHaveBeenCalledWith(deps.doc, "ravenloft-game", "cidade-noturna", 1);
-    expect(submissionsDb.listSubmissions).toHaveBeenCalledWith(deps.doc, "ravenloft-game", "cidade-noturna", 2);
-    expect(submissionsDb.listSubmissions).toHaveBeenCalledWith(deps.doc, "ravenloft-game", "cidade-noturna", 6);
-    expect(submissionsDb.listSubmissions).not.toHaveBeenCalledWith(deps.doc, "ravenloft-game", "cidade-noturna", 7);
+    expect(submissionsDb.listSubmissions).not.toHaveBeenCalledWith(deps.doc, "vampirorpg-game", "cidade-noturna", 1);
+    expect(submissionsDb.listSubmissions).toHaveBeenCalledWith(deps.doc, "vampirorpg-game", "cidade-noturna", 2);
+    expect(submissionsDb.listSubmissions).toHaveBeenCalledWith(deps.doc, "vampirorpg-game", "cidade-noturna", 6);
+    expect(submissionsDb.listSubmissions).not.toHaveBeenCalledWith(deps.doc, "vampirorpg-game", "cidade-noturna", 7);
     expect(chat).toHaveBeenCalled();
     const system = chat.mock.calls[0]![0];
     expect(system).toContain("CONTEXTO DA CAMPANHA");
@@ -532,8 +532,8 @@ describe("draftPublicEvent", () => {
     expect(system).not.toContain("Privado 1");
     expect(system).not.toContain("Resultado privado 1");
     expect(system).not.toContain("Descoberta 1");
-    expect(system).toContain("Ordem da Casa Vargen: Ordem 6");
-    expect(system).toContain("Resultado privado da Casa Vargen: Resultado privado 6");
+    expect(system).toContain("Ordem da Clã Gangrel: Ordem 6");
+    expect(system).toContain("Resultado privado da Clã Gangrel: Resultado privado 6");
     expect(system).toContain("Descoberta 6");
     expect(system).not.toContain("Evento bloqueado não resolvido.");
     expect(turnsDb.putTurn).not.toHaveBeenCalled();
@@ -565,13 +565,13 @@ describe("a dívida do Porto no painel", () => {
   it("o painel mostra o que o Porto deve neste turno", async () => {
     vi.mocked(turnsDb.getActiveTurn).mockResolvedValue({ ...draftTurn, turnId: 8 });
     vi.mocked(projectsDb.listCampaignProjects).mockResolvedValue([
-      { houseId: "casa-vargen", templateId: "rumores-da-rua-o-que-nao-se-explica", status: "COMPLETED", lastProcessedTurnId: 7 } as any,
+      { houseId: "cla-gangrel", templateId: "rumores-da-rua-o-que-nao-se-explica", status: "COMPLETED", lastProcessedTurnId: 7 } as any,
     ]);
 
     const res = await getDashboard(deps, authReq({ method: "GET" }));
 
     expect((res.body as any).portoPendente).toEqual([
-      { houseId: "casa-vargen", tipo: "BRUMAS", confiabilidade: expect.any(String), envenenadoPor: null },
+      { houseId: "cla-gangrel", tipo: "BRUMAS", confiabilidade: expect.any(String), envenenadoPor: null },
     ]);
   });
 
@@ -584,7 +584,7 @@ describe("a dívida do Porto no painel", () => {
 
 describe("draftPrivateInfo", () => {
   it("returns generated private info without persisting it", async () => {
-    const chat = vi.fn(async () => JSON.stringify({ "casa-vargen": "Corvos pousam sobre Droskar." }));
+    const chat = vi.fn(async () => JSON.stringify({ "cla-gangrel": "Corvos pousam sobre Parque do Norte." }));
     vi.mocked(turnsDb.getActiveTurn).mockResolvedValue({ ...draftTurn, turnId: 2, publicEvent: "A noite não termina." });
     vi.mocked(turnsDb.listTurns).mockResolvedValue([
       { ...draftTurn, turnId: 1, status: "RESOLVED", result: { publicResult: "O gelo venceu a ponte.", houseResults: {}, attributeDeltas: {}, discoveries: [] } },
@@ -593,7 +593,7 @@ describe("draftPrivateInfo", () => {
 
     const res = await draftPrivateInfo({ ...deps, chat }, authReq({ method: "POST" }));
 
-    expect(res).toEqual({ status: 200, body: { privateInfo: { "casa-vargen": "Corvos pousam sobre Droskar." } } });
+    expect(res).toEqual({ status: 200, body: { privateInfo: { "cla-gangrel": "Corvos pousam sobre Parque do Norte." } } });
     expect(chat).toHaveBeenCalledWith(expect.stringContaining("Turno 1: O gelo venceu a ponte."), expect.stringContaining("A noite não termina."), true, undefined);
     expect(turnsDb.putTurn).not.toHaveBeenCalled();
   });
@@ -607,17 +607,17 @@ describe("draftPrivateInfo", () => {
   it("leva ao prompt o que foi comprado no Porto no turno anterior", async () => {
     // A assinatura importa: sem os parâmetros declarados, o TypeScript infere
     // tupla vazia em mock.calls e o acesso ao índice 1 não compila.
-    const chat = vi.fn(async (_system: string, _user: string) => JSON.stringify({ "casa-vargen": "..." }));
+    const chat = vi.fn(async (_system: string, _user: string) => JSON.stringify({ "cla-gangrel": "..." }));
     vi.mocked(turnsDb.getActiveTurn).mockResolvedValue({ ...draftTurn, turnId: 8 });
     vi.mocked(projectsDb.listCampaignProjects).mockResolvedValue([
       {
-        houseId: "casa-vargen",
+        houseId: "cla-gangrel",
         templateId: "rumores-da-rua-o-que-nao-se-explica",
         status: "COMPLETED",
         lastProcessedTurnId: 7,
       } as any,
       {
-        houseId: "casa-vargen",
+        houseId: "cla-gangrel",
         templateId: "rumores-da-rua-quem-anda-armado",
         status: "COMPLETED",
         lastProcessedTurnId: 6,
@@ -635,10 +635,10 @@ describe("draftPrivateInfo", () => {
   });
 
   it("derruba o rascunho que denuncia a mecânica do Porto", async () => {
-    const chat = vi.fn(async () => JSON.stringify({ "casa-vargen": "Dizem que alguém comprou informação no cais." }));
+    const chat = vi.fn(async () => JSON.stringify({ "cla-gangrel": "Dizem que alguém comprou informação no cais." }));
     vi.mocked(turnsDb.getActiveTurn).mockResolvedValue({ ...draftTurn, turnId: 8 });
     vi.mocked(projectsDb.listCampaignProjects).mockResolvedValue([
-      { houseId: "casa-vargen", templateId: "rumores-da-rua-o-que-nao-se-explica", status: "COMPLETED", lastProcessedTurnId: 7 } as any,
+      { houseId: "cla-gangrel", templateId: "rumores-da-rua-o-que-nao-se-explica", status: "COMPLETED", lastProcessedTurnId: 7 } as any,
     ]);
 
     await expect(draftPrivateInfo({ ...deps, chat }, authReq({ method: "POST" }))).rejects.toMatchObject({
@@ -652,7 +652,7 @@ describe("draftPrivateInfo", () => {
    * linguagem do mundo. Derrubar o rascunho aí travaria o turno por nada.
    */
   it("não derruba o rascunho quando ninguém comprou nada", async () => {
-    const chat = vi.fn(async () => JSON.stringify({ "casa-vargen": "Corre um rumor falso sobre a morte do rei." }));
+    const chat = vi.fn(async () => JSON.stringify({ "cla-gangrel": "Corre um rumor falso sobre a morte do rei." }));
     vi.mocked(projectsDb.listCampaignProjects).mockResolvedValue([]);
 
     const res = await draftPrivateInfo({ ...deps, chat }, authReq({ method: "POST" }));
@@ -672,13 +672,13 @@ describe("draftResolution", () => {
   it("returns a parsed AI resolution draft for a locked turn", async () => {
     const chat = vi.fn(async () => JSON.stringify({
       publicResult: "As muralhas resistem.",
-      houseResults: { "casa-vargen": "A guarda segura o portão." },
-      attributeDeltas: { "casa-vargen": { soldados: -1 } },
+      houseResults: { "cla-gangrel": "A guarda segura o portão." },
+      attributeDeltas: { "cla-gangrel": { soldados: -1 } },
       discoveries: ["A neve sussurra nomes."],
     }));
     vi.mocked(turnsDb.getActiveTurn).mockResolvedValue({ ...composedTurn, status: "LOCKED" });
     vi.mocked(submissionsDb.listSubmissions).mockResolvedValue([
-      { houseId: "casa-vargen", orderText: "Guarnecer o portão.", submittedAt: "2026-01-03T00:00:00.000Z" },
+      { houseId: "cla-gangrel", orderText: "Guarnecer o portão.", submittedAt: "2026-01-03T00:00:00.000Z" },
     ]);
 
     const res = await draftResolution({ ...deps, chat }, authReq({ method: "POST" }));
@@ -687,8 +687,8 @@ describe("draftResolution", () => {
       status: 200,
       body: {
         publicResult: "As muralhas resistem.",
-        houseResults: { "casa-vargen": "A guarda segura o portão." },
-        attributeDeltas: { "casa-vargen": { soldados: -1 } },
+        houseResults: { "cla-gangrel": "A guarda segura o portão." },
+        attributeDeltas: { "cla-gangrel": { soldados: -1 } },
         discoveries: ["A neve sussurra nomes."],
       },
     });
@@ -718,9 +718,9 @@ describe("applyResolution", () => {
     vi.mocked(turnsDb.createNextTurnDraft).mockResolvedValue({ ...draftTurn, turnId: 3 });
     const body = {
       publicResult: "O cerco termina em silêncio.",
-      houseResults: { "casa-vargen": "A Casa Vargen preserva a muralha." },
+      houseResults: { "cla-gangrel": "A Clã Gangrel preserva a muralha." },
       attributeDeltas: {
-        "casa-vargen": { soldados: 1, recursos: -2 },
+        "cla-gangrel": { soldados: 1, recursos: -2 },
         "casa-baixa": { riqueza: -2, controle: 1 },
       },
       discoveries: ["Um sino toca sob a neve."],
@@ -729,26 +729,26 @@ describe("applyResolution", () => {
     const res = await applyResolution(deps, authReq({ method: "POST", body }));
 
     expect(res).toEqual({ status: 200, body: { nextTurnId: 3 } });
-    expect(housesDb.updateHouseAttributes).toHaveBeenCalledWith(deps.doc, "ravenloft-game", "cidade-noturna", "casa-vargen", {
+    expect(housesDb.updateHouseAttributes).toHaveBeenCalledWith(deps.doc, "vampirorpg-game", "cidade-noturna", "cla-gangrel", {
       riqueza: 1,
       recursos: 0,
       soldados: 5,
       controle: 2,
     });
-    expect(housesDb.updateHouseAttributes).toHaveBeenCalledWith(deps.doc, "ravenloft-game", "cidade-noturna", "casa-baixa", {
+    expect(housesDb.updateHouseAttributes).toHaveBeenCalledWith(deps.doc, "vampirorpg-game", "cidade-noturna", "casa-baixa", {
       riqueza: 0,
       recursos: 1,
       soldados: 2,
       controle: 1,
     });
-    expect(turnsDb.saveTurnResult).toHaveBeenCalledWith(deps.doc, "ravenloft-game", "cidade-noturna", 2, {
+    expect(turnsDb.saveTurnResult).toHaveBeenCalledWith(deps.doc, "vampirorpg-game", "cidade-noturna", 2, {
       ...body,
       attributeChanges: {
-        "casa-vargen": [{ key: "recursos", before: 2, after: 0 }],
+        "cla-gangrel": [{ key: "recursos", before: 2, after: 0 }],
         "casa-baixa": [{ key: "controle", before: 0, after: 1 }],
       },
     });
-    expect(turnsDb.createNextTurnDraft).toHaveBeenCalledWith(deps.doc, "ravenloft-game", "cidade-noturna", 3);
+    expect(turnsDb.createNextTurnDraft).toHaveBeenCalledWith(deps.doc, "vampirorpg-game", "cidade-noturna", 3);
   });
 });
 
@@ -773,7 +773,7 @@ describe("world bible routes", () => {
   it("putWorldBible validates and saves", async () => {
     const res = await putWorldBible(deps, authReq({ method: "PUT", body: { lore: "Nova lore", visualDirectives: "Novas diretrizes" } }));
     expect(res.status).toBe(204);
-    expect(worldBibleDb.putWorldBible).toHaveBeenCalledWith(deps.doc, "ravenloft-game", "cidade-noturna", { lore: "Nova lore", visualDirectives: "Novas diretrizes" });
+    expect(worldBibleDb.putWorldBible).toHaveBeenCalledWith(deps.doc, "vampirorpg-game", "cidade-noturna", { lore: "Nova lore", visualDirectives: "Novas diretrizes" });
   });
 
   it("putWorldBible requires an admin token", async () => {
@@ -812,7 +812,7 @@ describe("turn images", () => {
     expect(promptArg).toContain("ESTILO: dark fantasy gótico.");
     expect(promptArg).toContain("Ponte coberta de neve.");
     expect(imageStore.uploadTurnImage).toHaveBeenCalledWith("event", 4, expect.any(Buffer));
-    expect(turnsDb.setTurnImage).toHaveBeenCalledWith(deps.doc, "ravenloft-game", "cidade-noturna", 4, "event", "https://bucket/turns/004/event.png?v=1");
+    expect(turnsDb.setTurnImage).toHaveBeenCalledWith(deps.doc, "vampirorpg-game", "cidade-noturna", 4, "event", "https://bucket/turns/004/event.png?v=1");
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ imageUrl: "https://bucket/turns/004/event.png?v=1" });
   });
@@ -858,7 +858,7 @@ describe("turn images", () => {
     );
 
     expect(imageStore.uploadTurnImage).toHaveBeenCalledWith("event", 4, Buffer.from("jpeg-bytes"), "image/jpeg");
-    expect(turnsDb.setTurnImage).toHaveBeenCalledWith(deps.doc, "ravenloft-game", "cidade-noturna", 4, "event", "https://bucket/turns/004/event.jpg?v=1");
+    expect(turnsDb.setTurnImage).toHaveBeenCalledWith(deps.doc, "vampirorpg-game", "cidade-noturna", 4, "event", "https://bucket/turns/004/event.jpg?v=1");
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ imageUrl: "https://bucket/turns/004/event.jpg?v=1" });
   });
@@ -925,7 +925,7 @@ describe("turn images", () => {
   it("clears an image url on delete", async () => {
     vi.mocked(turnsDb.getActiveTurn).mockResolvedValue({ ...composedTurn, turnId: 4 });
     const res = await deleteTurnImage(deps, authReq({ method: "POST", body: { kind: "result" } }));
-    expect(turnsDb.setTurnImage).toHaveBeenCalledWith(deps.doc, "ravenloft-game", "cidade-noturna", 4, "result", "");
+    expect(turnsDb.setTurnImage).toHaveBeenCalledWith(deps.doc, "vampirorpg-game", "cidade-noturna", 4, "result", "");
     expect(res.status).toBe(204);
   });
 
@@ -951,7 +951,7 @@ describe("adminRoutes wiki", () => {
   it("creates a wiki entry with a generated id and updatedAt", async () => {
     const res = await createWikiEntry(
       deps,
-      authReq({ method: "POST", body: { section: "clas", title: "Casa Vargen", body: "lobos", order: 2 } }),
+      authReq({ method: "POST", body: { section: "clas", title: "Clã Gangrel", body: "lobos", order: 2 } }),
     );
     expect(res.status).toBe(200);
     const entry = (res.body as any).entry;
@@ -981,7 +981,7 @@ describe("adminRoutes wiki", () => {
   it("deletes a wiki entry", async () => {
     const res = await removeWikiEntry(deps, authReq({ method: "POST", body: { entryId: "abc" } }));
     expect(res.status).toBe(204);
-    expect(wikiDb.deleteWikiEntry).toHaveBeenCalledWith(deps.doc, "ravenloft-game", "cidade-noturna", "abc");
+    expect(wikiDb.deleteWikiEntry).toHaveBeenCalledWith(deps.doc, "vampirorpg-game", "cidade-noturna", "abc");
   });
 
   it("requires admin to create", async () => {
@@ -995,7 +995,7 @@ describe("adminRoutes wiki", () => {
     const res = await seedWiki(deps, authReq({ method: "POST" }));
     expect(res.status).toBe(200);
     expect((res.body as any).seeded).toBe(18);
-    expect(wikiDb.seedDefaultWiki).toHaveBeenCalledWith(deps.doc, "ravenloft-game", "cidade-noturna");
+    expect(wikiDb.seedDefaultWiki).toHaveBeenCalledWith(deps.doc, "vampirorpg-game", "cidade-noturna");
   });
 
   it("requires admin to seed", async () => {
@@ -1015,7 +1015,7 @@ describe("GM bible routes", () => {
   it("creates a GM entry with a generated id", async () => {
     const res = await createGmEntry(
       deps,
-      authReq({ method: "POST", body: { section: "a-verdade", title: "A verdade", body: "Othmar", order: 0 } }),
+      authReq({ method: "POST", body: { section: "a-verdade", title: "A verdade", body: "Príncipe", order: 0 } }),
     );
     expect(res.status).toBe(200);
     expect((res.body as any).entry.entryId).toBe("gmid000001");
@@ -1041,7 +1041,7 @@ describe("GM bible routes", () => {
   it("deletes a GM entry", async () => {
     const res = await removeGmEntry(deps, authReq({ method: "POST", body: { entryId: "abc" } }));
     expect(res.status).toBe(204);
-    expect(gmDb.deleteGmEntry).toHaveBeenCalledWith(deps.doc, "ravenloft-game", "cidade-noturna", "abc");
+    expect(gmDb.deleteGmEntry).toHaveBeenCalledWith(deps.doc, "vampirorpg-game", "cidade-noturna", "abc");
   });
 
   it("seeds the default GM lore", async () => {
@@ -1049,7 +1049,7 @@ describe("GM bible routes", () => {
     const res = await seedGm(deps, authReq({ method: "POST" }));
     expect(res.status).toBe(200);
     expect((res.body as any).seeded).toBe(20);
-    expect(gmDb.seedDefaultGm).toHaveBeenCalledWith(deps.doc, "ravenloft-game", "cidade-noturna");
+    expect(gmDb.seedDefaultGm).toHaveBeenCalledWith(deps.doc, "vampirorpg-game", "cidade-noturna");
   });
 
   it("requires admin for every GM route", async () => {
@@ -1066,7 +1066,7 @@ describe("adminApproveProject", () => {
     const poorHouse = { ...house, attributes: { riqueza: 0, recursos: 0, soldados: 0, controle: 0 }, stability: 0 };
     vi.mocked(housesDb.getHouse).mockResolvedValue(poorHouse);
     vi.mocked(projectsDb.listCampaignProjects).mockResolvedValue([
-      { id: "p1", houseId: "casa-vargen", status: "PENDING_GM", costs: [{ type: "WEALTH", amount: 2, timing: "ON_START" }] } as any,
+      { id: "p1", houseId: "cla-gangrel", status: "PENDING_GM", costs: [{ type: "WEALTH", amount: 2, timing: "ON_START" }] } as any,
     ]);
     await expect(
       adminApproveProject(deps, authReq({ method: "POST", body: { projectId: "p1" } })),
@@ -1076,7 +1076,7 @@ describe("adminApproveProject", () => {
 
   it("rejects approving a project that is not pending", async () => {
     vi.mocked(projectsDb.listCampaignProjects).mockResolvedValue([
-      { id: "p1", houseId: "casa-vargen", status: "ACTIVE", costs: [] } as any,
+      { id: "p1", houseId: "cla-gangrel", status: "ACTIVE", costs: [] } as any,
     ]);
     await expect(
       adminApproveProject(deps, authReq({ method: "POST", body: { projectId: "p1" } })),
@@ -1164,7 +1164,7 @@ describe("as rotas comerciais rendem recurso", () => {
   function rotas(n: number) {
     return Array.from({ length: n }, (_, i) => ({
       id: `r${i}`, campaignId: "cidade-noturna", turnNumber: 7, kind: "ACORDO",
-      betweenA: "h1", betweenB: "casa-karasoy", summary: "rota", sourceMessageId: "m",
+      betweenA: "h1", betweenB: "cla-brujah", summary: "rota", sourceMessageId: "m",
       status: "ATIVO", createdAt: "2026-08-29T00:00:00Z",
     }));
   }

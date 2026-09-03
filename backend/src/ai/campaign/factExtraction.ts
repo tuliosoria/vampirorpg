@@ -19,7 +19,7 @@ export function factExtractionSystemPrompt(): string {
     "2. Toda entrada precisa de uma CITAÇÃO LITERAL do texto — copiada caractere por caractere, com pelo menos vinte caracteres. A citação é conferida contra o texto e a entrada é DESCARTADA se não bater.",
     "3. Opinião de personagem não é fato. Se alguém na cena ACHA, DESCONFIA ou ACUSA, isso não entra. Só entra o que o narrador afirma ter acontecido.",
     "4. Um resumo por fato, uma frase, com número, prazo e lugar quando o texto os der.",
-    "5. 'partes' são os clãs envolvidos, pelas chaves da lista. Deixe VAZIO quando o fato vale para a Cidade inteira — uma decisão da corte, uma data, uma sentença.",
+    "5. 'partes' são os clãs envolvidos, pelas chaves da lista. Deixe VAZIO quando o fato vale parà Cidade inteira — uma decisão da corte, uma data, uma sentença.",
     "6. Prefira poucos fatos densos a muitos fatos rasos. Uma cena inteira pode render um fato, ou nenhum.",
     "",
     `Chaves de Casa válidas: ${SEATS.map((s) => s.key).join(", ")}`,
@@ -123,7 +123,7 @@ export function parseFacts(
     }
 
     // A citação é conferida contra o bloco que gerou esta chamada, e só contra
-    // ele. Um fato "extraído" do resultado privado de Khazdrun cuja citação na
+    // ele. Um fato "extraído" do resultado privado de Nosferatu cuja citação na
     // verdade veio do texto público seria classificado como segredo por engano.
     if (!quoteIsGrounded(citacao, ctx.bloco.texto)) {
       descartados++;

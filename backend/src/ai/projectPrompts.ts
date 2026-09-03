@@ -133,7 +133,7 @@ const PER_SECTION_CHARS = 800;
 const CANON_BUDGET_CHARS = 6000;
 
 export function buildProjectCanon(entries: { section: string; title: string; body: string }[]): string {
-  const parts: string[] = [PROJECT_MECHANICS_CANON, "", "CÂNONE PÚBLICO DE VALDREN:"];
+  const parts: string[] = [PROJECT_MECHANICS_CANON, "", "CÂNONE PÚBLICO DA CIDADE:"];
   let used = 0;
   for (const section of CANON_SECTIONS) {
     for (const e of entries.filter((x) => x.section === section)) {

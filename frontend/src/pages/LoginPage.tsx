@@ -46,7 +46,7 @@ export function LoginPage() {
       <Box component="form" onSubmit={submit} sx={{ maxWidth: 420, mt: 2 }}>
         <TextField
           label="Código do jogador"
-          placeholder="ex.: vargen-4K7P"
+          placeholder="ex.: ventrue-4K7P"
           value={code}
           onChange={(e) => setCode(e.target.value)}
           sx={{ mb: 2 }}

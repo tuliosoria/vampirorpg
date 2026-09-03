@@ -7,9 +7,9 @@ afterEach(limparCanon);
 
 const FONTE = `Nosferatu mandou cem.
 
-Cem homens e um comboio de suprimentos, sob o martelo de Khar-Durak, de uma Casa que sustenta três mil. O oficial de registro contou duas vezes.
+Cem homens e um comboio de suprimentos, sob o martelo de Galeria Subterrânea, de uma Casa que sustenta três mil. O oficial de registro contou duas vezes.
 
-Alic decretou o aumento dos tributos cobrados das Casas que não contribuíram com tropas.`;
+Vasco decretou o aumento dos tributos cobrados das Casas que não contribuíram com tropas.`;
 
 const ctx = { bloco: { visibility: "PUBLICO", rotulo: "r", texto: FONTE }, turnNumber: 6, campaignId: "c", now: "2026-08-29T00:00:00Z", id: () => "id1" };
 
@@ -35,14 +35,14 @@ describe("a citação decide se o fato existe", () => {
   });
 
   it("descarta tipo que não existe", () => {
-    const r = parseFacts(json([{ kind: "FOFOCA", partes: [], resumo: "x", citacao: "Alic decretou o aumento dos tributos" }]), ctx);
+    const r = parseFacts(json([{ kind: "FOFOCA", partes: [], resumo: "x", citacao: "Vasco decretou o aumento dos tributos" }]), ctx);
     expect(r.facts).toEqual([]);
   });
 });
 
 describe("as partes", () => {
   it("guarda vazio para o fato do reino", () => {
-    const r = parseFacts(json([{ kind: "DECRETO", partes: [], resumo: "Tributo agravado.", citacao: "Alic decretou o aumento dos tributos cobrados das Casas" }]), ctx);
+    const r = parseFacts(json([{ kind: "DECRETO", partes: [], resumo: "Tributo agravado.", citacao: "Vasco decretou o aumento dos tributos cobrados das Casas" }]), ctx);
     expect(r.facts[0].parties).toEqual([]);
   });
 
@@ -72,8 +72,8 @@ describe("respostas que não são JSON", () => {
 describe("o turno fatiado por audiência", () => {
   const input = {
     turnNumber: 6, publicEvent: "Vinte mil marcham.", publicResult: "Nosferatu mandou cem.",
-    houseResults: { "khazdrun-wxey": "A montanha não rachou.", "vazio-1": "" },
-    seatOfHouseId: (h: string) => (h === "khazdrun-wxey" ? "cla-nosferatu" : null),
+    houseResults: { "nosferatu-wxey": "A montanha não rachou.", "vazio-1": "" },
+    seatOfHouseId: (h: string) => (h === "nosferatu-wxey" ? "cla-nosferatu" : null),
   };
 
   // Uma chamada por bloco, e não uma pelo turno inteiro: com o turno todo o

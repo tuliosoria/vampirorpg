@@ -37,7 +37,7 @@ export interface Detector {
    * Quebra um bloco de texto em prosa e nomes, para virar link na tela.
    *
    * Só a PRIMEIRA menção de cada pessoa vira trecho de pessoa. Um parágrafo que
-   * repete "Elara" seis vezes não precisa de seis links — precisa de um, e o
+   * repete "Inês" seis vezes não precisa de seis links — precisa de um, e o
    * resto do texto continua sendo texto.
    */
   trechos(texto: string): Trecho[];
@@ -96,9 +96,9 @@ function palavrasComuns(verbetes: VerbeteAnalisavel[]): Set<string> {
  * Só o nome próprio identifica a pessoa — nunca o sobrenome.
  *
  * O sobrenome falha de duas maneiras, e as duas apareceram no texto real de
- * a Cidade. Ele nomeia lugares: "Torre de Véspera" fazia quatro verbetes
- * afirmarem que Maelor Véspera aparecia neles. E ele é dividido com gente que
- * não está no elenco: "Alaric Venn" oferecia um link que levava a Liora Venn,
+ * a Cidade. Ele nomeia lugares: "Capela da Consolação" fazia quatro verbetes
+ * afirmarem que Professor Haddad aparecia neles. E ele é dividido com gente que
+ * não está no elenco: "Bruno do Corte" oferecia um link que levava a Neide do Corte,
  * despejando o leitor na pessoa errada.
  *
  * Isso custa alcance — quem for citado só pelo sobrenome não é achado. É o
@@ -129,7 +129,7 @@ function vocabularioDoElenco(
  * `mentionsHouse` não serve aqui. Ela foi escrita para casar nome de entidade
  * e título de verbete — strings de poucas palavras — e procura por substring
  * crua. Solta no corpo de um verbete, "ouro" casava dentro de couro e tesouro,
- * e "ulgar" dentro de vulgar. Num texto longo a chance de uma substring de
+ * e "ouro" dentro de tesouro. Num texto longo a chance de uma substring de
  * quatro letras aparecer é quase certeza. Aqui os termos ganham borda de
  * palavra e passam pelo mesmo filtro de palavra comum dos personagens — que é
  * o que tira "ouro", o metal, do caminho.
@@ -192,7 +192,7 @@ export function construirDetector(
   const comuns = palavrasComuns(verbetes);
   const casas = vocabularioDasCasas(comuns);
   // Um nome que também batiza uma Casa ou uma cidade pertence ao lugar: o
-  // texto que diz "Karasoy" quase sempre fala da Casa, não da pessoa.
+  // texto que diz "Brujah" quase sempre fala da Casa, não da pessoa.
   const topônimos = new Set([...casas.values()].flat());
   const dono = vocabularioDoElenco(elenco, comuns, topônimos);
   const ordem = new Map(elenco.map((p, i) => [p.id, i]));

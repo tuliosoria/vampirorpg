@@ -13,7 +13,7 @@ import { useApi } from "../../api/ApiProvider";
 import { LoadingState } from "../LoadingState";
 import type { AdminCorrespondence, AdminCorrespondenceThread } from "../../api/client";
 
-/** Id do NPC → nome legível, para não mostrar "kaelen-drakorys" ao Mestre. */
+/** Id do NPC → nome legível, para não mostrar "vasco-aranha" ao Narrador. */
 function nomeDoNpc(id: string): string {
   return fullCodex().find((n) => n.id === id)?.name ?? id;
 }

@@ -5,12 +5,12 @@ import { ORDER_TEXT_MAX } from "@vampiro/content";
 
 const validCreateHouseBody = {
   displayName: "Jogador",
-  name: "Casa Vargen",
+  name: "Clã Gangrel",
   motto: "No inverno, resistimos",
   emblem: { icon: "lobo", color1: "#111111", color2: "#222222" },
   leaderName: "Radan",
   heirName: "Irina",
-  castleName: "Castelo Vargen",
+  castleName: "Castelo Gangrel",
   townsText: "Três vilas",
   historyText: "Antiga linhagem",
   specialty: "Patrulhas",
@@ -63,13 +63,13 @@ describe("validation schemas", () => {
   it("parseAdminUpdateHouseBody requires houseId and accepts free attributes", () => {
     const { displayName, ...houseFields } = validCreateHouseBody;
     void displayName;
-    const body = { houseId: "casa-vargen", ...houseFields, attributes: { riqueza: 0, recursos: 0, soldados: 1, controle: 0 } };
+    const body = { houseId: "cla-gangrel", ...houseFields, attributes: { riqueza: 0, recursos: 0, soldados: 1, controle: 0 } };
     expect(parseAdminUpdateHouseBody(body)).toEqual(body);
     expect(() => parseAdminUpdateHouseBody({ ...body, houseId: "" })).toThrow(HttpError);
   });
 
   it("parseAdminDeleteHouseBody requires houseId", () => {
-    expect(parseAdminDeleteHouseBody({ houseId: "casa-vargen" })).toEqual({ houseId: "casa-vargen" });
+    expect(parseAdminDeleteHouseBody({ houseId: "cla-gangrel" })).toEqual({ houseId: "cla-gangrel" });
     expect(() => parseAdminDeleteHouseBody({})).toThrow(HttpError);
   });
 
@@ -97,15 +97,15 @@ describe("validation schemas", () => {
   });
 
   it("keeps login parsers working", () => {
-    expect(parseLoginBody({ playerCode: "vargen-4K7P" })).toEqual({ playerCode: "vargen-4K7P" });
+    expect(parseLoginBody({ playerCode: "gangrel-4K7P" })).toEqual({ playerCode: "gangrel-4K7P" });
     expect(parseAdminLoginBody({ adminCode: "secret" })).toEqual({ adminCode: "secret" });
   });
 
   it("parseApplyResolutionBody accepts a valid resolution", () => {
     const body = {
       publicResult: "O inverno recua por uma noite.",
-      houseResults: { "casa-vargen": "A muralha resiste." },
-      attributeDeltas: { "casa-vargen": { soldados: -1, controle: 1 } },
+      houseResults: { "cla-gangrel": "A muralha resiste." },
+      attributeDeltas: { "cla-gangrel": { soldados: -1, controle: 1 } },
       discoveries: ["Há fogo sob o lago."],
     };
 
@@ -115,20 +115,20 @@ describe("validation schemas", () => {
   it("parseApplyResolutionBody rejects malformed nested records", () => {
     expect(() => parseApplyResolutionBody({
       publicResult: "Resultado",
-      houseResults: { "casa-vargen": 7 },
+      houseResults: { "cla-gangrel": 7 },
       attributeDeltas: {},
       discoveries: [],
     })).toThrow(HttpError);
     expect(() => parseApplyResolutionBody({
       publicResult: "Resultado",
       houseResults: {},
-      attributeDeltas: { "casa-vargen": null },
+      attributeDeltas: { "cla-gangrel": null },
       discoveries: [],
     })).toThrow(HttpError);
     expect(() => parseApplyResolutionBody({
       publicResult: "Resultado",
       houseResults: {},
-      attributeDeltas: { "casa-vargen": { reputacao: 1 } },
+      attributeDeltas: { "cla-gangrel": { reputacao: 1 } },
       discoveries: [],
     })).toThrow(HttpError);
     expect(() => parseApplyResolutionBody({
@@ -162,10 +162,10 @@ describe("parseImagesField", () => {
 describe("parseHouseImageGenerateBody", () => {
   it("parses name, description, emblem", () => {
     const out = parseHouseImageGenerateBody({
-      name: "Casa Vargen", description: "Uma casa antiga do norte.",
+      name: "Clã Gangrel", description: "Uma casa antiga do norte.",
       emblem: { icon: "lobo", color1: "#3f3f46", color2: "#1e3a5f" },
     });
-    expect(out.name).toBe("Casa Vargen");
+    expect(out.name).toBe("Clã Gangrel");
     expect(out.emblem.icon).toBe("lobo");
   });
 });
@@ -198,13 +198,13 @@ describe("wiki schemas", () => {
 
     expect(parseWikiCreateBody({
       section: "clas",
-      title: "Casa Euralune",
+      title: "Clã Toreador",
       body: "Senhores do céu.",
       order: 1,
-      imageUrls: ["/houses/euralune.jpg", "/houses/euralune-2.jpg"],
+      imageUrls: ["/houses/toreador.jpg", "/houses/toreador-2.jpg"],
     })).toMatchObject({
-      imageUrl: "/houses/euralune.jpg",
-      imageUrls: ["/houses/euralune.jpg", "/houses/euralune-2.jpg"],
+      imageUrl: "/houses/toreador.jpg",
+      imageUrls: ["/houses/toreador.jpg", "/houses/toreador-2.jpg"],
     });
   });
 
@@ -219,10 +219,10 @@ describe("wiki schemas", () => {
 
     expect(() => parseWikiCreateBody({
       section: "clas",
-      title: "Casa Euralune",
+      title: "Clã Toreador",
       body: "",
       order: 0,
-      imageUrls: ["/houses/euralune.jpg", "javascript:alert(1)"],
+      imageUrls: ["/houses/toreador.jpg", "javascript:alert(1)"],
     })).toThrow(HttpError);
   });
 });
@@ -232,14 +232,14 @@ import { canonImageKey } from "../keys";
 
 describe("canon schemas", () => {
   const proposal = {
-    title: "Sera de Vargen",
+    title: "Sera de Gangrel",
     section: "clas",
     body: "Batedora das fronteiras do norte.",
-    summary: "Batedora de Vargen.",
+    summary: "Batedora de Gangrel.",
     entityType: "CHARACTER",
-    canonicalName: "Sera de Vargen",
+    canonicalName: "Sera de Gangrel",
     immutableTraits: ["cicatriz no queixo"],
-    houseId: "vargen",
+    houseId: "gangrel",
   };
 
   it("parses a preview body", () => {
@@ -374,7 +374,7 @@ describe("canon schemas", () => {
 });
 
 describe("assertCanonImageOwned", () => {
-  const baseUrl = "https://ravenloft-images.s3.us-east-1.amazonaws.com";
+  const baseUrl = "https://vampiro-images.s3.us-east-1.amazonaws.com";
 
   it("accepts a url/key pair produced by uploadCanonImage", () => {
     const key = canonImageKey("abc-123", "png");

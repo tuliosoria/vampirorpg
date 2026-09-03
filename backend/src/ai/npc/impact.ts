@@ -6,8 +6,8 @@ import type { NpcIdentity, NpcDynamic, NpcImpact } from "@vampiro/content";
  * — nunca prosa livre reescrevendo a ficha.
  *
  * O mesmo evento move NPCs em direções opostas porque passa pela identidade de
- * cada um: o líder gnomo desaba em confiança no rei que atacou Ninho Alto; um
- * comandante Vargen pode subir ("finalmente um rei disposto a usar força").
+ * cada um: o líder gnomo desaba em confiança no rei que atacou o Teatro Municipal; um
+ * comandante Gangrel pode subir ("finalmente um rei disposto a usar força").
  */
 export const IMPACT_SYSTEM_PROMPT = [
   "Você é o motor de reações de um jogo político. Dado um acontecimento e um personagem,",

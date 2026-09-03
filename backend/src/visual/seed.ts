@@ -11,18 +11,15 @@ export interface SeedItem {
   description: string;
 }
 
-export const SEED_ITEMS: SeedItem[] = [
-  { file: "Principe Vasco Aranha.png", entityId: "alic-valerius", entityType: "CHARACTER", name: "Príncipe Vasco Aranha", slug: "alic-valerius", assetType: "PORTRAIT", canonicalLevel: "CANONICAL", description: "Retrato do Príncipe Vasco Aranha" },
-  { file: "Lady Celene Valerius.png", entityId: "celene-valerius", entityType: "CHARACTER", name: "Lady Celene Valerius", slug: "celene-valerius", assetType: "PORTRAIT", canonicalLevel: "CANONICAL", description: "Retrato de Lady Celene Valerius" },
-  { file: "Mapa Oficial.png", entityId: "mapa-cidade", entityType: "MAP", name: "Mapa Oficial da Cidade", slug: "mapa-cidade", assetType: "MAP", canonicalLevel: "LOCKED", description: "Mapa Oficial da Cidade (travado)" },
-  { file: "Khar-Durak.png", entityId: "khar-durak", entityType: "CITY", name: "Khar-Durak", slug: "khar-durak", assetType: "ESTABLISHING", canonicalLevel: "CANONICAL", description: "Cidade de Khar-Durak" },
-  { file: "Euralune Cidade - Ninho Alto.png", entityId: "euralune", entityType: "CITY", name: "Euralune (Ninho Alto)", slug: "euralune", assetType: "ESTABLISHING", canonicalLevel: "CANONICAL", description: "Cidade de Euralune, o Ninho Alto" },
-  { file: "Solarion Sahra-Lun.png", entityId: "solarion", entityType: "CITY", name: "Solarion (Sahra-Lun)", slug: "solarion", assetType: "ESTABLISHING", canonicalLevel: "CANONICAL", description: "Cidade de Solarion, Sahra-Lun" },
-  { file: "Elfos de Solarion.png", entityId: "elfos-solarion", entityType: "ANCESTRY", name: "Elfos de Solarion", slug: "elfos-solarion", assetType: "REFERENCE_SHEET", canonicalLevel: "CANONICAL", description: "Elfos de Solarion" },
-  { file: "Elfos de Sahra-Lun.png", entityId: "elfos-sahra-lun", entityType: "ANCESTRY", name: "Elfos de Sahra-Lun", slug: "elfos-sahra-lun", assetType: "REFERENCE_SHEET", canonicalLevel: "CANONICAL", description: "Elfos de Sahra-Lun" },
-  { file: "Gnomos de Euralune.png", entityId: "gnomos-euralune", entityType: "ANCESTRY", name: "Gnomos de Euralune", slug: "gnomos-euralune", assetType: "REFERENCE_SHEET", canonicalLevel: "CANONICAL", description: "Gnomos de Euralune" },
-  { file: "Mandibula de Osso.png", entityId: "mandibula-de-osso", entityType: "CREATURE", name: "Clã Mandíbula de Osso", slug: "mandibula-de-osso", assetType: "REFERENCE_SHEET", canonicalLevel: "CANONICAL", description: "Clã Mandíbula de Osso" },
-];
+/**
+ * As imagens que a crônica traz de fábrica.
+ *
+ * Nasce vazia. Era o acervo do jogo de origem — retratos, cidades e povos de um
+ * mundo que não é este —, e os arquivos nem vieram no fork: a semente apontava
+ * para PNGs que não existem. Quem povoa o acervo é o Narrador, pelo Estúdio.
+ */
+export const SEED_ITEMS: SeedItem[] = [];
+
 
 export interface SeedDeps {
   getActiveStyleBible: (campaignId: string) => Promise<VisualStyleBible | null>;

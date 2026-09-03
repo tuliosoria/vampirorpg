@@ -16,7 +16,7 @@ const nomeDaSede = (k: string) => SEATS.find((s) => s.key === k)?.name ?? k;
  * O registro da campanha: o que já aconteceu e não se discute.
  *
  * Existe porque o que aconteceu só vivia como prosa, e a afirmação errada de
- * que Khazdrun não enviou tropa nenhuma atravessou três turnos, o evento
+ * que Nosferatu não enviou tropa nenhuma atravessou três turnos, o evento
  * público, o resultado da Casa e três cartas entregues antes de alguém notar.
  *
  * Como a extração grava sem passar por aprovação, esta tela é a única

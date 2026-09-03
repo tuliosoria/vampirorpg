@@ -19,7 +19,7 @@ describe("nome de gente vira link", () => {
   });
 
   it("não altera uma vírgula do texto", () => {
-    const texto = "Selma escreveu a Vasco sobre Alic, e ninguém respondeu.";
+    const texto = "Solano escreveu a Vasco sobre Vasco, e ninguém respondeu.";
     const { container } = mostrar(<TextoComPessoas texto={texto} />);
     expect(container.textContent).toBe(texto);
   });

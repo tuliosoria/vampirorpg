@@ -40,7 +40,7 @@ describe("clampRelationValue", () => {
 
 describe("describeRelation", () => {
   it("concorda em gênero com cada eixo", () => {
-    const r = emptyHouseRelation("casa-do-ouro", "casa-khazdrun");
+    const r = emptyHouseRelation("casa-do-ouro", "cla-nosferatu");
     r.amizade = 80;
     r.comercio = 10;
     expect(describeRelation(r)).toBe("amizade boa, comércio ruim, favores médio.");

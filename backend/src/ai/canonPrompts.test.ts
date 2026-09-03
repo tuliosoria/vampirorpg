@@ -4,7 +4,7 @@ import { VISUAL_ENTITY_TYPES } from "@vampiro/content";
 import type { WikiEntry } from "@vampiro/content";
 
 const wiki: WikiEntry[] = [
-  { entryId: "w1", section: "clas", title: "Casa Vargen", body: "Guarda a fronteira norte.", order: 0, updatedAt: "" },
+  { entryId: "w1", section: "clas", title: "Clã Gangrel", body: "Guarda a fronteira norte.", order: 0, updatedAt: "" },
   { entryId: "w2", section: "mesa", title: "teste de Força de Vontade", body: "Slot de nível 3.", order: 0, updatedAt: "" },
 ];
 
@@ -15,7 +15,7 @@ afterEach(() => {
 describe("buildCanonContext", () => {
   it("leaves table rules out of the canon fed to the model", () => {
     const ctx = buildCanonContext(wiki);
-    expect(ctx).toContain("Casa Vargen");
+    expect(ctx).toContain("Clã Gangrel");
     expect(ctx).not.toContain("teste de Força de Vontade");
   });
 
@@ -37,10 +37,10 @@ describe("buildCanonContext", () => {
 
 describe("buildCanonProposalPrompt", () => {
   it("names the house, the sections and the player text", () => {
-    const { system, user } = buildCanonProposalPrompt("Casa Vargen", buildCanonContext(wiki), "Quero criar Sera, batedora.");
+    const { system, user } = buildCanonProposalPrompt("Clã Gangrel", buildCanonContext(wiki), "Quero criar Sera, batedora.");
     expect(system).toContain("Cidade");
     expect(system).toContain("JSON");
-    expect(user).toContain("Casa Vargen");
+    expect(user).toContain("Clã Gangrel");
     expect(user).toContain("Quero criar Sera");
     expect(user).toContain("clas");
     expect(user).not.toContain("mesa");
@@ -52,14 +52,14 @@ describe("buildCanonProposalPrompt", () => {
    * silêncio — um personagem proposto saía sem ficha nem retrato.
    */
   it("lista os tipos de entidade válidos, com o id e o rótulo", () => {
-    const { user } = buildCanonProposalPrompt("Casa Solarion", buildCanonContext(wiki), "Quero adicionar o Faraó.");
+    const { user } = buildCanonProposalPrompt("Clã Ventrue", buildCanonContext(wiki), "Quero adicionar o Faraó.");
     expect(user).toContain("CHARACTER");
     expect(user).toContain("Personagem");
     for (const t of VISUAL_ENTITY_TYPES) expect(user).toContain(t);
   });
 
   it("autoriza propor mudanças ao cânone existente e proíbe recusar ou diluir", () => {
-    const { system } = buildCanonProposalPrompt("Casa Solarion", buildCanonContext(wiki), "Troque o nome do líder.");
+    const { system } = buildCanonProposalPrompt("Clã Ventrue", buildCanonContext(wiki), "Troque o nome do líder.");
     // Uma proposta que altera/contradiz o cânone é legítima; só o Mestre decide.
     expect(system).toMatch(/altera|contradi|mudan/i);
     expect(system).toMatch(/o Mestre decide/i);
@@ -69,7 +69,7 @@ describe("buildCanonProposalPrompt", () => {
   });
 
   it("mantém as travas que importam: nada continental e não mata quem o jogador não pediu", () => {
-    const { system } = buildCanonProposalPrompt("Casa Vargen", buildCanonContext(wiki), "x");
+    const { system } = buildCanonProposalPrompt("Clã Gangrel", buildCanonContext(wiki), "x");
     expect(system).toMatch(/escala continental/i);
     expect(system).toMatch(/mate personagens/i);
     expect(system).toMatch(/mecânica de mesa|números de regra/i);
@@ -79,10 +79,10 @@ describe("buildCanonProposalPrompt", () => {
 describe("parseCanonProposalJson", () => {
   it("accepts a well-formed proposal", () => {
     const p = parseCanonProposalJson(JSON.stringify({
-      title: "Sera de Vargen", section: "clas", body: "Batedora.", summary: "Batedora.",
-      entityType: "CHARACTER", canonicalName: "Sera de Vargen", immutableTraits: ["cicatriz"], houseId: "vargen",
+      title: "Sera de Gangrel", section: "clas", body: "Batedora.", summary: "Batedora.",
+      entityType: "CHARACTER", canonicalName: "Sera de Gangrel", immutableTraits: ["cicatriz"], houseId: "gangrel",
     }));
-    expect(p.title).toBe("Sera de Vargen");
+    expect(p.title).toBe("Sera de Gangrel");
     expect(p.entityType).toBe("CHARACTER");
   });
 
@@ -150,10 +150,10 @@ describe("parseCanonReviewJson", () => {
 describe("buildCanonReviewPrompt", () => {
   it("includes the proposal and the canon", () => {
     const { user } = buildCanonReviewPrompt(buildCanonContext(wiki), {
-      title: "Sera de Vargen", section: "clas", body: "Batedora.", summary: "Batedora.",
-      entityType: "CHARACTER", canonicalName: "Sera de Vargen", immutableTraits: [], houseId: "vargen",
+      title: "Sera de Gangrel", section: "clas", body: "Batedora.", summary: "Batedora.",
+      entityType: "CHARACTER", canonicalName: "Sera de Gangrel", immutableTraits: [], houseId: "gangrel",
     });
-    expect(user).toContain("Sera de Vargen");
-    expect(user).toContain("Casa Vargen");
+    expect(user).toContain("Sera de Gangrel");
+    expect(user).toContain("Clã Gangrel");
   });
 });

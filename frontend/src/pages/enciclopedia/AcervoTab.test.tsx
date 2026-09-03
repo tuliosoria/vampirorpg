@@ -91,8 +91,8 @@ describe("loreSummary", () => {
   });
 
   it("strips markdown emphasis", () => {
-    expect(loreSummary("Os **Ferrumor** descendem de _Caladris_.")).toBe(
-      "Os Ferrumor descendem de Caladris.",
+    expect(loreSummary("Os **Setita** descendem de _Caladris_.")).toBe(
+      "Os Setita descendem de Caladris.",
     );
   });
 

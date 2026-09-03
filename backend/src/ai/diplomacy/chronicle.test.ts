@@ -5,7 +5,7 @@ import { buildPublicChronicle } from "./chronicle";
 function turn(id: number, over: Partial<Turn> = {}): Turn {
   return {
     turnId: id, status: "RESOLVED", publicEvent: `Evento do turno ${id}.`,
-    privateInfo: { "casa-solarion": "SEGREDO: a Asteria foi sabotada." },
+    privateInfo: { "cla-ventrue": "SEGREDO: a incêndio do Banco foi sabotada." },
     createdAt: "", result: { publicResult: `Resultado do turno ${id}.` } as never,
     ...over,
   } as Turn;

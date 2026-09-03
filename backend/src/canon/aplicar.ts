@@ -49,7 +49,7 @@ export async function garantirCanon(
        *
        * Isto roda antes de TODA rota, então uma exceção aqui viraria 500 no
        * site inteiro — inclusive no login e no turno, que não dependem de clã
-       * nenhum. Degradar para a Cidade vazia é pior que o certo e muito melhor
+       * nenhum. Degradar parà Cidade vazia é pior que o certo e muito melhor
        * que o site fora do ar; e como não marcamos `carregadoEm`, a próxima
        * requisição tenta de novo em vez de congelar o vazio por trinta segundos.
        */

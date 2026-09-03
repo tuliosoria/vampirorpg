@@ -7,13 +7,13 @@ export const CANON_MAX_CHARS = 2500;
  * Assembles the canon that constrains a generation.
  *
  * The author usually writes a short request — "desenhe uma muralha de
- * Rimewatch" — and expects the system to already know what Rimewatch looks
+ * o Antigo Sanatório" — and expects the system to already know what o Antigo Sanatório looks
  * like. So the request text (plus the selected entity's name, if any) is
  * resolved against the wiki, and the matched entries' structured facts —
  * symbol, seat, territory — are injected. Those are the drawable details the
  * author should never have to retype, and the ones they are most likely to
- * misremember: Rimerberg's symbol is a black tower under three snowflakes,
- * while the grey wolf belongs to Vargen.
+ * misremember: Malkavian's symbol is a black tower under three snowflakes,
+ * while the grey wolf belongs to Gangrel.
  *
  * The entity's own hand-authored fields come first: a canon sheet is more
  * specific than a lore article, and should win where the two overlap.

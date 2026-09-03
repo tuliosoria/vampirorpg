@@ -152,7 +152,7 @@ describe("briefingsDoPorto", () => {
           id: "c2",
           houseId: "nosferatu-g0gg",
           templateId: TEMPLATE_RUMOR_FALSO,
-          targetHouseId: "casa-khazdrun",
+          targetHouseId: "cla-nosferatu",
         }),
       ],
       7,

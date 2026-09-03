@@ -3,7 +3,7 @@ import { GetCommand, PutCommand, QueryCommand, UpdateCommand } from "@aws-sdk/li
 import { createNextTurnDraft, getActiveTurn, listTurns, putTurn, saveTurnResult, setTurnStatus, setTurnImage } from "./turns";
 import type { Turn, TurnResult } from "@vampiro/content";
 
-const TABLE = "ravenloft-game";
+const TABLE = "vampirorpg-game";
 const CAMPAIGN = "cidade-noturna";
 
 function docReturning(value: unknown) {
@@ -40,7 +40,7 @@ describe("turns db", () => {
     const doc = docReturning({
       Items: [
         { ...turn(1), SK: "TURN#001" },
-        { houseId: "vargen", SK: "TURN#001#SUB#vargen" },
+        { houseId: "gangrel", SK: "TURN#001#SUB#gangrel" },
         { ...turn(3), SK: "TURN#003" },
       ],
     });

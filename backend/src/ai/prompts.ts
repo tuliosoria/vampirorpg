@@ -17,7 +17,7 @@ export interface WorldContext {
    *
    * A crônica narra o que aconteceu; isto assenta. Sem o registro, o único
    * jeito de saber quem mandou tropa era reler prosa — e foi assim que a
-   * afirmação errada sobre Khazdrun atravessou três turnos, o evento público, o
+   * afirmação errada sobre Nosferatu atravessou três turnos, o evento público, o
    * resultado da Casa e três cartas já entregues.
    */
   worldFacts?: string;
@@ -493,7 +493,7 @@ export function buildPublicEventPrompt(houses: House[], ctx?: WorldContext): { s
     : "";
   const system = (publicEventContext ? PREMISE + factsSection(ctx) : withContext(PREMISE, ctx)) +
     contextBlock +
-    " Crie o EVENTO PÚBLICO do próximo turno: um acontecimento marcante que atravessa a Cidade inteira e obriga os personagens a decidir. Escreva 2 a 4 frases, com tom sombrio e cinematográfico, coerente com o mundo e a continuidade dos turnos anteriores. Não decida as ações das Casas nem os resultados. Não exponha diretamente informações privadas, ordens privadas, consequências privadas ou segredos ainda não revelados." +
+    " Crie o EVENTO PÚBLICO do próximo turno: um acontecimento marcante que atravessà Cidade inteira e obriga os personagens a decidir. Escreva 2 a 4 frases, com tom sombrio e cinematográfico, coerente com o mundo e a continuidade dos turnos anteriores. Não decida as ações das Casas nem os resultados. Não exponha diretamente informações privadas, ordens privadas, consequências privadas ou segredos ainda não revelados." +
     PLAYER_NARRATIVE_MARKDOWN_FORMAT +
     " Responda ESTRITAMENTE em JSON no formato: {\"publicEvent\": string}.";
   const continuityLine = publicEventContext

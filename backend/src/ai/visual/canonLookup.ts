@@ -43,15 +43,15 @@ export function fold(s: string): string {
 }
 
 /**
- * The distinctive part of a wiki title: "Casa Rimerberg — Os Vigias da Última
- * Neve" → "Casa Rimerberg". Titles follow `Nome — Epíteto`.
+ * The distinctive part of a wiki title: "Clã Malkavian — Os Vigias da Última
+ * Neve" → "Clã Malkavian". Titles follow `Nome — Epíteto`.
  */
 export function titleHead(title: string): string {
   return title.split(/\s*[—–]\s*|\s+-\s+/)[0].trim();
 }
 
 /**
- * A seat is written as prose, not an identifier: "Ordu-Yildiz, cidade móvel"
+ * A seat is written as prose, not an identifier: "Rua Treze, cidade móvel"
  * names the city plus an aside. Only the part before the comma is the name.
  */
 export function seatName(sede: string | undefined): string | null {
@@ -64,7 +64,7 @@ export function seatName(sede: string | undefined): string | null {
 const STOPWORDS = new Set(["casa", "cla", "clã", "ordem", "grande", "os", "as", "de", "da", "do", "dos", "das", "cidade", "a", "o"]);
 
 /**
- * Significant tokens of a title head, e.g. "Casa Rimerberg" → ["rimerberg"].
+ * Significant tokens of a title head, e.g. "Clã Malkavian" → ["malkavian"].
  * Matching on "Casa" alone would hit every house entry at once.
  */
 export function significantTokens(titleOrName: string): string[] {
@@ -93,14 +93,14 @@ export function findCanonMatches(requestText: string, entries: WikiEntry[], limi
 
   for (const entry of entries) {
     const facts = extractCanonFacts(entry.body);
-    // A house is identifiable by its own name or by its seat: "desenhe Droskar"
-    // should reach Casa Vargen, which declares `Sede: Droskar`.
+    // A house is identifiable by its own name or by its seat: "desenhe o Parque do Norte"
+    // should reach Clã Gangrel, which declares `Sede: o Parque do Norte`.
     const tokens = [...significantTokens(entry.title), ...(facts.sede ? significantTokens(facts.sede) : [])];
     const hit = tokens.find((t) => haystack.includes(t));
     if (!hit) continue;
     matches.push({
       m: { entry, facts, matchedOn: hit },
-      // Longer tokens are more distinctive: "rimerberg" beats "norte".
+      // Longer tokens are more distinctive: "malkavian" beats "norte".
       weight: hit.length,
     });
   }
@@ -111,10 +111,10 @@ export function findCanonMatches(requestText: string, entries: WikiEntry[], limi
   // Follow "Sede:" in BOTH directions, because a request names one end or the
   // other but almost never both.
   //
-  // City -> House: "uma muralha de Rimewatch" must reach Casa Rimerberg for its
-  // heraldry, though the word "Rimerberg" never appears.
+  // City -> House: "uma muralha do Antigo Sanatório" must reach Clã Malkavian for its
+  // heraldry, though the word "Malkavian" never appears.
   //
-  // House -> City: "a capital de Karasoy" must reach the Ordu-Yildiz article,
+  // House -> City: "a capital de Brujah" must reach the Rua Treze article,
   // which is the only place the fortified wagons and disassemblable towers are
   // described. Without it the model has nothing concrete to draw and invents
   // something vague — this is exactly how a city defined by its wheels came

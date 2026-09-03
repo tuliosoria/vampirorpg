@@ -9,7 +9,7 @@ function entry(entryId: string, title: string, section = "clas"): WikiEntry {
 }
 
 const ENTRIES = [
-  entry("w1", "Ordem do Sino"),
+  entry("w1", "Corte do Sangue"),
   entry("w2", "Galeria Subterrânea"),
   entry("w3", "Vasco Aranha"),
 ];
@@ -22,16 +22,16 @@ const ENTRIES = [
  */
 const REAL_ENTRIES = [
   entry("c1", "Galeria Subterrânea — A Cidade da Montanha Viva", "lugares"),
-  entry("c2", "Ninho Alto — A Cidade das Asas", "lugares"),
-  entry("c3", "Sahra-Lun — Oásis das Sete Sombras", "lugares"),
-  entry("c4", "Clã Mandíbula de Osso — O Povo que Quebrou as Correntes"),
+  entry("c2", "Teatro Municipal — A Cidade das Asas", "lugares"),
+  entry("c3", "Cais Velho — Oásis das Sete Sombras", "lugares"),
+  entry("c4", "Clã Setita — O Povo que Quebrou as Correntes"),
   entry("c5", "Clã Gangrel — Os Senhores do Céu"),
   entry("c6", "Clã Ventrue — Os Olhos do Meio-Dia"),
 ];
 
 describe("suggestMatch", () => {
   it("matches an exact title", () => {
-    expect(suggestMatch("Ordem do Sino", ENTRIES)?.entryId).toBe("w1");
+    expect(suggestMatch("Corte do Sangue", ENTRIES)?.entryId).toBe("w1");
   });
 
   it("ignores case and accents", () => {
@@ -50,32 +50,32 @@ describe("suggestMatch", () => {
 
   it("matches a title whose epithet follows an em dash", () => {
     expect(suggestMatch("Galeria Subterrânea", REAL_ENTRIES)?.entryId).toBe("c1");
-    expect(suggestMatch("Clã Mandíbula de Osso", REAL_ENTRIES)?.entryId).toBe("c4");
+    expect(suggestMatch("Clã Setita", REAL_ENTRIES)?.entryId).toBe("c4");
   });
 
   it("does not truncate a name at a hyphen that is not a separator", () => {
     // "Galeria Subterrânea" is one word, not "Khar" with an epithet.
     expect(suggestMatch("Galeria Subterrânea", [entry("z", "Khar — A Fenda Antiga")])).toBeNull();
-    expect(suggestMatch("Sahra-Lun", [entry("z", "Sahra — Nada a Ver")])).toBeNull();
+    expect(suggestMatch("Cais Velho", [entry("z", "Sahra — Nada a Ver")])).toBeNull();
   });
 
   it("matches through the entity's own parenthetical", () => {
-    expect(suggestMatch("Gangrel (Ninho Alto)", REAL_ENTRIES)?.entryId).toBe("c2");
-    expect(suggestMatch("Ventrue (Sahra-Lun)", REAL_ENTRIES)?.entryId).toBe("c3");
+    expect(suggestMatch("Gangrel (Teatro Municipal)", REAL_ENTRIES)?.entryId).toBe("c2");
+    expect(suggestMatch("Ventrue (Cais Velho)", REAL_ENTRIES)?.entryId).toBe("c3");
   });
 
   it("prefers the whole name over a parenthetical head", () => {
-    const entries = [...REAL_ENTRIES, entry("c7", "Gangrel (Ninho Alto)", "lugares")];
-    expect(suggestMatch("Gangrel (Ninho Alto)", entries)?.entryId).toBe("c7");
+    const entries = [...REAL_ENTRIES, entry("c7", "Gangrel (Teatro Municipal)", "lugares")];
+    expect(suggestMatch("Gangrel (Teatro Municipal)", entries)?.entryId).toBe("c7");
   });
 
   it("still declines the seeded entities that have no verbete at all", () => {
     for (const name of [
       "Vasco Aranha",
-      "Lady Celene Tremere",
+      "Lady Inês Tremere",
       "Mapa Oficial da Cidade",
       "Elfos de Ventrue",
-      "Elfos de Sahra-Lun",
+      "Elfos de Cais Velho",
       "Gnomos de Gangrel",
     ]) {
       expect(suggestMatch(name, REAL_ENTRIES)).toBeNull();
@@ -100,12 +100,12 @@ describe("ReconciliacaoPanel", () => {
     const onLink = vi.fn();
     render(
       <ReconciliacaoPanel
-        unlinked={[{ id: "e1", canonicalName: "Ordem do Sino" }]}
+        unlinked={[{ id: "e1", canonicalName: "Corte do Sangue" }]}
         entries={ENTRIES}
         onLink={onLink}
       />,
     );
-    await userEvent.click(screen.getByRole("button", { name: "Vincular a Ordem do Sino" }));
+    await userEvent.click(screen.getByRole("button", { name: "Vincular a Corte do Sangue" }));
     expect(onLink).toHaveBeenCalledWith("e1", "w1");
   });
 
@@ -123,8 +123,8 @@ describe("ReconciliacaoPanel", () => {
 
     const picker = screen.getByRole("combobox", { name: "Escolher verbete" });
     await userEvent.click(picker);
-    await userEvent.type(picker, "Ninho");
-    await userEvent.click(screen.getByRole("option", { name: "Ninho Alto — A Cidade das Asas" }));
+    await userEvent.type(picker, "Teatro");
+    await userEvent.click(screen.getByRole("option", { name: "Teatro Municipal — A Cidade das Asas" }));
     expect(onLink).toHaveBeenCalledWith("e9", "c2");
   });
 

@@ -5,7 +5,7 @@ import { SEATS, distanceKm, houseProfileFor, seatOf } from "@vampiro/content";
  *
  * Sem isto a IA sabe o que as duas Casas têm e não sabe onde elas ficam, então
  * negocia no vazio: propõe encontro sem lugar, rota sem trajeto, posto sem
- * chão. Foi o que travou Solarion e Euralune por dois turnos — Euralune pediu
+ * chão. Foi o que travou Ventrue e Toreador por dois turnos — Toreador pediu
  * "chão de ninguém" e ninguém, dos dois lados, soube dizer onde isso ficaria.
  */
 export interface NeutralGround {
@@ -58,7 +58,7 @@ export function buildGeographyBlock(aKey: string | null, bKey: string | null, aN
     ...meio.map((m) => `- ${m.seat} (${m.name}): ${m.fromA} km de ${aName}, ${m.fromB} km de ${bName}. ${m.oQueTem}`),
     "",
     "Proposta com lugar nomeado vale mais que proposta sem: 'que se construa no meio do caminho' é uma",
-    "intenção; 'no posto de Raven's Cross, a doze dias das suas torres' é um acordo. Nomeie.",
+    "intenção; 'no ferro-velho da marginal, a vinte minutos do seu refúgio' é um acordo. Nomeie.",
   ];
   return linhas.join("\n");
 }

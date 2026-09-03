@@ -9,7 +9,7 @@ import { HOUSE_CANON, type HouseCanon } from "../lore/houseCanon.js";
  *
  * É uma ficha só de propósito. O motor lê o cânone de cinco constantes
  * separadas (`SEATS`, `LEADER_PERSONAS`, `HOUSE_CHARACTERS`, `HOUSE_PROFILE`,
- * `HOUSE_CANON`), e no Valdren cada uma era um arquivo versionado à mão, o que
+ * `HOUSE_CANON`), e no jogo de origem cada uma era um arquivo versionado à mão, o que
  * obrigava quem inventasse uma Casa a lembrar de cinco lugares. Aqui o Narrador
  * preenche uma ficha e `aplicarCanon` a distribui pelas cinco.
  *

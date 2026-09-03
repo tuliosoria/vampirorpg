@@ -11,10 +11,10 @@ import { semearCanon, limparCanon } from "@vampiro/content/test-fixtures";
 semearCanon();
 afterAll(limparCanon);
 
-const karasoy: WikiEntry = {
+const brujah: WikiEntry = {
   entryId: "w1", section: "clas", order: 0, updatedAt: "",
   title: "Casa Brujah — As Filhas da Estrela",
-  body: "> **Lema:** \"Não guardamos um tesouro.\"\n> **Sede:** Ordu-Yildiz, cidade móvel.\n\nConfederação de cavalaria das Planícies da Estrela.",
+  body: "> **Lema:** \"Não guardamos um tesouro.\"\n> **Sede:** Rua Treze, cidade móvel.\n\nConfederação de cavalaria das Planícies da Estrela.",
 };
 
 // Trecho real de 10_RELACOES_RIVALIDADES_E_FERIDAS_HISTORICAS.md
@@ -22,9 +22,9 @@ const RELATIONS = `# Brujah e Ouro
 
 Ouro entende a terra por meio de títulos, cercas e produtividade. Brujah entende as Planícies da Estrela por rotas sazonais e memória oral. A ferida mais conhecida é a Marcha dos Cascos Vazios, quando proprietários dos Campos Dourados cercaram uma rota durante uma seca e cavalos e cavaleiras morreram tentando alcançar água.
 
-# Nosferatu e Ferrumor
+# Nosferatu e Setita
 
-Nosferatu e Ferrumor são rivais porque realizam funções semelhantes com filosofias opostas.`;
+Nosferatu e Setita são rivais porque realizam funções semelhantes com filosofias opostas.`;
 
 describe("HOUSE_REPLY_SYSTEM_PROMPT", () => {
   it("manda escrever na voz do clã, não como narrador", () => {
@@ -53,28 +53,28 @@ describe("relationsBetween", () => {
   });
 
   it("traz a seção inteira, não só o parágrafo que nomeia as duas", () => {
-    // O parágrafo que explica o Tempo sem Nomes cita "Mandíbula de Osso" e
+    // O parágrafo que explica o Tempo sem Nomes cita "Setita" e
     // "dinastias élficas", mas não "Ventrue" — casando por parágrafo, a
     // relação mais carregada do cânone ficava de fora.
-    const doc = `# Mandíbula de Osso, Ventrue e o Tempo sem Nomes\n\nDurante gerações, os ancestrais do Clã Mandíbula de Osso foram escravizados por antigas dinastias élficas do Deserto de Sahr. Entre os orcs, esse período é chamado de Tempo sem Nomes.`;
-    const r = relationsBetween(doc, "Clã Mandíbula de Osso", "Ventrue");
+    const doc = `# Setita, Ventrue e o Tempo sem Nomes\n\nDurante gerações, os ancestrais do Clã Setita foram escravizados por antigas dinastias élficas do Deserto de Sahr. Entre os orcs, esse período é chamado de Tempo sem Nomes.`;
+    const r = relationsBetween(doc, "Clã Setita", "Ventrue");
     expect(r.join(" ")).toMatch(/escravizados/);
   });
 
   it("descarta seção panorâmica que cita meia dúzia de Casas", () => {
-    // "Nenhuma Casa vota apenas sobre a idade de Alic..." casa com qualquer par
+    // "Nenhuma Casa vota apenas sobre a idade de Vasco..." casa com qualquer par
     // e não diz nada sobre este.
-    const doc = `# Consequência para a coroação\n\nNenhuma Casa vota apenas sobre a idade de Alic. Gangrel pensa em promessas, Ouro em grãos, Casa do Ouro em contratos, Nosferatu em autonomia, Ventrue em tradição, Brujah em fronteiras, Toreador em justiça.`;
+    const doc = `# Consequência para a coroação\n\nNenhuma Casa vota apenas sobre a idade de Vasco. Gangrel pensa em promessas, Ouro em grãos, Casa do Ouro em contratos, Nosferatu em autonomia, Ventrue em tradição, Brujah em fronteiras, Toreador em justiça.`;
     expect(relationsBetween(doc, "Casa Brujah", "Ventrue")).toEqual([]);
   });
 
   it("não traz a rivalidade de outras Casas", () => {
     const r = relationsBetween(RELATIONS, "Casa Brujah", "Casa Ouro");
-    expect(r.join(" ")).not.toMatch(/Ferrumor/);
+    expect(r.join(" ")).not.toMatch(/Setita/);
   });
 
   it("devolve vazio quando não há história registrada entre elas", () => {
-    expect(relationsBetween(RELATIONS, "Casa Brujah", "Casa Drakorys")).toEqual([]);
+    expect(relationsBetween(RELATIONS, "Casa Brujah", "Clã Ravnos")).toEqual([]);
   });
 });
 
@@ -83,11 +83,11 @@ describe("buildHouseReplyUser", () => {
     toHouseName: "Casa Brujah",
     fromHouseName: "Casa Ouro",
     fromHouseKey: "casa-do-ouro",
-    houseEntry: karasoy,
+    houseEntry: brujah,
     character: null,
     relations: ["A ferida mais conhecida é a Marcha dos Cascos Vazios."],
-    publicEvent: "O Rei ordena que cada Casa envie tropas a o centro velho.",
-    chronicle: "## Turno 2\no centro velho foi atacada durante a votação.\nO que se seguiu: a Asteria afundou na Curva dos Salgueiros.",
+    publicEvent: "O Rei ordena que cada Casa envie tropas ao centro velho.",
+    chronicle: "## Turno 2\no centro velho foi atacada durante a votação.\nO que se seguiu: a incêndio do Banco afundou na Curva dos Salgueiros.",
     persona: null as never,
     leaderDied: false,
     priorLetters: [] as { turnNumber: number; author: "PLAYER" | "AI"; body: string }[],
@@ -107,7 +107,7 @@ describe("buildHouseReplyUser", () => {
 
   it("dá à Casa a sua própria identidade e a carta recebida", () => {
     const u = buildHouseReplyUser(base);
-    expect(u).toMatch(/Ordu-Yildiz/);
+    expect(u).toMatch(/Rua Treze/);
     expect(u).toMatch(/Propomos uma aliança/);
   });
 
@@ -121,15 +121,15 @@ describe("buildHouseReplyUser", () => {
   });
 
   it("inclui o que está acontecendo agora", () => {
-    expect(buildHouseReplyUser(base)).toMatch(/envie tropas a o centro velho/);
+    expect(buildHouseReplyUser(base)).toMatch(/envie tropas ao centro velho/);
   });
 
   it("inclui a crônica dos turnos anteriores", () => {
     // Sem ela a Casa responde como quem acabou de acordar: sabe do chamado de
-    // tropas, mas não que o centro velho foi atacada nem que a Asteria afundou.
+    // tropas, mas não que o centro velho foi atacada nem que a incêndio do Banco afundou.
     const u = buildHouseReplyUser(base);
     expect(u).toMatch(/você viveu isto/);
-    expect(u).toMatch(/Asteria afundou/);
+    expect(u).toMatch(/incêndio do Banco afundou/);
   });
 
   it("funciona sem verbete e sem evento", () => {
@@ -288,9 +288,9 @@ describe("carta a um indivíduo", () => {
 
 describe("carta a um NPC do Codex", () => {
   const arquimago = {
-    id: "maelor-vespera",
-    name: "Maelor Véspera",
-    role: "O Trino da Ordem dos Três",
+    id: "professor-haddad",
+    name: "Professor Haddad",
+    role: "O Trino da Corte do Sangue",
     tier: "MAJOR" as const,
     affiliation: "corte-do-sangue",
     location: "Vale da Coroa",
@@ -304,7 +304,7 @@ describe("carta a um NPC do Codex", () => {
     roleplayGuidance: "Raramente demonstra surpresa.",
   };
   const base = {
-    toHouseName: "Ordem dos Três",
+    toHouseName: "Corte do Sangue",
     fromHouseName: "Casa Ventrue",
     fromHouseKey: "cla-ventrue",
     houseEntry: null,
@@ -331,7 +331,7 @@ describe("carta a um NPC do Codex", () => {
 
   it("encarna o NPC pela ficha do Codex, com voz e linhas vermelhas", () => {
     const u = buildHouseReplyUser(base);
-    expect(u).toMatch(/Você é Maelor Véspera/);
+    expect(u).toMatch(/Você é Professor Haddad/);
     expect(u).toMatch(/vocabulário preciso/);
     expect(u).toMatch(/Não aceita ameaças à Ordem/);
     expect(u).toMatch(/na sua voz — não como a chancelaria/);
@@ -346,7 +346,7 @@ describe("carta a um NPC do Codex", () => {
     const u = buildHouseReplyUser({
       ...base,
       npcDynamic: {
-        affiliation: "corte-do-sangue", id: "maelor-vespera", mood: "preocupado", objective: "medir a ameaça de Alic",
+        affiliation: "corte-do-sangue", id: "professor-haddad", mood: "preocupado", objective: "medir a ameaça de Vasco",
         concerns: "", loyalty: "", location: "", relations: { "cla-ventrue": { trust: 72, respect: 81, fear: 12, resentment: 8, obligation: 20, summary: "Casa sofisticada." } },
         memory: [{ turnNumber: 3, description: "Ventrue ajudou a Ordem.", impact: "+confiança" }], updatedAt: "",
       },
@@ -410,10 +410,10 @@ describe("memória entre turnos", () => {
 
 describe("persona do líder", () => {
   const persona = {
-    leaderName: "Lorde Thrain Nosferatu", title: "Senhor de Khar-Durak",
+    leaderName: "Lorde Vasco Nosferatu", title: "Senhor de Galeria Subterrânea",
     temperament: "Cauteloso e teimoso; acha que pedra não suporta duas fundações.",
     speechStyle: "Curto, sem floreio, cita contratos.",
-    wants: "Autonomia sobre as minas.", refuses: "Comando externo sobre Khar-Durak.",
+    wants: "Autonomia sobre as minas.", refuses: "Comando externo sobre Galeria Subterrânea.",
     crownStance: "Coopera, mas teme controle permanente.",
     interests: "Docas e autonomia.",
   };
@@ -437,18 +437,18 @@ describe("persona do líder", () => {
 
   it("faz a Casa escrever como uma pessoa, não como instituição", () => {
     const u = buildHouseReplyUser({ ...base, persona, leaderDied: false });
-    expect(u).toMatch(/Você é Lorde Thrain Nosferatu/);
+    expect(u).toMatch(/Você é Lorde Vasco Nosferatu/);
     expect(u).toMatch(/pedra não suporta duas fundações/);
     expect(u).toMatch(/O que você nunca aceita/);
   });
 
   it("nunca assina com o nome de um líder morto", () => {
-    // Aylin Brujah afundou com a Asteria no turno 3. Uma carta assinada por
+    // Solano Brujah afundou com a incêndio do Banco no turno 3. Uma carta assinada por
     // ela destruiria a ilusão na primeira linha.
     const u = buildHouseReplyUser({ ...base, persona, leaderDied: true });
     expect(u).toMatch(/MORREU/);
     expect(u).toMatch(/Nunca assine com o nome do morto/);
-    expect(u).not.toMatch(/Você é Lorde Thrain Nosferatu,/);
+    expect(u).not.toMatch(/Você é Lorde Vasco Nosferatu,/);
   });
 
   it("mantém o temperamento da Casa mesmo depois da morte do líder", () => {
@@ -485,7 +485,7 @@ describe("relação entre Casas no prompt", () => {
     toHouseName: "Casa Brujah",
     fromHouseName: "Casa Ouro",
     fromHouseKey: "casa-do-ouro",
-    houseEntry: karasoy,
+    houseEntry: brujah,
     character: null,
     relations: [] as string[],
     publicEvent: "",
@@ -545,7 +545,7 @@ describe("os dois lados da mesa", () => {
     toHouseName: "Casa Brujah",
     fromHouseName: "Casa Ouro",
     fromHouseKey: "casa-do-ouro",
-    houseEntry: karasoy,
+    houseEntry: brujah,
     character: null,
     relations: [] as string[],
     publicEvent: "",
@@ -572,16 +572,16 @@ describe("os dois lados da mesa", () => {
   // ferro, e que Nosferatu tem ferro e não planta trigo. A Casa respondia cega.
   it("entrega o perfil de quem escreveu, não só o de quem responde", () => {
     const ulgar = houseProfileFor("cla-ravnos")!;
-    const khazdrun = houseProfileFor("cla-nosferatu")!;
+    const nosferatu = houseProfileFor("cla-nosferatu")!;
     const out = buildHouseReplyUser({
       ...base,
       toHouseName: "Grande Casa Ravnos",
       fromHouseName: "Casa Nosferatu",
       houseProfile: ulgar,
-      writerProfile: khazdrun,
+      writerProfile: nosferatu,
     });
     expect(out).toContain(ulgar.resources);
-    expect(out).toContain(khazdrun.resources);
+    expect(out).toContain(nosferatu.resources);
     expect(out).toContain("O que se sabe de Casa Nosferatu");
   });
 
@@ -613,11 +613,11 @@ describe("acordo que sai da carta", () => {
   // e nada nunca criou um: aliança e acordo viviam só dentro do texto.
   it("extrai o acordo do JSON junto com a carta", () => {
     const r = parseReply(JSON.stringify({
-      carta: "Aceitamos. O posto fica em Raven's Cross.",
-      acordo: { tipo: "ACORDO", resumo: "Rota comercial por Raven's Cross: vigias por grão, sinais por sal." },
+      carta: "Aceitamos. O posto fica em Ferro-velho.",
+      acordo: { tipo: "ACORDO", resumo: "Rota comercial por Ferro-velho: vigias por grão, sinais por sal." },
     }));
-    expect(r.text).toMatch(/Raven's Cross/);
-    expect(r.acordo).toEqual({ tipo: "ACORDO", resumo: "Rota comercial por Raven's Cross: vigias por grão, sinais por sal." });
+    expect(r.text).toMatch(/Ferro-velho/);
+    expect(r.acordo).toEqual({ tipo: "ACORDO", resumo: "Rota comercial por Ferro-velho: vigias por grão, sinais por sal." });
   });
 
   it("não inventa acordo quando a conversa apenas seguiu", () => {
@@ -662,7 +662,7 @@ describe("o mapa entra na negociação", () => {
     });
     expect(out).toMatch(/19 km/);
     expect(out).toMatch(/Chão de ninguém/);
-    expect(out).toMatch(/Raven's Cross/);
+    expect(out).toMatch(/km/);
     expect(out).toMatch(/Nomeie/);
   });
 });
@@ -713,10 +713,10 @@ const ctxBase = {
 };
 
 describe("a vida de quem responde", () => {
-  const BIO = "Orven Geada veio de uma família de caçadores das aldeias externas, acostumada a trocar peles por sal-gema.";
+  const BIO = "Capitã Solano veio de uma família de caçadores das aldeias externas, acostumada a trocar peles por sal-gema.";
 
   // 122 KB de biografia autorada existiam desde sempre e só a página de
-  // personagem as lia. A IA escrevia a Dama Elara a partir de três linhas de
+  // personagem as lia. A IA escrevia a Dama Inês a partir de três linhas de
   // speechStyle enquanto a biografia dela dizia com quem ela se dá e com quem
   // não se dá.
   it("põe a biografia no prompt, depois de quem a pessoa é", () => {
@@ -745,16 +745,16 @@ describe("a vida de quem responde", () => {
 });
 
 describe("quanta gente a Casa põe em campo", () => {
-  const KARASOY = { sustainableTroops: 3000, emergencyTroops: 7000 };
+  const BRUJAH = { sustainableTroops: 3000, emergencyTroops: 7000 };
 
-  // Selma ofereceu "300 cavaleiras Ak-Boran" sem nada no prompt dizendo se
+  // Solano ofereceu "300 cavaleiras Ak-Boran" sem nada no prompt dizendo se
   // isso é muito ou pouco para Brujah. Saiu plausível por sorte.
   it("dá o número das duas Casas", () => {
     const out = buildHouseReplyUser({
       ...ctxBase,
       houseProfile: houseProfileFor("cla-brujah"),
       writerProfile: houseProfileFor("casa-do-ouro"),
-      houseForce: KARASOY,
+      houseForce: BRUJAH,
       writerForce: { sustainableTroops: 4000, emergencyTroops: 9000 },
     });
     expect(out).toContain("3000");
@@ -763,7 +763,7 @@ describe("quanta gente a Casa põe em campo", () => {
   });
 
   it("proíbe prometer mais do que a mobilização de emergência", () => {
-    const out = buildHouseReplyUser({ ...ctxBase, houseProfile: houseProfileFor("cla-brujah"), houseForce: KARASOY });
+    const out = buildHouseReplyUser({ ...ctxBase, houseProfile: houseProfileFor("cla-brujah"), houseForce: BRUJAH });
     expect(out).toMatch(/Nunca prometa mais do que a mobilização de emergência/i);
   });
 

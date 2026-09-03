@@ -10,7 +10,7 @@ const report: ConsistencyReport = {
   architectureScore: 70,
   paletteScore: 91,
   violations: [
-    { severity: "HIGH", category: "identidade", description: "O rosto não corresponde ao retrato canônico de Alic." },
+    { severity: "HIGH", category: "identidade", description: "O rosto não corresponde ao retrato canônico de Vasco." },
     { severity: "LOW", category: "paleta", description: "Tons ligeiramente quentes demais." },
   ],
   recommendedAction: "CORRECTIVE_EDIT",
@@ -20,7 +20,7 @@ const report: ConsistencyReport = {
 describe("ConsistencyReportPanel", () => {
   it("lists each violation with its severity and category", () => {
     render(<ConsistencyReportPanel report={report} referenceCount={3} needsReview={false} />);
-    expect(screen.getByText("O rosto não corresponde ao retrato canônico de Alic.")).toBeInTheDocument();
+    expect(screen.getByText("O rosto não corresponde ao retrato canônico de Vasco.")).toBeInTheDocument();
     expect(screen.getByText("Tons ligeiramente quentes demais.")).toBeInTheDocument();
     expect(screen.getByText(/identidade/)).toBeInTheDocument();
   });
@@ -82,7 +82,7 @@ describe("ConsistencyReportPanel", () => {
     render(<ConsistencyReportPanel report={report} referenceCount={3} needsReview />);
     expect(screen.getByRole("alert")).toHaveClass(/MuiAlert-standardWarning/);
     expect(
-      screen.getByText("O rosto não corresponde ao retrato canônico de Alic."),
+      screen.getByText("O rosto não corresponde ao retrato canônico de Vasco."),
     ).toBeInTheDocument();
     expect(screen.getByText("Tons ligeiramente quentes demais.")).toBeInTheDocument();
     // The itemised reasons are the explanation; the generic fallback would be noise.

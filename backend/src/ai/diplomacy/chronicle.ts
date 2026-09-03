@@ -9,7 +9,7 @@ export const CHRONICLE_MAX_CHARS = 4500;
  * Uma Casa que responde a uma carta precisa saber onde a história está. Sem
  * isto ela conhece só o evento do turno corrente e escreve como quem acabou de
  * acordar — o Rei pediu tropas, mas ela não sabe que o centro velho foi atacada nem
- * que a Asteria afundou.
+ * que o incêndio do Banco afundou.
  *
  * Nunca inclui `privateInfo`: aquilo é o que cada Casa recebeu em segredo, e
  * uma Casa NPC não pode conhecer o correio privado de outra.

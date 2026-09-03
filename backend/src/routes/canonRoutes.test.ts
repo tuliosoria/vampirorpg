@@ -21,14 +21,14 @@ vi.mock("../canon/publish", () => ({ publishCanonSubmission: vi.fn(async (_d, s)
 
 const config = {
   campaignId: "cidade-noturna",
-  tableName: "ravenloft-game",
+  tableName: "vampirorpg-game",
   tokenSigningSecret: "segredo",
   tokenTtlSeconds: 3600,
 } as unknown as Config;
 
 function playerReq(over: Partial<HandlerRequest> = {}): HandlerRequest {
   const token = signToken(
-    { type: "player", campaignId: "cidade-noturna", houseId: "vargen", displayName: "Casa Vargen", exp: Date.now() + 60_000 },
+    { type: "player", campaignId: "cidade-noturna", houseId: "gangrel", displayName: "Clã Gangrel", exp: Date.now() + 60_000 },
     "segredo",
   );
   return {
@@ -43,14 +43,14 @@ function playerReq(over: Partial<HandlerRequest> = {}): HandlerRequest {
 }
 
 const proposal = {
-  title: "Sera de Vargen",
+  title: "Sera de Gangrel",
   section: "clas",
   body: "Batedora das fronteiras.",
   summary: "Batedora.",
   entityType: "CHARACTER",
-  canonicalName: "Sera de Vargen",
+  canonicalName: "Sera de Gangrel",
   immutableTraits: [],
-  houseId: "vargen",
+  houseId: "gangrel",
 };
 
 const chat = vi.fn();
@@ -68,7 +68,7 @@ describe("canonPreview", () => {
       .mockResolvedValueOnce(JSON.stringify({ verdict: "OK", flags: [], conflictingEntryIds: [] }));
     const res = await canonPreview(deps(), playerReq({ body: { rawText: "Quero criar Sera." } }));
     expect(res.status).toBe(200);
-    expect((res.body as { proposal: { title: string } }).proposal.title).toBe("Sera de Vargen");
+    expect((res.body as { proposal: { title: string } }).proposal.title).toBe("Sera de Gangrel");
     expect((res.body as { review: { verdict: string } }).review.verdict).toBe("OK");
   });
 
@@ -78,7 +78,7 @@ describe("canonPreview", () => {
       .mockRejectedValueOnce(new Error("modelo indisponível"));
     const res = await canonPreview(deps(), playerReq({ body: { rawText: "Quero criar Sera." } }));
     expect(res.status).toBe(200);
-    expect((res.body as { proposal: { title: string } }).proposal.title).toBe("Sera de Vargen");
+    expect((res.body as { proposal: { title: string } }).proposal.title).toBe("Sera de Gangrel");
     expect((res.body as { review: unknown }).review).toBeNull();
   });
 
@@ -98,7 +98,7 @@ describe("canonPreview", () => {
   // lista bruta que carregaria regras de mesa ou segredos do Mestre.
   it("feeds the canon-filtered wiki query into the AI prompt", async () => {
     vi.mocked(wikiDb.listCanonWikiEntries).mockResolvedValue([
-      { entryId: "w1", section: "clas", title: "Casa Vargen", body: "História pública." },
+      { entryId: "w1", section: "clas", title: "Clã Gangrel", body: "História pública." },
     ] as never);
     chat
       .mockResolvedValueOnce(JSON.stringify(proposal))
@@ -108,7 +108,7 @@ describe("canonPreview", () => {
 
     expect(vi.mocked(wikiDb.listCanonWikiEntries)).toHaveBeenCalledTimes(1);
     const prompts = chat.mock.calls.map((c) => `${c[0]} ${c[1]}`).join("\n");
-    expect(prompts).toContain("Casa Vargen");
+    expect(prompts).toContain("Clã Gangrel");
   });
 });
 
@@ -117,8 +117,8 @@ describe("canonSubmit", () => {
     const res = await canonSubmit(deps(), playerReq({ body: { rawText: "Quero criar Sera.", proposal } }));
     expect(res.status).toBe(200);
     const saved = vi.mocked(canonDb.putCanonSubmission).mock.calls[0][3];
-    expect(saved.houseId).toBe("vargen");
-    expect(saved.authorName).toBe("Casa Vargen");
+    expect(saved.houseId).toBe("gangrel");
+    expect(saved.authorName).toBe("Clã Gangrel");
     expect(saved.status).toBe("PENDING_GM");
   });
 
@@ -180,12 +180,12 @@ describe("canonSubmit", () => {
 
 describe("canonListMine", () => {
   it("lists only this house's submissions", async () => {
-    const mine = [{ id: "s1", houseId: "vargen", status: "PENDING_GM" }];
+    const mine = [{ id: "s1", houseId: "gangrel", status: "PENDING_GM" }];
     vi.mocked(canonDb.listCanonSubmissions).mockResolvedValue(mine as never);
     const res = await canonListMine(deps(), playerReq({ method: "GET" }));
     expect(res.status).toBe(200);
     expect(res.body).toEqual(mine);
-    expect(vi.mocked(canonDb.listCanonSubmissions).mock.calls[0][3]).toBe("vargen");
+    expect(vi.mocked(canonDb.listCanonSubmissions).mock.calls[0][3]).toBe("gangrel");
   });
 });
 
@@ -218,8 +218,8 @@ function adminReq(over: Partial<HandlerRequest> = {}): HandlerRequest {
 const pending = {
   id: "sub1",
   campaignId: "cidade-noturna",
-  houseId: "vargen",
-  authorName: "Casa Vargen",
+  houseId: "gangrel",
+  authorName: "Clã Gangrel",
   rawText: "Quero criar Sera.",
   rawImageUrl: null,
   rawImageKey: null,

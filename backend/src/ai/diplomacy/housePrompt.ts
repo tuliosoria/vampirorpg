@@ -32,7 +32,7 @@ export const HOUSE_REPLY_SYSTEM_PROMPT = [
   // confiança e autonomia que não movem uma única peça do tabuleiro.
   "7. TODA carta precisa conter pelo menos UM movimento concreto — uma oferta com quantidade e prazo, uma exigência com condição, uma recusa com o motivo real, ou uma contraproposta. Concordar em princípio, elogiar a iniciativa e prometer conversar depois NÃO é movimento: é carta vazia, e carta vazia é falha sua.",
   "8. Fale de coisas, não de conceitos. Endereço, quadra, nome, dívida, favor, carniçal, rebanho, silêncio, prazo, preço. Um clã que precisa de sangue diz sangue.",
-  // Solarion e Euralune passaram dois turnos repetindo a mesma posição porque
+  // Ventrue e Toreador passaram dois turnos repetindo a mesma posição porque
   // nada exigia avanço: dava para reiterar disposição para sempre.
   "9. Uma negociação avança ou termina. Se o outro já disse o que quer e você pode dar, FECHE — nomeando lugar, quantidade e prazo. Se não pode, diga por que e ofereça outra coisa. Se já se repetiram duas vezes, ou aceite ou encerre; reiterar disposição pela terceira vez é perder o turno de todo mundo.",
   "",
@@ -56,8 +56,8 @@ const BIO_MAX = 1800;
 /**
  * A força de uma Casa em números, para a oferta parar de ser chute.
  *
- * A Selma ofereceu "300 cavaleiras Ak-Boran" sem nada no prompt dizendo que
- * Karasoy sustenta 3.000 combatentes e mobiliza 7.000 em emergência. O número
+ * A Solano ofereceu "300 cavaleiras Ak-Boran" sem nada no prompt dizendo que
+ * Brujah sustenta 3.000 combatentes e mobiliza 7.000 em emergência. O número
  * saiu plausível por sorte, e por sorte também sairia absurdo.
  */
 export interface HouseForce {
@@ -139,8 +139,8 @@ export interface HouseReplyContext {
   /**
    * O que a Casa que ESCREVEU tem e do que ela carece.
    *
-   * Sem isto a resposta é cega: os Ulgar não têm como oferecer madeira por
-   * ferro se ignoram que Khazdrun funde ferro de sobra e não planta trigo. O
+   * Sem isto a resposta é cega: os Ravnos não têm como oferecer madeira por
+   * ferro se ignoram que Nosferatu funde ferro de sobra e não planta trigo. O
    * perfil é conhecimento público na Cidade — que povo vive de quê não é
    * segredo de ninguém —, então dá para entregar sem quebrar a regra de que a
    * Casa só sabe o que saberia.
@@ -166,8 +166,8 @@ export interface HouseReplyContext {
    *
    * São 122 KB de prosa escrita à mão que, até aqui, só a página de personagem
    * lia. É onde está o que nenhum outro campo guarda: por que a pessoa pensa
-   * como pensa, e o que ela tem com os OUTROS NPCs. A da Dama Elara diz que
-   * "Alic passa por seus corredores sob escolta dobrada desde a morte de
+   * como pensa, e o que ela tem com os OUTROS NPCs. A da Dama Inês diz que
+   * "Vasco passa por seus corredores sob escolta dobrada desde a morte de
    * Edric" — estado de relação entre quatro pessoas que não influenciava uma
    * única carta.
    *
@@ -315,8 +315,8 @@ export function buildHouseReplyUser(ctx: HouseReplyContext): string {
     parts.push(`Seus interesses e favores agora: ${p.interests}`);
 
     // A desconfiança ou confiança é por Casa: só entra quando é justamente esta
-    // Casa que escreve. É o que faz os orcs responderem a Solarion com a
-    // memória da escravidão sem tratar Khazdrun do mesmo jeito.
+    // Casa que escreve. É o que faz os orcs responderem a Ventrue com a
+    // memória da escravidão sem tratar Nosferatu do mesmo jeito.
     const distrust = ctx.fromHouseKey ? p.distrusts?.[ctx.fromHouseKey] : undefined;
     const trust = ctx.fromHouseKey ? p.trusts?.[ctx.fromHouseKey] : undefined;
     if (distrust) parts.push(`Você DESCONFIA de ${ctx.fromHouseName}: ${distrust} Isso pesa no tom, sem virar acusação gratuita.`);
@@ -431,8 +431,8 @@ export function buildHouseReplyUser(ctx: HouseReplyContext): string {
   //
   // Exigia `character` além do estado vivo, e a rota já passou a carregar o
   // dinâmico do LÍDER quando a carta vai à chancelaria: o resultado era buscar
-  // a memória no banco e jogá-la fora. O testemunho inteiro de Selma sobre a
-  // Asteria era lido e descartado em toda carta que não a endereçasse pelo
+  // a memória no banco e jogá-la fora. O testemunho inteiro de Solano sobre a
+  // o incêndio do Banco era lido e descartado em toda carta que não a endereçasse pelo
   // nome. Quem responde é quem tem o estado vivo, tenha nome na carta ou não.
   if (ctx.npcDynamic) {
     const living = buildRoleplayBlock({ dynamic: ctx.npcDynamic, fromHouseKey: ctx.fromHouseKey, fromHouseName: ctx.fromHouseName });
@@ -525,12 +525,12 @@ function buildCodexNpcReply(ctx: HouseReplyContext, npc: NpcIdentity): string {
  * Seções do arquivo de relações que tratam das duas Casas.
  *
  * Casa por parágrafo não serve: o parágrafo que explica o Tempo sem Nomes cita
- * "Mandíbula de Osso" e "dinastias élficas", mas não "Solarion" pelo nome, e
+ * "Setita" e "dinastias élficas", mas não "Ventrue" pelo nome, e
  * ficava de fora justamente a relação mais carregada do cânone. A seção
  * inteira é a unidade certa — é assim que o documento está escrito.
  *
  * Seções que citam meia dúzia de Casas ("Nenhuma Casa vota apenas sobre a idade
- * de Alic...") são descartadas: casam com qualquer par e não dizem nada sobre
+ * de Vasco...") são descartadas: casam com qualquer par e não dizem nada sobre
  * este.
  */
 const CATCH_ALL_HOUSE_COUNT = 5;
@@ -553,7 +553,7 @@ export function relationsBetween(relationsDoc: string, a: string, b: string, lim
     // Uma seção panorâmica cita meia dúzia de Casas e não diz nada sobre este
     // par. Mas uma seção cujo TÍTULO nomeia as duas é sobre elas mesmo que
     // mencione outras de passagem — é o caso do Tempo sem Nomes, que cita
-    // Auremont, Ferrumor e Khazdrun para explicar quem se omitiu.
+    // Ouro, Setita e Nosferatu para explicar quem se omitiu.
     if (!inHeading) {
       const named = seatTokens().filter((t) => folded.includes(t)).length;
       if (named > CATCH_ALL_HOUSE_COUNT) continue;

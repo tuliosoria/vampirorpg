@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { getWorldBible, putWorldBible } from "./worldBible";
 
-const TABLE = "ravenloft-game";
+const TABLE = "vampirorpg-game";
 const CAMPAIGN = "cidade-noturna";
 
 function docReturning(value: unknown) {

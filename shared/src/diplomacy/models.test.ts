@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { newMessage, sendsRemaining, pairKey, clampMessage, MESSAGE_MAX, isFactKind } from "./models.js";
 
 const msg = (author: "PLAYER" | "AI", i = 0) =>
-  newMessage({ id: `m${i}`, campaignId: "cidade-noturna", turnNumber: 2, fromHouseId: "h1", toHouseKey: "casa-karasoy", author, body: "olá" });
+  newMessage({ id: `m${i}`, campaignId: "cidade-noturna", turnNumber: 2, fromHouseId: "h1", toHouseKey: "cla-brujah", author, body: "olá" });
 
 describe("sendsRemaining", () => {
   it("conta só os envios do jogador, não as respostas", () => {
@@ -27,12 +27,12 @@ describe("sendsRemaining", () => {
 
 describe("pairKey", () => {
   it("distingue destinatários diferentes da mesma Casa", () => {
-    // O orçamento é por par: gastar com Karasoy não pode consumir o de Vargen.
-    expect(pairKey("h1", "casa-karasoy")).not.toBe(pairKey("h1", "casa-vargen"));
+    // O orçamento é por par: gastar com Brujah não pode consumir o de Gangrel.
+    expect(pairKey("h1", "cla-brujah")).not.toBe(pairKey("h1", "cla-gangrel"));
   });
 
   it("é estável para o mesmo par", () => {
-    expect(pairKey("h1", "casa-karasoy")).toBe(pairKey("h1", "casa-karasoy"));
+    expect(pairKey("h1", "cla-brujah")).toBe(pairKey("h1", "cla-brujah"));
   });
 });
 

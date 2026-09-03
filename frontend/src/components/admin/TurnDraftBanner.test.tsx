@@ -15,7 +15,7 @@ async function setup(onLoad = vi.fn(), turnStatus?: string) {
   const client = new MockApiClient();
   const { adminToken } = await client.adminLogin("code");
   client.setTurnDraftForTest({
-    publicEvent: "Drakorys denuncia a Coroa.",
+    publicEvent: "Ravnos denuncia a Coroa.",
     // Uma chave por nome de Casa, outra por houseId — as duas devem casar.
     privateInfo: { "Casa do Ouro": "Vejam a rota vigiada.", "h-khaz": "O resíduo arcano confirma." },
     note: "Racional: primeira fratura aberta.",
@@ -36,7 +36,7 @@ describe("TurnDraftBanner", () => {
   it("mostra o rascunho pendente com a nota e o evento público", async () => {
     await setup();
     expect(await screen.findByText(/Rascunho de turno pendente/)).toBeInTheDocument();
-    expect(screen.getByText(/Drakorys denuncia a Coroa/)).toBeInTheDocument();
+    expect(screen.getByText(/Ravnos denuncia a Coroa/)).toBeInTheDocument();
     expect(screen.getByText(/primeira fratura aberta/)).toBeInTheDocument();
   });
 
@@ -44,7 +44,7 @@ describe("TurnDraftBanner", () => {
     const { onLoad } = await setup();
     await screen.findByText(/Rascunho de turno pendente/);
     await act(async () => { await userEvent.click(screen.getByRole("button", { name: /Carregar nos campos/ })); });
-    expect(onLoad).toHaveBeenCalledWith("Drakorys denuncia a Coroa.", {
+    expect(onLoad).toHaveBeenCalledWith("Ravnos denuncia a Coroa.", {
       "h-ouro": "Vejam a rota vigiada.",
       "h-khaz": "O resíduo arcano confirma.",
     });
@@ -80,7 +80,7 @@ describe("TurnDraftBanner", () => {
       resolution: {
         publicResult: "Os clãs se movem.",
         houseResults: { "Casa do Ouro": "Exército mobilizado.", "h-khaz": "Investigação avança." },
-        discoveries: ["A Asteria foi sabotada."],
+        discoveries: ["A incêndio do Banco foi sabotada."],
       },
     });
     await act(async () => {
@@ -95,7 +95,7 @@ describe("TurnDraftBanner", () => {
     expect(onLoadResolution).toHaveBeenCalledWith(
       "Os clãs se movem.",
       { "h-ouro": "Exército mobilizado.", "h-khaz": "Investigação avança." },
-      ["A Asteria foi sabotada."],
+      ["A incêndio do Banco foi sabotada."],
     );
   });
 
@@ -122,7 +122,7 @@ describe("estado do turno", () => {
     expect(await screen.findByText(/só aparecem com o turno em DRAFT/i)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Carregar nos campos/i })).toBeNull();
     // E o texto do rascunho sai da tela.
-    expect(screen.queryByText(/Drakorys denuncia a Coroa/)).toBeNull();
+    expect(screen.queryByText(/Ravnos denuncia a Coroa/)).toBeNull();
   });
 
   it("mas continua permitindo descartar, para o rascunho velho não ficar preso", async () => {
@@ -165,9 +165,9 @@ describe("o preview mostra o que o jogador vai ver", () => {
   it("renderiza o resultado público do mesmo jeito", async () => {
     await comRascunho({
       publicEvent: "evento", privateInfo: {}, note: "",
-      resolution: { publicResult: "**Gor-Kirius convocou.**", houseResults: {}, discoveries: [] },
+      resolution: { publicResult: "**Casa de banhos convocou.**", houseResults: {}, discoveries: [] },
     });
-    expect(await screen.findByText("Gor-Kirius convocou.")).toBeInTheDocument();
+    expect(await screen.findByText("Casa de banhos convocou.")).toBeInTheDocument();
   });
 
   // Antes só havia uma etiqueta com o nome da Casa: dava para saber que existiam

@@ -133,7 +133,7 @@ describe("getGenerationStatus", () => {
 import { listVisualEntities, getVisualEntity, listEntityAssets, listGallery, canonizeAsset, lockAsset, unlockAsset, deleteAsset, getStyleBible, getVisualAsset } from "./visualRoutes";
 
 describe("entity and asset routes", () => {
-  const entityItem = { PK: "x", SK: "VENTITY#alic", id: "alic", entityType: "CHARACTER", canonicalName: "Alic", slug: "alic", canonicalAssetIds: [] };
+  const entityItem = { PK: "x", SK: "VENTITY#alic", id: "alic", entityType: "CHARACTER", canonicalName: "Vasco", slug: "alic", canonicalAssetIds: [] };
   const assetItem = (over: any = {}) => ({ PK: "x", SK: "VASSET#a1", id: "a1", entityId: "alic", canonicalLevel: "DRAFT", ...over });
 
   it("listVisualEntities returns entities", async () => {
@@ -204,10 +204,10 @@ describe("previewContext", () => {
   it("returns operation, warnings and reference count for an entity with a canonical asset", async () => {
     const doc = { send: vi.fn(async (cmd: any) => {
       const sk = cmd?.input?.Key?.SK ?? "";
-      if (sk.startsWith("VENTITY#")) return { Item: { PK: "x", SK: sk, id: "alic", entityType: "CHARACTER", canonicalName: "Alic", slug: "alic", status: "CANONICAL", immutableTraits: ["cicatriz"], canonicalAssetIds: ["a1"] } };
+      if (sk.startsWith("VENTITY#")) return { Item: { PK: "x", SK: sk, id: "alic", entityType: "CHARACTER", canonicalName: "Vasco", slug: "alic", status: "CANONICAL", immutableTraits: ["cicatriz"], canonicalAssetIds: ["a1"] } };
       return { Items: [{ PK: "x", SK: "VASSET#a1", id: "a1", entityId: "alic", canonicalLevel: "CANONICAL" }] };
     }) } as any;
-    const res = await previewContext(makeDeps({ doc }), { method: "POST", path: "/x", headers: {}, body: { requestText: "Alic sorrindo", entityId: "alic" }, pathParams: {}, sourceIp: "1.2.3.4" });
+    const res = await previewContext(makeDeps({ doc }), { method: "POST", path: "/x", headers: {}, body: { requestText: "Vasco sorrindo", entityId: "alic" }, pathParams: {}, sourceIp: "1.2.3.4" });
     expect((res.body as any).operation).toBe("EDIT");
     expect((res.body as any).referenceCount).toBeGreaterThanOrEqual(1);
     expect(Array.isArray((res.body as any).warnings)).toBe(true);
@@ -239,10 +239,10 @@ describe("createVisualEntity", () => {
     } as unknown as DynamoDBDocumentClient;
     const deps = { doc, config: adminConfig } as unknown as Deps;
 
-    const res = await createVisualEntity(deps, adminReq({ canonicalName: "Ordem do Sino", entityType: "HOUSE" }) as any);
+    const res = await createVisualEntity(deps, adminReq({ canonicalName: "Corte do Sangue", entityType: "HOUSE" }) as any);
 
     expect(res.status).toBe(201);
-    expect((res.body as any).canonicalName).toBe("Ordem do Sino");
+    expect((res.body as any).canonicalName).toBe("Corte do Sangue");
     expect((res.body as any).immutableTraits).toEqual([]);
     expect((res.body as any).wikiEntryId).toBeNull();
   });
@@ -260,11 +260,11 @@ describe("createVisualEntity", () => {
 
   it("rejects a duplicate slug", async () => {
     const doc = {
-      send: vi.fn(async () => ({ Items: [{ id: "e0", slug: "ordem-do-sino", immutableTraits: [] }] })),
+      send: vi.fn(async () => ({ Items: [{ id: "e0", slug: "corte-do-sangue", immutableTraits: [] }] })),
     } as unknown as DynamoDBDocumentClient;
     const deps = { doc, config: adminConfig } as unknown as Deps;
     await expect(
-      createVisualEntity(deps, adminReq({ canonicalName: "Ordem do Sino", entityType: "HOUSE" }) as any),
+      createVisualEntity(deps, adminReq({ canonicalName: "Corte do Sangue", entityType: "HOUSE" }) as any),
     ).rejects.toThrow();
   });
 });
@@ -280,7 +280,7 @@ describe("updateVisualEntity", () => {
   it("merges provided fields and bumps the version", async () => {
     const deps = withEntity({
       PK: "p", SK: "VENTITY#e1", id: "e1", campaignId: "cidade-noturna",
-      canonicalName: "Khar-Durak", publicDescription: "antiga", entityType: "CITY",
+      canonicalName: "Galeria Subterrânea", publicDescription: "antiga", entityType: "CITY",
       immutableTraits: [], version: 1, updatedAt: "2026-01-01T00:00:00.000Z",
     });
 
@@ -288,7 +288,7 @@ describe("updateVisualEntity", () => {
 
     expect(res.status).toBe(200);
     expect((res.body as any).publicDescription).toBe("cidade escavada na montanha");
-    expect((res.body as any).canonicalName).toBe("Khar-Durak");
+    expect((res.body as any).canonicalName).toBe("Galeria Subterrânea");
     expect((res.body as any).version).toBe(2);
   });
 
@@ -380,11 +380,11 @@ import { getVisualCoverage } from "./visualRoutes";
 describe("getVisualCoverage", () => {
   it("reports totals, per-section counts, and unlinked entities", async () => {
     const wiki = [
-      { entryId: "w1", section: "clas", title: "Ordem do Sino", body: "", order: 0, updatedAt: "" },
-      { entryId: "w2", section: "lugares", title: "Khar-Durak", body: "", order: 0, updatedAt: "" },
+      { entryId: "w1", section: "clas", title: "Corte do Sangue", body: "", order: 0, updatedAt: "" },
+      { entryId: "w2", section: "lugares", title: "Galeria Subterrânea", body: "", order: 0, updatedAt: "" },
     ];
     const entities = [
-      { id: "e1", canonicalName: "Khar-Durak", wikiEntryId: "w2", immutableTraits: [] },
+      { id: "e1", canonicalName: "Galeria Subterrânea", wikiEntryId: "w2", immutableTraits: [] },
       { id: "e2", canonicalName: "Mapa Oficial", wikiEntryId: null, immutableTraits: [] },
     ];
     const doc = {
@@ -478,24 +478,24 @@ describe("canonizeAsset cria a entidade que faltava", () => {
     return { deps: { doc, config: adminConfig } as unknown as Deps, written };
   }
 
-  const orphan = { PK: "p", SK: "VASSET#a1", id: "a1", entityId: null, assetType: "ESTABLISHING", description: "Capital de Karasoy", canonicalLevel: "DRAFT" };
+  const orphan = { PK: "p", SK: "VASSET#a1", id: "a1", entityId: null, assetType: "ESTABLISHING", description: "Capital de Brujah", canonicalLevel: "DRAFT" };
 
   it("cria a entidade quando a imagem não pertence a nenhuma", async () => {
     // Uma geração feita por "Imagem sem entidade" não tem entidade. Antes,
     // canonizar deixava a imagem órfã: visível na Galeria e ausente do
     // dropdown, sem como ser continuada.
     const { deps, written } = depsWithAsset(orphan);
-    const res = await canonizeAsset(deps, adminReq({ canonicalName: "Ordu-Yildiz" }, { id: "a1" }) as any);
+    const res = await canonizeAsset(deps, adminReq({ canonicalName: "Rua Treze" }, { id: "a1" }) as any);
 
     expect((res.body as any).entityId).toBeTruthy();
     const entity = written.find((w) => w.SK?.startsWith("VENTITY#"));
-    expect(entity.canonicalName).toBe("Ordu-Yildiz");
+    expect(entity.canonicalName).toBe("Rua Treze");
     expect(entity.canonicalAssetIds).toContain("a1");
   });
 
   it("liga a imagem à entidade recém-criada", async () => {
     const { deps, written } = depsWithAsset(orphan);
-    await canonizeAsset(deps, adminReq({ canonicalName: "Ordu-Yildiz" }, { id: "a1" }) as any);
+    await canonizeAsset(deps, adminReq({ canonicalName: "Rua Treze" }, { id: "a1" }) as any);
     const saved = written.find((w) => w.SK === "VASSET#a1");
     expect(saved.entityId).toBeTruthy();
     expect(saved.canonicalLevel).toBe("CANONICAL");
@@ -505,7 +505,7 @@ describe("canonizeAsset cria a entidade que faltava", () => {
     // Falta de rótulo não pode impedir a canonização.
     const { deps, written } = depsWithAsset(orphan);
     await canonizeAsset(deps, adminReq({}, { id: "a1" }) as any);
-    expect(written.find((w) => w.SK?.startsWith("VENTITY#")).canonicalName).toBe("Capital de Karasoy");
+    expect(written.find((w) => w.SK?.startsWith("VENTITY#")).canonicalName).toBe("Capital de Brujah");
   });
 
   it("deduz o tipo pelo enquadramento: plano geral vira cidade", async () => {

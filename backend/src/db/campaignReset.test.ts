@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { QueryCommand, ScanCommand, BatchWriteCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { resetCampaign } from "./campaignReset";
 
-const TABLE = "ravenloft-game";
+const TABLE = "vampirorpg-game";
 const CAMPAIGN = "cidade-noturna";
 
 function makeDoc(campaignItems: Record<string, unknown>[], playerItems: Record<string, unknown>[]) {
@@ -52,7 +52,7 @@ describe("resetCampaign", () => {
     // would also be silent: the wiki survives, so the loss looks partial.
     const campaignItems = [
       { PK: "CAMPAIGN#CIDADE_NOTURNA", SK: "TURN#001" },
-      { PK: "CAMPAIGN#CIDADE_NOTURNA", SK: "VENTITY#khar-durak" },
+      { PK: "CAMPAIGN#CIDADE_NOTURNA", SK: "VENTITY#galeria-subterranea" },
       { PK: "CAMPAIGN#CIDADE_NOTURNA", SK: "VSTYLE#0003" },
     ];
     const doc = makeDoc(campaignItems, []);
@@ -65,7 +65,7 @@ describe("resetCampaign", () => {
     );
 
     expect(deletedSks).toContain("TURN#001");
-    expect(deletedSks).not.toContain("VENTITY#khar-durak");
+    expect(deletedSks).not.toContain("VENTITY#galeria-subterranea");
     expect(deletedSks).not.toContain("VSTYLE#0003");
     expect(result.deleted).toBe(1);
   });

@@ -114,7 +114,7 @@ describe("buildProjectCanon", () => {
     { section: "visao-geral", title: "a Cidade", body: "a Cidade é um reino-ilha cercado pela névoa." },
     { section: "crise-atual", title: "O Noites da Cidade", body: "Um inverno sobrenatural ameaça as Casas." },
     { section: "mortais", title: "Censo 1", body: "X".repeat(40000) },
-    { section: "clas", title: "Casa Ulgar", body: "Os Ulgar são guerreiros errantes." },
+    { section: "clas", title: "Casa Ravnos", body: "Os Ravnos são guerreiros errantes." },
   ];
 
   it("includes the mechanics summary and essential world sections", async () => {

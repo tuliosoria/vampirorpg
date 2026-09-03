@@ -122,14 +122,14 @@ O **cidadeo comum** preserva *juramentos* antigos.
       <WikiMarkdown
         body={`| Classe | Como aparece na Cidade |
 | --- | --- |
-| Wizard | A Ordem dos Três |
+| Wizard | A Corte do Sangue |
 | Warlock | Pactos |`}
       />,
     );
 
     expect(screen.getByRole("table")).toBeInTheDocument();
     expect(screen.getByRole("columnheader", { name: "Classe" })).toBeInTheDocument();
-    expect(screen.getByRole("cell", { name: "A Ordem dos Três" })).toBeInTheDocument();
+    expect(screen.getByRole("cell", { name: "A Corte do Sangue" })).toBeInTheDocument();
     expect(screen.getAllByRole("row")).toHaveLength(3);
     expect(screen.queryByText(/\| --- \|/)).toBeNull();
   });

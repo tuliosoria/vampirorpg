@@ -2,7 +2,7 @@ import type { Deps } from "./publicRoutes";
 import type { HandlerRequest, HandlerResponse } from "../types/domain";
 import { HttpError } from "../types/domain";
 import {
-  RELATIONS_DOC, SEATS, budgetBetween, newMessage, pairKey, personaFor, seatOf, sendsRemaining,
+  SEATS, budgetBetween, newMessage, pairKey, personaFor, seatOf, sendsRemaining,
   clampMessage, characterFor, characterId, fullCodex, houseRoster, codexBySeat, codexNpcBySeatAndId, houseProfileFor, seatKeyForHouseId,
   houseCanonFor, npcFor,
   type DiplomaticMessage,
@@ -27,6 +27,7 @@ import { buildPublicChronicle } from "../ai/diplomacy/chronicle";
 import { buildHouseSituation } from "../ai/diplomacy/situation";
 import { leaderIsDead } from "../ai/diplomacy/succession";
 import { fold, titleHead } from "../ai/visual/canonLookup";
+import { getWorldBible } from "../db/worldBible";
 
 function newId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
@@ -41,8 +42,8 @@ function leaderIdOf(seatKey: string): string {
 /**
  * A biografia autorada de quem responde, ou null.
  *
- * Nem todo mundo tem: dos 16 líderes, 14 têm biografia, e o Patriarca Durgan e
- * o Faraó Gloriandur ainda não. Sem biografia o bloco simplesmente não é
+ * Nem todo mundo tem: dos 16 líderes, 14 têm biografia, e o Bruno e
+ * a Anciã Rala ainda não. Sem biografia o bloco simplesmente não é
  * escrito, e a carta sai como saía antes.
  */
 function biographyOf(affiliation: string, id: string): string | null {
@@ -65,7 +66,7 @@ function dedupePeople(people: { id: string; name: string; role: string }[]): { i
 
 /**
  * Casa viva do jogador → chave canônica. As Casas vivas guardam nomes curtos
- * ("Do Ouro", "Solarion"); as chaves seguem os títulos do wiki.
+ * ("Do Ouro", "Ventrue"); as chaves seguem os títulos do wiki.
  */
 export function houseKeyForName(name: string): string | null {
   const f = fold(name).trim();
@@ -199,7 +200,7 @@ function nomeDoNpc(id: string): string {
  * A conversa do jogador com uma Casa, do começo.
  *
  * Mostrava só o turno corrente, e por isso um jogador que negociou dois turnos
- * seguidos com Euralune abria a Casa e via vazio — como se nunca tivesse
+ * seguidos com Toreador abria a Casa e via vazio — como se nunca tivesse
  * escrito. A IA já recebia as cartas passadas para não responder como quem
  * esquece; faltava o jogador ter a mesma memória.
  *
@@ -318,7 +319,13 @@ export async function sendMessage(deps: Deps, req: HandlerRequest): Promise<Hand
         // é a chancelaria que fala.
         biography: biographyOf(codexNpc?.affiliation ?? toHouseKey, toCharacterId ?? leaderIdOf(toHouseKey)),
         toHouseKey,
-        relations: relationsBetween(RELATIONS_DOC, target.name, house.name),
+        // As feridas entre clãs saem da Bíblia do Mundo, que o Narrador
+        // escreve — não de um documento embutido no código.
+        relations: relationsBetween(
+          (await getWorldBible(deps.doc, deps.config.tableName, deps.config.campaignId))?.lore ?? "",
+          target.name,
+          house.name,
+        ),
         publicEvent: turn.publicEvent ?? "",
         chronicle,
         persona,
@@ -435,8 +442,8 @@ export async function adminDiplomacy(deps: Deps, req: HandlerRequest): Promise<H
     };
     t.messages.push(m);
     // A primeira carta do fio diz quem procurou quem. Sem isto o painel mostra
-    // "Khazdrun → Casa Valerius" com a resposta de Valerius rotulada como
-    // "respondeu", quando na verdade foi Valerius que escreveu primeiro.
+    // "Nosferatu → Clã Ventrue" com a resposta de Ventrue rotulada como
+    // "respondeu", quando na verdade foi Ventrue que escreveu primeiro.
     t.mundoComecou = t.messages[0]?.author === "AI";
     threads.set(k, t);
   }
@@ -557,8 +564,8 @@ export async function respondToPact(deps: Deps, req: HandlerRequest): Promise<Ha
   await putFact(deps.doc, tableName, campaignId, pacto);
 
   // A matriz fala em chave de SEDE, sempre. Gravar com houseId criava uma
-  // segunda linha para a mesma Casa ("solarion-k0hc" ao lado de
-  // "casa-solarion"), e a carta — que lê pela sede — nunca via o que o pacto
+  // segunda linha para o mesmo clã ("ventrue-k0hc" ao lado de
+  // "cla-ventrue"), e a carta — que lê pelo domínio — nunca via o que o pacto
   // tinha movido. O acordo mexia num número que ninguém consultava.
   const minhaSedeChave = seatKeyForHouseId(player.houseId);
   if (!minhaSedeChave) throw new HttpError(409, "NO_SEAT", "A sua Casa ainda não tem sede registrada no mapa.");

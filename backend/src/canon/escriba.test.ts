@@ -10,21 +10,21 @@ import * as entitiesDb from "../db/visual/entities";
 
 function proposta(over: Partial<CanonProposal> = {}): CanonProposal {
   return {
-    title: "Sera de Vargen",
+    title: "Sera de Gangrel",
     section: "clas",
     body: "Batedora das fronteiras.",
     summary: "Batedora.",
     entityType: "CHARACTER",
-    canonicalName: "Sera de Vargen",
+    canonicalName: "Sera de Gangrel",
     immutableTraits: ["cicatriz no queixo"],
-    houseId: "Vargen",
+    houseId: "Gangrel",
     ...over,
   };
 }
 
 const deps = () => ({
   doc: {} as never,
-  tableName: "ravenloft-game",
+  tableName: "vampirorpg-game",
   campaignId: "cidade-noturna",
 });
 
@@ -34,13 +34,13 @@ beforeEach(() => vi.clearAllMocks());
 
 describe("escreverCanone", () => {
   it("grava verbete e entidade e devolve os dois ids", async () => {
-    const r = await escreverCanone(deps(), { proposal: proposta(), houseId: "vargen-x1", opId: OP });
+    const r = await escreverCanone(deps(), { proposal: proposta(), houseId: "gangrel-x1", opId: OP });
 
     expect(r.wikiEntryId).toBeTruthy();
     expect(r.visualEntityId).toBeTruthy();
 
     const entry = vi.mocked(wikiDb.putWikiEntry).mock.calls[0][3];
-    expect(entry.title).toBe("Sera de Vargen");
+    expect(entry.title).toBe("Sera de Gangrel");
     expect(entry.body).toBe("Batedora das fronteiras.");
     // Sem imagem é o ponto da ferramenta: o verbete não pode sair com campo de
     // imagem nenhum, nem vazio, para não abrir moldura sem retrato na tela.
@@ -48,7 +48,7 @@ describe("escreverCanone", () => {
     expect(entry.imageUrls).toBeUndefined();
 
     const entity = vi.mocked(entitiesDb.putEntity).mock.calls[0][3];
-    expect(entity.canonicalName).toBe("Sera de Vargen");
+    expect(entity.canonicalName).toBe("Sera de Gangrel");
     expect(entity.wikiEntryId).toBe(r.wikiEntryId);
     expect(entity.status).toBe("CANONICAL");
     expect(entity.immutableTraits.map((t) => t.text)).toEqual(["cicatriz no queixo"]);
@@ -56,13 +56,13 @@ describe("escreverCanone", () => {
 
   /**
    * A Casa do Mestre vem do seletor da tela, nunca do campo homônimo da
-   * proposta: aquele é texto livre da IA, que devolve o nome ("Vargen") onde o
-   * banco espera o id sorteado ("vargen-x1").
+   * proposta: aquele é texto livre da IA, que devolve o nome ("Gangrel") onde o
+   * banco espera o id sorteado ("gangrel-x1").
    */
   it("usa a Casa recebida, não a que a IA escreveu na proposta", async () => {
-    await escreverCanone(deps(), { proposal: proposta({ houseId: "Vargen" }), houseId: "vargen-x1", opId: OP });
+    await escreverCanone(deps(), { proposal: proposta({ houseId: "Gangrel" }), houseId: "gangrel-x1", opId: OP });
 
-    expect(vi.mocked(entitiesDb.putEntity).mock.calls[0][3].houseId).toBe("vargen-x1");
+    expect(vi.mocked(entitiesDb.putEntity).mock.calls[0][3].houseId).toBe("gangrel-x1");
   });
 
   it("aceita cânone sem Casa nenhuma", async () => {
@@ -88,11 +88,11 @@ describe("escreverCanone", () => {
   });
 
   it("desempata slug já usado", async () => {
-    vi.mocked(entitiesDb.listEntities).mockResolvedValueOnce([{ slug: "sera-de-vargen" }] as never);
+    vi.mocked(entitiesDb.listEntities).mockResolvedValueOnce([{ slug: "sera-de-gangrel" }] as never);
 
     await escreverCanone(deps(), { proposal: proposta(), houseId: null, opId: OP });
 
-    expect(vi.mocked(entitiesDb.putEntity).mock.calls[0][3].slug).toMatch(/^sera-de-vargen-/);
+    expect(vi.mocked(entitiesDb.putEntity).mock.calls[0][3].slug).toMatch(/^sera-de-gangrel-/);
   });
 
   /**
@@ -141,12 +141,12 @@ describe("republicar com a mesma chave de operação", () => {
   it("não desempata o slug contra a própria tentativa anterior", async () => {
     const primeira = await escreverCanone(deps(), { proposal: proposta(), houseId: null, opId: "op-1" });
     vi.mocked(entitiesDb.listEntities).mockResolvedValueOnce([
-      { id: primeira.visualEntityId, slug: "sera-de-vargen" },
+      { id: primeira.visualEntityId, slug: "sera-de-gangrel" },
     ] as never);
 
     await escreverCanone(deps(), { proposal: proposta(), houseId: null, opId: "op-1" });
 
     const ultima = vi.mocked(entitiesDb.putEntity).mock.calls.at(-1)![3];
-    expect(ultima.slug).toBe("sera-de-vargen");
+    expect(ultima.slug).toBe("sera-de-gangrel");
   });
 });

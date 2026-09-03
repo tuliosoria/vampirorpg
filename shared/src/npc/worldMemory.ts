@@ -2,8 +2,8 @@
  * World Memory: o que aconteceu, e quem sabe.
  *
  * Sem controle de conhecimento os NPCs viram uma hivemind — um sacerdote em
- * Porto Cinzento passaria a odiar Alic no instante em que ele ordena, em
- * segredo, um ataque a Ninho Alto. `npcKnows` é o que impede isso: resolve se
+ * Porto Cinzento passaria a odiar Vasco no instante em que ele ordena, em
+ * segredo, um ataque ao Teatro Municipal. `npcKnows` é o que impede isso: resolve se
  * um fato já chegou a um NPC, a partir de a quem ele era visível e de quão
  * rápido se espalha.
  */
@@ -32,7 +32,7 @@ export interface WorldEvent {
 export interface NpcMemoryEntry {
   turnNumber: number;
   description: string;
-  /** Um resumo curto do efeito ("−15 confiança em Solarion"), para o roleplay. */
+  /** Um resumo curto do efeito ("−15 confiança em Ventrue"), para o roleplay. */
   impact: string;
 }
 

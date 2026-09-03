@@ -15,12 +15,12 @@ function turn(over: Partial<Turn>): Turn {
 describe("buildHouseSituation", () => {
   it("pega a fatia do evento público que menciona a Casa", () => {
     const turns = [
-      turn({ turnId: 4, publicEvent: "A Casa do Ouro rompeu com a Coroa de Alic. Karasoy enviou tropas." }),
+      turn({ turnId: 4, publicEvent: "A Casa do Ouro rompeu com a Coroa de Vasco. Brujah enviou tropas." }),
     ];
     const s = buildHouseSituation({ houseName: "Casa do Ouro", turns });
     expect(s).toMatch(/rompeu com a Coroa/);
     // Não arrasta a frase que é de outra Casa.
-    expect(s).not.toMatch(/Karasoy enviou tropas/);
+    expect(s).not.toMatch(/Brujah enviou tropas/);
   });
 
   it("inclui descobertas e resultado público que citam a Casa", () => {
@@ -29,21 +29,21 @@ describe("buildHouseSituation", () => {
         turnId: 4,
         publicEvent: "",
         result: {
-          publicResult: "Ferrumor perdeu dois navios na travessia.",
+          publicResult: "Setita perdeu dois navios na travessia.",
           houseResults: {},
           attributeDeltas: {},
-          discoveries: ["Um estaleiro secreto de Ferrumor foi revelado."],
+          discoveries: ["Um estaleiro secreto de Setita foi revelado."],
         },
       }),
     ];
-    const s = buildHouseSituation({ houseName: "Casa Ferrumor", turns });
+    const s = buildHouseSituation({ houseName: "Clã Setita", turns });
     expect(s).toMatch(/perdeu dois navios/);
     expect(s).toMatch(/estaleiro secreto/);
   });
 
   it("dá vazio quando nada do turno menciona a Casa", () => {
-    const turns = [turn({ turnId: 4, publicEvent: "A neve fechou os portões de o centro velho." })];
-    expect(buildHouseSituation({ houseName: "Casa Euralune", turns })).toBe("");
+    const turns = [turn({ turnId: 4, publicEvent: "A neve fechou os portões do centro velho." })];
+    expect(buildHouseSituation({ houseName: "Clã Toreador", turns })).toBe("");
   });
 
   // As três Casas de jogador sabem o que a info privada lhes diz.
@@ -63,9 +63,9 @@ describe("buildHouseSituation", () => {
 
   it("não repete a mesma linha que aparece em evento e resolução", () => {
     const turns = [
-      turn({ turnId: 4, publicEvent: "Karasoy marchou para o norte.", result: { publicResult: "Karasoy marchou para o norte.", houseResults: {}, attributeDeltas: {}, discoveries: [] } }),
+      turn({ turnId: 4, publicEvent: "Brujah marchou para o norte.", result: { publicResult: "Brujah marchou para o norte.", houseResults: {}, attributeDeltas: {}, discoveries: [] } }),
     ];
-    const s = buildHouseSituation({ houseName: "Casa Karasoy", turns });
+    const s = buildHouseSituation({ houseName: "Clã Brujah", turns });
     expect(s.match(/marchou para o norte/g)?.length).toBe(1);
   });
 });

@@ -7,7 +7,7 @@ import { fichaVazia, type ClaFicha } from "@vampiro/content";
  *
  * Ficam na partição da campanha, sob `CANONCLA#`. Sobrevivem ao reset da
  * campanha pelo mesmo motivo que a wiki sobrevive: reiniciar apaga o estado da
- * partida, não a Cidade.
+ * partida, nãa Cidade.
  */
 function strip(item: Record<string, unknown>): ClaFicha {
   const base = fichaVazia(

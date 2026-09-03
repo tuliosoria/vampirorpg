@@ -42,8 +42,8 @@ export interface CreateEntityBody {
 }
 
 export function slugify(name: string): string {
-  // Strip the combining-diacritical-marks block after NFD so "Mandíbula"
-  // becomes "mandibula".
+  // Strip the combining-diacritical-marks block after NFD so "Setita"
+  // becomes "setita".
   return name
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")

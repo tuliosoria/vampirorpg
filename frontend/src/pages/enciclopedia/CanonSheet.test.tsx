@@ -8,7 +8,7 @@ import { newVisualEntity } from "@vampiro/content";
 function makeEntity() {
   const e = newVisualEntity({
     id: "e1", campaignId: "cidade-noturna", entityType: "CITY",
-    canonicalName: "Galeria Subterrânea", slug: "khar-durak",
+    canonicalName: "Galeria Subterrânea", slug: "galeria-subterranea",
     publicDescription: "Cidade da Montanha Viva",
   });
   e.immutableTraits = [

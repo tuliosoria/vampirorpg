@@ -8,7 +8,7 @@ import * as turnsDb from "../db/turns";
 import * as spyDb from "../db/spyOps";
 
 const casa: any = {
-  houseId: "solarion-k0hc", name: "Solarion",
+  houseId: "ventrue-k0hc", name: "Ventrue",
   attributes: { riqueza: 2, recursos: 3, soldados: 2, controle: 3 },
 };
 
@@ -20,7 +20,7 @@ let cobrar: any;
 
 beforeEach(() => {
   vi.restoreAllMocks();
-  vi.spyOn(auth, "requirePlayer").mockReturnValue({ houseId: "solarion-k0hc" } as never);
+  vi.spyOn(auth, "requirePlayer").mockReturnValue({ houseId: "ventrue-k0hc" } as never);
   vi.spyOn(adminAuth, "requireAdmin").mockReturnValue(undefined as never);
   vi.spyOn(housesDb, "getHouse").mockResolvedValue(casa);
   vi.spyOn(turnsDb, "getActiveTurn").mockResolvedValue({ turnId: 7, status: "OPEN" } as never);
@@ -31,7 +31,7 @@ beforeEach(() => {
 
 describe("contratar uma operação", () => {
   it("cobra na hora, e não na resolução", async () => {
-    const res = await startSpyOp(deps(), req({ question: "Quem pôs Aylin no barco", level: "TESTEMUNHA" }));
+    const res = await startSpyOp(deps(), req({ question: "Quem pôs Solano no barco", level: "TESTEMUNHA" }));
     expect(res.status).toBe(201);
     // 3 recursos - 2 do nível
     expect(cobrar.mock.calls[0][4]).toMatchObject({ recursos: 1, riqueza: 2 });
@@ -66,7 +66,7 @@ describe("contratar uma operação", () => {
 
 describe("resolver", () => {
   const emCurso = {
-    id: "s1", campaignId: "cidade-noturna", houseId: "solarion-k0hc", turnNumber: 7,
+    id: "s1", campaignId: "cidade-noturna", houseId: "ventrue-k0hc", turnNumber: 7,
     question: "x", level: "PROVA", targetKey: "", status: "EM_CURSO",
     outcome: null, report: "", createdAt: "", resolvedAt: null,
   };

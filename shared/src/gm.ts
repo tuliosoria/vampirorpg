@@ -4,17 +4,21 @@ export interface GmSection {
 }
 
 /**
- * Sections for the GM-only "Bíblia do Mestre" (Game Master's bible). These are
- * NEVER exposed through any public endpoint, the content spoils the campaign's
- * central mystery (that the Pale King is the erased king Othmar I, the Houses'
- * ancient betrayal, how to reveal the truth, and Othmar's anchors). Kept
- * separate from the player wiki by design, so secret lore can never leak.
+ * As seções da Bíblia do Mestre, que só o Narrador vê.
+ *
+ * NUNCA saem por endpoint público: é aqui que vive o que estragaria a crônica
+ * se vazasse. A separação da wiki do jogador é estrutural, e não uma questão de
+ * lembrar de esconder.
+ *
+ * As seções são gavetas, não conteúdo: no jogo de origem uma delas levava o
+ * nome próprio de um vilão daquela campanha, anunciado na interface a quem
+ * abrisse a aba. Estas nomeiam o TIPO de segredo, e servem a qualquer crônica.
  */
 export const GM_SECTIONS: GmSection[] = [
   { id: "a-verdade", label: "A Verdade" },
-  { id: "casas-segredo", label: "O Segredo das Casas" },
-  { id: "revelacao", label: "Como Revelar a Verdade" },
-  { id: "ancoras", label: "As Âncoras de Othmar" },
+  { id: "casas-segredo", label: "O que cada clã esconde" },
+  { id: "revelacao", label: "Como revelar, e quando" },
+  { id: "ancoras", label: "Conspirações em curso" },
   { id: "pergunta", label: "A Pergunta Central" },
 ];
 

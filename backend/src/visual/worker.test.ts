@@ -44,10 +44,10 @@ describe("runGenerationPipeline", () => {
 
   it("EDIT path used when entity has a canonical asset", async () => {
     const canonicalAsset = { id: "prev", campaignId: "cidade-noturna", entityId: "alic", assetType: "PORTRAIT" as const, storageKey: "k", storageUrl: "u", thumbnailStorageKey: null, thumbnailUrl: null, mimeType: "image/png", width: 1, height: 1, aspectRatio: "3:2", checksum: "c", status: "READY" as const, canonicalLevel: "CANONICAL" as const, styleBibleVersion: 1, entityVersion: 1, generationId: null, parentAssetIds: [], referenceRoles: ["IDENTITY" as const], cameraAngle: "", viewType: "", description: "", extractedVisualDescription: "", consistencyScore: 90, consistencyReport: null, tags: [], createdAt: "2026-01-01T00:00:00Z" };
-    const gen = { ...newVisualGeneration({ id: "g1", campaignId: "cidade-noturna", requestedBy: "ip", requestText: "Alic sorrindo" }), entityId: "alic" };
+    const gen = { ...newVisualGeneration({ id: "g1", campaignId: "cidade-noturna", requestedBy: "ip", requestText: "Vasco sorrindo" }), entityId: "alic" };
     const deps = baseDeps({
       getGeneration: vi.fn(async () => gen),
-      getEntity: vi.fn(async () => ({ id: "alic", campaignId: "cidade-noturna", entityType: "CHARACTER" as const, canonicalName: "Alic", aliases: [], slug: "alic", publicDescription: "", immutableTraits: [{ id: "t1", text: "cicatriz no olho esquerdo", source: "AUTHORED" as const, originAssetId: null, createdAt: "" }], wikiEntryId: null, flexibleTraits: [], prohibitedChanges: [], visualKeywords: [], negativeInstructions: [], scaleDescription: "", culturalContext: "", houseId: null, regionId: null, parentEntityId: null, relatedEntityIds: [], status: "CANONICAL" as const, canonicalAssetIds: ["prev"], supportingAssetIds: [], referenceSheetAssetId: null, mapAssetId: null, version: 1, profile: null, createdAt: "2026-01-01T00:00:00Z", updatedAt: "2026-01-01T00:00:00Z" })),
+      getEntity: vi.fn(async () => ({ id: "alic", campaignId: "cidade-noturna", entityType: "CHARACTER" as const, canonicalName: "Vasco", aliases: [], slug: "alic", publicDescription: "", immutableTraits: [{ id: "t1", text: "cicatriz no olho esquerdo", source: "AUTHORED" as const, originAssetId: null, createdAt: "" }], wikiEntryId: null, flexibleTraits: [], prohibitedChanges: [], visualKeywords: [], negativeInstructions: [], scaleDescription: "", culturalContext: "", houseId: null, regionId: null, parentEntityId: null, relatedEntityIds: [], status: "CANONICAL" as const, canonicalAssetIds: ["prev"], supportingAssetIds: [], referenceSheetAssetId: null, mapAssetId: null, version: 1, profile: null, createdAt: "2026-01-01T00:00:00Z", updatedAt: "2026-01-01T00:00:00Z" })),
       listEntityAssets: vi.fn(async () => [canonicalAsset]),
     });
     await runGenerationPipeline(deps, "cidade-noturna", "g1");
@@ -115,7 +115,7 @@ describe("style reference resolution", () => {
 
 describe("asset type", () => {
   it("uses the assetType from the generation instead of always SCENE", async () => {
-    const gen = { ...newVisualGeneration({ id: "g1", campaignId: "cidade-noturna", requestedBy: "ip", requestText: "retrato de Alic" }), assetType: "PORTRAIT" as const };
+    const gen = { ...newVisualGeneration({ id: "g1", campaignId: "cidade-noturna", requestedBy: "ip", requestText: "retrato de Vasco" }), assetType: "PORTRAIT" as const };
     const deps = baseDeps({ getGeneration: vi.fn(async () => gen) });
 
     await runGenerationPipeline(deps, "cidade-noturna", "g1");

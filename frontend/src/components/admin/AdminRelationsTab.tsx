@@ -54,8 +54,8 @@ function iguais(a: Rascunho, b: Rascunho): boolean {
 /**
  * Como cada Casa vê as outras: amizade, comércio e favores.
  *
- * A relação é direcional de propósito — a Casa do Ouro pode cortejar Khazdrun
- * enquanto Khazdrun desconfia dela, e é dessa assimetria que sai a política. Por
+ * A relação é direcional de propósito — a Casa do Ouro pode cortejar Nosferatu
+ * enquanto Nosferatu desconfia dela, e é dessa assimetria que sai a política. Por
  * isso o painel escolhe UMA Casa e mostra o que ELA sente, com o lado inverso ao
  * lado apenas para leitura.
  *

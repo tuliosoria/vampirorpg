@@ -3,7 +3,7 @@ import { PutCommand, QueryCommand, GetCommand } from "@aws-sdk/lib-dynamodb";
 import { putCanonSubmission, getCanonSubmission, listCanonSubmissions } from "./canonSubmissions";
 import { newCanonSubmission, type CanonSubmission } from "@vampiro/content";
 
-const TABLE = "ravenloft-game";
+const TABLE = "vampirorpg-game";
 const CAMPAIGN = "cidade-noturna";
 
 function docReturning(value: unknown) {
@@ -14,8 +14,8 @@ function submission(id: string, createdAt: string): CanonSubmission {
   const sub = newCanonSubmission({
     id,
     campaignId: CAMPAIGN,
-    houseId: "vargen",
-    authorName: "Casa Vargen",
+    houseId: "gangrel",
+    authorName: "Clã Gangrel",
     rawText: "texto",
     rawImageUrl: null,
     rawImageKey: null,
@@ -27,7 +27,7 @@ function submission(id: string, createdAt: string): CanonSubmission {
       entityType: "CHARACTER",
       canonicalName: "Sera",
       immutableTraits: [],
-      houseId: "vargen",
+      houseId: "gangrel",
     },
   });
   return { ...sub, createdAt, updatedAt: createdAt };
@@ -79,11 +79,11 @@ describe("canonSubmissions db", () => {
 
     const other = docReturning({
       Items: [
-        { ...submission("mine", "2026-01-01T00:00:00.000Z"), houseId: "vargen" },
-        { ...submission("theirs", "2026-02-01T00:00:00.000Z"), houseId: "auremont" },
+        { ...submission("mine", "2026-01-01T00:00:00.000Z"), houseId: "gangrel" },
+        { ...submission("theirs", "2026-02-01T00:00:00.000Z"), houseId: "ouro" },
       ],
     });
-    const mine = await listCanonSubmissions(other as never, TABLE, CAMPAIGN, "vargen");
+    const mine = await listCanonSubmissions(other as never, TABLE, CAMPAIGN, "gangrel");
     expect(mine.map((s) => s.id)).toEqual(["mine"]);
   });
 });

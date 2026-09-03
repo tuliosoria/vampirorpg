@@ -2,12 +2,12 @@
  * Quanto cabe numa carroça — a âncora que faltava às cartas de comércio.
  *
  * Sem ela, o modelo escrevia números que soam impressionantes e não existem:
- * uma carta de Valerius ofereceu "8.000 sacas de trigo" por "300 toneladas de
+ * uma carta de Ventrue ofereceu "8.000 sacas de trigo" por "300 toneladas de
  * ferro", em dois comboios. São quase quinhentas carroças de boi por comboio,
  * duas vezes, numa estrada de inverno com orcs acampados no caminho.
  *
  * O problema não é o modelo ignorar a Idade Média: é ele não ter com o que
- * comparar. Quando o contexto ancorava — a Euralune negociando correio —, ele
+ * comparar. Quando o contexto ancorava — a Toreador negociando correio —, ele
  * escreveu "seis tubos selados por viagem, de no máximo duas libras cada", que
  * é exatamente a escala certa.
  *

@@ -94,9 +94,9 @@ export function GmBibleManager({ token }: { token: string }) {
         <Stack spacing={2}>
           <Typography variant="h2">Bíblia do Mestre (segredos)</Typography>
           <Alert severity="warning">
-            Conteúdo secreto da campanha. Só você vê isto: nunca aparece para os jogadores nem em qualquer
-            página pública. Aqui ficam a verdade sobre Othmar, os segredos das Casas, as fases de revelação e
-            as âncoras do o Príncipe.
+            Conteúdo secreto da crônica. Só você vê isto: nunca aparece para os jogadores nem em qualquer
+            página pública. Aqui ficam as conspirações em curso, quem está por trás de quê, o que cada clã
+            esconde e em que noite você pretende revelar cada coisa.
           </Alert>
           <Typography variant="body2" color="text.secondary">
             Use como referência ao conduzir os turnos. As entradas são preservadas ao reiniciar a campanha.

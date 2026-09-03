@@ -42,7 +42,7 @@ export interface EntradaDoEscriba {
    *
    * Vem do seletor da tela, nunca de `proposal.houseId`: aquele campo é texto
    * livre da IA, que não conhece os ids sorteados das Casas e devolve o nome
-   * ("Vargen") onde o banco espera o id ("vargen-x1"). O Mestre não tem Casa de
+   * ("Gangrel") onde o banco espera o id ("gangrel-x1"). O Narrador não tem clã de
    * sessão de onde tirar isso, então ele escolhe — e escolhe "nenhuma" para o
    * muito que escreve que não pertence a Casa alguma.
    */

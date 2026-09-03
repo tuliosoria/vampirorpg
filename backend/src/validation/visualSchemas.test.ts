@@ -9,7 +9,7 @@ describe("parseGenerateBody", () => {
     expect(r.entityId).toBeNull();
   });
   it("accepts an optional entityId", () => {
-    const r = parseGenerateBody({ requestText: "Alic sorrindo", entityId: "alic" });
+    const r = parseGenerateBody({ requestText: "Vasco sorrindo", entityId: "alic" });
     expect(r.entityId).toBe("alic");
   });
   it("rejects an empty requestText", () => {
@@ -22,16 +22,16 @@ describe("parseGenerateBody", () => {
 
 describe("parseCreateEntityBody", () => {
   it("accepts a minimal valid body", () => {
-    const out = parseCreateEntityBody({ canonicalName: "Ordem do Sino", entityType: "HOUSE" });
-    expect(out.canonicalName).toBe("Ordem do Sino");
+    const out = parseCreateEntityBody({ canonicalName: "Corte do Sangue", entityType: "HOUSE" });
+    expect(out.canonicalName).toBe("Corte do Sangue");
     expect(out.entityType).toBe("HOUSE");
-    expect(out.slug).toBe("ordem-do-sino");
+    expect(out.slug).toBe("corte-do-sangue");
     expect(out.wikiEntryId).toBeNull();
   });
 
   it("slugifies accented names", () => {
-    const out = parseCreateEntityBody({ canonicalName: "Mandíbula de Osso", entityType: "CREATURE" });
-    expect(out.slug).toBe("mandibula-de-osso");
+    const out = parseCreateEntityBody({ canonicalName: "Setita", entityType: "CREATURE" });
+    expect(out.slug).toBe("setita");
   });
 
   it("keeps an explicit wikiEntryId", () => {

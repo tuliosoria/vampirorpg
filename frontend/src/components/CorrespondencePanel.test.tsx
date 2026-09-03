@@ -8,7 +8,7 @@ import { CorrespondencePanel } from "./CorrespondencePanel";
 
 const houseInput = {
   name: "Ventrue", motto: "O Sol jamais se curva!", emblem: { icon: "chama", color1: "#7f1d1d", color2: "#3f3f46" },
-  castleName: "Sahra-Lun", townsText: "Oásis e observatórios.", historyText: "Uma Casa de estudiosos.",
+  castleName: "Cais Velho", townsText: "Oásis e observatórios.", historyText: "Uma Casa de estudiosos.",
   specialty: "Astronomia", weakness: "Orgulho",
   attributes: { riqueza: 4, recursos: 3, soldados: 1, controle: 2 },
 } as never;

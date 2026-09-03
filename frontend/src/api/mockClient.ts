@@ -274,11 +274,11 @@ export class MockApiClient implements ApiClient {
   private visualAssets: VisualAsset[] = [
     {
       id: "a1", campaignId: "cidade-noturna", entityId: "e1", assetType: "PORTRAIT", storageKey: "k1",
-      storageUrl: "https://img.test/alic.png", thumbnailStorageKey: null, thumbnailUrl: null,
+      storageUrl: "https://img.test/vasco.png", thumbnailStorageKey: null, thumbnailUrl: null,
       mimeType: "image/png", width: 1536, height: 1024, aspectRatio: "3:2", checksum: "c1",
       status: "READY", canonicalLevel: "CANONICAL", styleBibleVersion: 1, entityVersion: 1,
       generationId: null, parentAssetIds: [], referenceRoles: [], cameraAngle: "", viewType: "",
-      description: "Retrato do Príncipe Alic.", extractedVisualDescription: "", consistencyScore: null,
+      description: "Retrato do Príncipe Vasco Aranha.", extractedVisualDescription: "", consistencyScore: null,
       consistencyReport: null, tags: [], createdAt: "2026-01-01T00:00:00.000Z",
     },
     {
@@ -287,7 +287,7 @@ export class MockApiClient implements ApiClient {
       mimeType: "image/png", width: 1536, height: 1024, aspectRatio: "3:2", checksum: "c2",
       status: "READY", canonicalLevel: "CANONICAL", styleBibleVersion: 1, entityVersion: 1,
       generationId: null, parentAssetIds: [], referenceRoles: [], cameraAngle: "", viewType: "",
-      description: "Vista de Khar-Durak.", extractedVisualDescription: "", consistencyScore: null,
+      description: "Vista da Galeria Subterrânea.", extractedVisualDescription: "", consistencyScore: null,
       consistencyReport: null, tags: [], createdAt: "2026-01-01T00:00:00.000Z",
     },
   ];
@@ -298,7 +298,7 @@ export class MockApiClient implements ApiClient {
   private visualTraitSeq = 0;
 
   constructor() {
-    this.houses.set("seed-vargen", makeHouse("seed-vargen", {
+    this.houses.set("seed-gangrel", makeHouse("seed-gangrel", {
       ...EXEMPLO_DE_PERSONAGEM,
     }));
   }
@@ -688,7 +688,7 @@ export class MockApiClient implements ApiClient {
 
   async respondToPact(playerToken: string, input: { factId: string; aceitar: boolean }): Promise<{ aceito: boolean; ativo?: string; custoPolitico?: { casa: string; amizade: number }[] }> {
     this.requirePlayer(playerToken);
-    return { aceito: input.aceitar, ativo: input.aceitar ? "Entreposto em Raven's Cross" : undefined };
+    return { aceito: input.aceitar, ativo: input.aceitar ? "Entreposto no Ferro-velho da Marginal" : undefined };
   }
 
   async listPacts(playerToken: string): Promise<PactsView> {
@@ -836,7 +836,7 @@ export class MockApiClient implements ApiClient {
     const reply: DiplomaticMessageView = { id: `m${this.correspondence.length + 2}`, turnNumber: 2, toHouseKey: input.toHouseKey, toCharacterId, author: "AI", body: toCharacterId ? "A pessoa responde na própria voz, guardando o que esconde." : "O clã responde com cautela e cita dívidas antigas.", createdAt: now };
     this.correspondence.push(sent, reply);
     const used = this.correspondence.filter((m) => m.toHouseKey === input.toHouseKey && m.author === "PLAYER").length;
-    // O orçamento é por Casa: Rimewatch tem uma carta, Karasoy tem duas.
+    // O orçamento é por Casa: o Antigo Sanatório tem uma carta, Brujah tem duas.
     const budget = MOCK_RECIPIENTS.find((r) => r.houseKey === input.toHouseKey)?.sends ?? 1;
     return { sent, reply, remaining: Math.max(0, budget - used), replyFailed: false };
   }

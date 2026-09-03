@@ -61,7 +61,7 @@ vi.mock("./canon/publish", () => ({
 }));
 
 const config: Config = {
-  tableName: "ravenloft-game",
+  tableName: "vampirorpg-game",
   campaignId: "cidade-noturna",
   adminCodeHash: "x",
   tokenSigningSecret: "secret",

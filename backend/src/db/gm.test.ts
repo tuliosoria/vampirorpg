@@ -3,7 +3,7 @@ import { DeleteCommand, PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import { listGmEntries, putGmEntry, deleteGmEntry, generateGmId, seedDefaultGm } from "./gm";
 import { DEFAULT_GM_ENTRIES, type GmEntry } from "@vampiro/content";
 
-const TABLE = "ravenloft-game";
+const TABLE = "vampirorpg-game";
 const CAMPAIGN = "cidade-noturna";
 
 function docReturning(value: unknown) {
@@ -14,7 +14,7 @@ const entry: GmEntry = {
   entryId: "abc123",
   section: "a-verdade",
   title: "A verdade",
-  body: "Othmar I.",
+  body: "Príncipe I.",
   order: 0,
   updatedAt: "2026-01-01T00:00:00.000Z",
 };

@@ -6,7 +6,7 @@
  * qualquer campanha e deve ser editável como qualquer outro texto do cenário.
  *
  * Sem isto toda Casa escreve como a mesma chancelaria educada. Com isto, Lorde
- * Thrain responde como alguém que acha que pedra não suporta duas fundações.
+ * o Príncipe responde como alguém que nunca precisou levantar a voz.
  */
 export interface LeaderPersona {
   leaderName: string;
@@ -22,7 +22,7 @@ export interface LeaderPersona {
   /**
    * Casas de quem esta desconfia, por chave de Casa, com o motivo. Injetado só
    * quando a Casa que escreve está no mapa — é o que faz os orcs responderem a
-   * Solarion com a memória da escravidão sem tratar todo mundo igual.
+   * Ventrue com a memória da escravidão sem tratar todo mundo igual.
    */
   distrusts?: Record<string, string>;
   /** Casas em quem esta confia, mesmo formato. */

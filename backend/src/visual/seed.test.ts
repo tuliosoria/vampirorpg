@@ -17,19 +17,23 @@ function makeDeps(over: Partial<SeedDeps> = {}): SeedDeps {
 }
 
 describe("seedVisualEncyclopedia", () => {
-  it("seeds StyleBible v1, entities and 10 assets on a fresh campaign", async () => {
+  // O acervo nasce vazio: a arte era do jogo de origem e os arquivos nem vieram
+  // no fork. O que se garante aqui é que semear o vazio cria a Bíblia de estilo
+  // e nada mais — nenhuma entidade fantasma apontando para PNG inexistente.
+  it("cria a Bíblia de estilo e nenhum ativo numa crônica nova", async () => {
     const deps = makeDeps();
     const summary = await seedVisualEncyclopedia(deps, "cidade-noturna");
     expect(deps.putStyleBible).toHaveBeenCalledTimes(1);
     expect(deps.putAsset).toHaveBeenCalledTimes(SEED_ITEMS.length);
     expect(summary.assetsCreated).toBe(SEED_ITEMS.length);
-    expect(summary.entitiesCreated).toBeGreaterThan(0);
+    expect(SEED_ITEMS).toHaveLength(0);
   });
-  it("marks the Mapa Oficial asset as LOCKED", async () => {
-    const deps = makeDeps();
-    await seedVisualEncyclopedia(deps, "cidade-noturna");
-    const lockedCall = (deps.putAsset as any).mock.calls.find((c: any[]) => c[1].description.includes("Mapa"));
-    expect(lockedCall[1].canonicalLevel).toBe("LOCKED");
+  // Todo item de semente que existir precisa declarar seu nível canônico: um
+  // mapa oficial entra travado, senão a próxima geração o reescreve.
+  it("todo item de semente declara um nível canônico", async () => {
+    for (const item of SEED_ITEMS) {
+      expect(["LOCKED", "CANONICAL", "DRAFT"]).toContain(item.canonicalLevel);
+    }
   });
   it("does not recreate the StyleBible when one is already active", async () => {
     const deps = makeDeps({ getActiveStyleBible: vi.fn(async () => ({ version: 1 } as any)) });

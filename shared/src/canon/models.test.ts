@@ -17,20 +17,20 @@ describe("newCanonSubmission", () => {
     const sub = newCanonSubmission({
       id: "abc",
       campaignId: "cidade-noturna",
-      houseId: "vargen",
-      authorName: "Casa Vargen",
+      houseId: "gangrel",
+      authorName: "Clã Gangrel",
       rawText: "  Quero criar Sera, a batedora.  ",
       rawImageUrl: null,
       rawImageKey: null,
       proposal: {
-        title: "Sera de Vargen",
+        title: "Sera de Gangrel",
         section: "casas",
         body: "Batedora das fronteiras.",
         summary: "Batedora.",
         entityType: "CHARACTER",
-        canonicalName: "Sera de Vargen",
+        canonicalName: "Sera de Gangrel",
         immutableTraits: ["cicatriz no queixo"],
-        houseId: "vargen",
+        houseId: "gangrel",
       },
     });
     expect(sub.status).toBe("PENDING_GM");
@@ -48,31 +48,31 @@ describe("newCanonSubmission", () => {
     const sub = newCanonSubmission({
       id: "abc",
       campaignId: "cidade-noturna",
-      houseId: "vargen",
-      authorName: "Casa Vargen",
+      houseId: "gangrel",
+      authorName: "Clã Gangrel",
       rawText: "Troque o nome do líder.",
       rawImageUrl: null,
       rawImageKey: null,
       proposal: {
-        title: "Novo líder de Solarion",
+        title: "Novo líder de Ventrue",
         section: "casas",
         body: "O líder passa a se chamar Corvo.",
         summary: "Renomeia o líder.",
         entityType: null,
         canonicalName: "Corvo",
         immutableTraits: [],
-        houseId: "solarion",
+        houseId: "ventrue",
       },
       review: {
         verdict: "CONFLICT",
         flags: [{ severity: "BLOCK", message: "Contradiz o nome já registrado." }],
-        conflictingEntryIds: ["w-solarion"],
+        conflictingEntryIds: ["w-ventrue"],
       },
     });
     expect(sub.review).toEqual({
       verdict: "CONFLICT",
       flags: [{ severity: "BLOCK", message: "Contradiz o nome já registrado." }],
-      conflictingEntryIds: ["w-solarion"],
+      conflictingEntryIds: ["w-ventrue"],
     });
   });
 
@@ -80,8 +80,8 @@ describe("newCanonSubmission", () => {
     const sub = newCanonSubmission({
       id: "abc",
       campaignId: "cidade-noturna",
-      houseId: "vargen",
-      authorName: "Casa Vargen",
+      houseId: "gangrel",
+      authorName: "Clã Gangrel",
       rawText: "x",
       rawImageUrl: null,
       rawImageKey: null,
@@ -105,18 +105,18 @@ describe("newCanonSubmission", () => {
     const sub = newCanonSubmission({
       id: "abc",
       campaignId: "cidade-noturna",
-      houseId: "vargen",
-      authorName: "Casa Vargen",
+      houseId: "gangrel",
+      authorName: "Clã Gangrel",
       rawText: "R".repeat(CANON_RAW_TEXT_MAX + 50),
       rawImageUrl: null,
       rawImageKey: null,
       proposal: {
-        title: "Sera de Vargen",
+        title: "Sera de Gangrel",
         section: "casas",
         body: "Batedora das fronteiras.",
         summary: "Batedora.",
         entityType: "CHARACTER",
-        canonicalName: "Sera de Vargen",
+        canonicalName: "Sera de Gangrel",
         immutableTraits: [],
         houseId: null,
       },
@@ -129,7 +129,7 @@ describe("newCanonSubmission", () => {
 describe("clampCanonProposal", () => {
   it("trunca canonicalName ao limite de título", () => {
     const proposal = clampCanonProposal({
-      title: "Sera de Vargen",
+      title: "Sera de Gangrel",
       section: "casas",
       body: "Batedora das fronteiras.",
       summary: "Batedora.",
@@ -144,12 +144,12 @@ describe("clampCanonProposal", () => {
 
   it("trunca cada traço imutável individualmente ao limite de traço", () => {
     const proposal = clampCanonProposal({
-      title: "Sera de Vargen",
+      title: "Sera de Gangrel",
       section: "casas",
       body: "Batedora das fronteiras.",
       summary: "Batedora.",
       entityType: null,
-      canonicalName: "Sera de Vargen",
+      canonicalName: "Sera de Gangrel",
       immutableTraits: ["T".repeat(CANON_TRAIT_MAX + 20), "curta", "X".repeat(CANON_TRAIT_MAX + 5)],
       houseId: null,
     });

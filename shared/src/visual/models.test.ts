@@ -34,7 +34,7 @@ describe("clampVisualText", () => {
 
 describe("factories", () => {
   it("newVisualEntity fills defaults and DRAFT status", () => {
-    const e = newVisualEntity({ id: "e1", campaignId: "cidade-noturna", entityType: "CHARACTER", canonicalName: "Alic", slug: "alic" });
+    const e = newVisualEntity({ id: "e1", campaignId: "cidade-noturna", entityType: "CHARACTER", canonicalName: "Vasco", slug: "alic" });
     expect(e.status).toBe("DRAFT");
     expect(e.version).toBe(1);
     expect(e.immutableTraits).toEqual([]);
@@ -73,7 +73,7 @@ describe("coerceCanonTraits", () => {
   it("passes CanonTrait objects through unchanged", () => {
     const trait: CanonTrait = {
       id: "t1",
-      text: "O mar em Krythos é verde-escuro.",
+      text: "O mar em fora da cidade é verde-escuro.",
       source: "DISCOVERED",
       originAssetId: "a1",
       createdAt: "2026-08-11T00:00:00.000Z",
@@ -168,8 +168,8 @@ describe("newVisualEntity", () => {
       id: "e1",
       campaignId: "cidade-noturna",
       entityType: "CITY",
-      canonicalName: "Khar-Durak",
-      slug: "khar-durak",
+      canonicalName: "Galeria Subterrânea",
+      slug: "galeria-subterranea",
     });
     expect(e.wikiEntryId).toBeNull();
     expect(e.immutableTraits).toEqual([]);
@@ -180,8 +180,8 @@ describe("newVisualEntity", () => {
       id: "e2",
       campaignId: "cidade-noturna",
       entityType: "CITY",
-      canonicalName: "Khar-Durak",
-      slug: "khar-durak",
+      canonicalName: "Galeria Subterrânea",
+      slug: "galeria-subterranea",
       immutableTraits: ["cidade escavada na montanha"],
     });
     expect(e.immutableTraits[0].text).toBe("cidade escavada na montanha");
@@ -193,8 +193,8 @@ describe("newVisualEntity", () => {
       id: "e3",
       campaignId: "cidade-noturna",
       entityType: "CITY",
-      canonicalName: "Khar-Durak",
-      slug: "khar-durak",
+      canonicalName: "Galeria Subterrânea",
+      slug: "galeria-subterranea",
       // @ts-expect-error immutableTraits must be CanonTrait[] or legacy string[]
       immutableTraits: 42,
     });

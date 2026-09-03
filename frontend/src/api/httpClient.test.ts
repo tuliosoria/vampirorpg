@@ -20,7 +20,7 @@ const houseInput: CreateHouseInput = {
   emblem: { icon: "lobo", color1: "#3f3f46", color2: "#1e3a5f" },
   leaderName: "Aldric",
   heirName: "Sera",
-  castleName: "Droskar",
+  castleName: "Parque do Norte",
   townsText: "Vilas do norte.",
   historyText: "Uma casa antiga.",
   specialty: "Defesa",

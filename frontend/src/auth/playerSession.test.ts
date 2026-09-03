@@ -9,16 +9,16 @@ describe("playerSession", () => {
   });
 
   it("round-trips a saved session", () => {
-    savePlayerSession({ playerToken: "t1", houseId: "vargen", displayName: "Elira" });
+    savePlayerSession({ playerToken: "t1", houseId: "gangrel", displayName: "Elira" });
     expect(loadPlayerSession()).toEqual({
       playerToken: "t1",
-      houseId: "vargen",
+      houseId: "gangrel",
       displayName: "Elira",
     });
   });
 
   it("clears the session", () => {
-    savePlayerSession({ playerToken: "t1", houseId: "vargen", displayName: "Elira" });
+    savePlayerSession({ playerToken: "t1", houseId: "gangrel", displayName: "Elira" });
     clearPlayerSession();
     expect(loadPlayerSession()).toBeNull();
   });

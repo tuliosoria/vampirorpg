@@ -7,9 +7,9 @@ beforeEach(semearCanon);
 afterEach(limparCanon);
 
 const elenco = [
-  { id: "gloriandur", nome: "Faraó Gloriandur" },
+  { id: "rala", nome: "Anciã Rala" },
   { id: "nima", nome: "Nima Olhos de Cinza" },
-  { id: "kael", nome: "Ser Kael Rimerberg" },
+  { id: "kael", nome: "Ser Kael Malkavian" },
 ];
 
 function verbete(body: string, title = "Um verbete") {
@@ -18,10 +18,10 @@ function verbete(body: string, title = "Um verbete") {
 
 describe("construirDetector", () => {
   it("encontra o personagem citado pelo nome próprio", () => {
-    const v = verbete("Gloriandur chegou ao porto.");
+    const v = verbete("Rala chegou ao porto.");
     const d = construirDetector([v], elenco);
 
-    expect(d.mencoesEm(v).personagens).toEqual(["gloriandur"]);
+    expect(d.mencoesEm(v).personagens).toEqual(["rala"]);
   });
 
   it("descarta a palavra do nome que o corpus escreve em minúscula", () => {
@@ -36,8 +36,8 @@ describe("construirDetector", () => {
   it("descarta o termo que serviria a dois personagens", () => {
     // Mandar o leitor para a pessoa errada é pior do que não oferecer link.
     const doisKael = [
-      { id: "kael-a", nome: "Ser Kael Rimerberg" },
-      { id: "kael-b", nome: "Kael de o centro velho" },
+      { id: "kael-a", nome: "Ser Kael Malkavian" },
+      { id: "kael-b", nome: "Kael do centro velho" },
     ];
     const v = verbete("Kael partiu ao amanhecer.");
     const d = construirDetector([v], doisKael);
@@ -53,17 +53,17 @@ describe("construirDetector", () => {
   });
 
   it("acha o nome no título do verbete, não só no corpo", () => {
-    const v = verbete("Nada aqui.", "A queda de Gloriandur");
+    const v = verbete("Nada aqui.", "A queda de Rala");
     const d = construirDetector([v], elenco);
 
-    expect(d.mencoesEm(v).personagens).toEqual(["gloriandur"]);
+    expect(d.mencoesEm(v).personagens).toEqual(["rala"]);
   });
 
   it("ignora acento e caixa", () => {
-    const v = verbete("GLORIANDUR voltou.");
+    const v = verbete("RALÁ voltou.");
     const d = construirDetector([v], elenco);
 
-    expect(d.mencoesEm(v).personagens).toEqual(["gloriandur"]);
+    expect(d.mencoesEm(v).personagens).toEqual(["rala"]);
   });
 
   it("verbete sem citação devolve listas vazias", () => {
@@ -114,20 +114,20 @@ describe("construirDetector", () => {
     });
 
     it("não identifica a pessoa pelo sobrenome que também nomeia um lugar", () => {
-      // "Torre de Véspera" é um lugar. Maelor Véspera era o personagem mais
+      // "Torre de Haddad" é um lugar. Professor Haddad era o personagem mais
       // citado do corpus, e quatro dos seis achados eram a torre.
-      const gente = [{ id: "maelor", nome: "Maelor Véspera" }];
-      const v = verbete("A Torre de Véspera fica ao sul, e o mestre a evitava.");
+      const gente = [{ id: "maelor", nome: "Professor Haddad" }];
+      const v = verbete("A Torre de Haddad fica ao sul, e o mestre a evitava.");
       const d = construirDetector([v], gente);
 
       expect(d.mencoesEm(v).personagens).toEqual([]);
     });
 
     it("não identifica a pessoa pelo sobrenome de outra pessoa", () => {
-      // No verbete dos vinte e sete magos, "Alaric Venn" oferecia um link que
-      // levava a Liora Venn: o leitor ia parar na pessoa errada.
-      const gente = [{ id: "liora", nome: "Mestra Liora Venn" }];
-      const v = verbete("Alaric Venn falou por último, e a mestra calou-se.");
+      // No verbete dos vinte e sete magos, "Bruno do Corte" oferecia um link que
+      // levava a Neide do Corte: o leitor ia parar na pessoa errada.
+      const gente = [{ id: "liora", nome: "Mestra Neide do Corte" }];
+      const v = verbete("Bruno do Corte falou por último, e a mestra calou-se.");
       const d = construirDetector([v], gente);
 
       expect(d.mencoesEm(v).personagens).toEqual([]);
@@ -144,11 +144,11 @@ describe("construirDetector", () => {
  * Os títulos são os da corte porque é neles que a regra tropeça.
  */
 const CORTE = [
-  { id: "dama-elara-voss", nome: "Dama Elara Voss" },
+  { id: "dama-ines-do-vale", nome: "Dama Inês do Vale" },
   { id: "principe-vasco-aranha", nome: "Príncipe Vasco Aranha" },
   { id: "vasco-aranha", nome: "Vasco Aranha" },
   { id: "xerife-remy-hal", nome: "Xerife Remy Hal" },
-  { id: "senescal-aelric-roderic", nome: "Senescal Aelric Roderic" },
+  { id: "senescal-aelric-roderic", nome: "Senescal Wilson Cavalcanti" },
   { id: "primogenita-ines-do-vale", nome: "Primogênita Inês do Vale" },
   { id: "lucia-ventrue", nome: "Lúcia Ventrue" },
   { id: "rala-vasques", nome: "Rala Vasques" },
@@ -166,17 +166,17 @@ describe("trechos para virar link", () => {
     detector.trechos(t).filter((p) => p.tipo === "pessoa").map((p) => `${p.valor}:${(p as { id: string }).id}`);
 
   it("acha quem o leitor não lembra quem é", () => {
-    // A pergunta que originou tudo: "eu não lembrava quem era Dama Elara".
-    expect(pessoas("A Dama Elara Voss selou os portões.")).toEqual(["Elara:dama-elara-voss"]);
+    // A pergunta que originou tudo: "eu não lembrava quem era Dama Inês".
+    expect(pessoas("A Dama Inês do Vale selou os portões.")).toEqual(["Inês:dama-ines-do-vale"]);
   });
 
   it("linka só a primeira menção de cada pessoa", () => {
-    const t = "Elara mandou aviso. Elara não esperou resposta. Elara fechou a rua.";
-    expect(pessoas(t)).toEqual(["Elara:dama-elara-voss"]);
+    const t = "Inês mandou aviso. Inês não esperou resposta. Inês fechou a rua.";
+    expect(pessoas(t)).toEqual(["Inês:dama-ines-do-vale"]);
   });
 
   it("devolve o texto inteiro, sem perder nem duplicar um caractere", () => {
-    const t = "Remy escreveu a Elara sobre Aelric, e ninguém respondeu.";
+    const t = "Remy escreveu a Inês sobre Wilson, e ninguém respondeu.";
     expect(detector.trechos(t).map((p) => p.valor).join("")).toBe(t);
   });
 
@@ -214,8 +214,8 @@ describe("título não é nome", () => {
   };
 
   it.each([
-    ["Dama Elara Voss", "Elara"],
-    ["Senescal Aelric Roderic", "Aelric"],
+    ["Dama Inês do Vale", "Inês"],
+    ["Senescal Wilson Cavalcanti", "Wilson"],
     ["Primogênita Inês do Vale", "Inês"],
     ["Xerife Remy Hal", "Remy"],
   ])("procura %s pelo nome próprio, não pelo título", (nome, esperado) => {
@@ -224,7 +224,7 @@ describe("título não é nome", () => {
 
   it("não deixa um cargo solto virar link para alguém", () => {
     // Só existe um Senescal na corte, então nada acusava a colisão: a palavra
-    // em qualquer frase levava a Aelric Roderic.
+    // em qualquer frase levava a Wilson Cavalcanti.
     expect(detector.trechos("O Senescal chegou tarde ao conselho.")).toEqual([
       { tipo: "texto", valor: "O Senescal chegou tarde ao conselho." },
     ]);

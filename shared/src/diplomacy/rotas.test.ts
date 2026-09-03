@@ -5,7 +5,7 @@ import type { CampaignFact } from "./models.js";
 function fato(over: Partial<CampaignFact> = {}): CampaignFact {
   return {
     id: "f", campaignId: "c", turnNumber: 7, kind: "ACORDO",
-    betweenA: "solarion-k0hc", betweenB: "casa-karasoy", summary: "Rota das Planícies.",
+    betweenA: "ventrue-k0hc", betweenB: "cla-brujah", summary: "Rota das Planícies.",
     sourceMessageId: "m", status: "ATIVO", createdAt: "2026-08-29T00:00:00Z", ...over,
   };
 }
@@ -37,23 +37,23 @@ describe("o que as rotas rendem", () => {
 
 describe("quais fatos são rota", () => {
   it("conta o acordo ativo da Casa", () => {
-    const r = rotasAbertasDe([fato(), fato({ id: "f2", betweenB: "casa-euralune" })], "solarion-k0hc");
+    const r = rotasAbertasDe([fato(), fato({ id: "f2", betweenB: "cla-toreador" })], "ventrue-k0hc");
     expect(r).toHaveLength(2);
   });
 
   it("ignora acordo de outra Casa", () => {
-    expect(rotasAbertasDe([fato()], "khazdrun-wxey")).toEqual([]);
+    expect(rotasAbertasDe([fato()], "nosferatu-wxey")).toEqual([]);
   });
 
   // Revogar o fato é a correção para uma rota que não deveria contar.
   it("ignora acordo revogado", () => {
-    expect(rotasAbertasDe([fato({ status: "REVOGADO" })], "solarion-k0hc")).toEqual([]);
+    expect(rotasAbertasDe([fato({ status: "REVOGADO" })], "ventrue-k0hc")).toEqual([]);
   });
 
   it("ignora aliança, promessa e recusa — só acordo é rota", () => {
     const outros = ["ALIANCA", "PROMESSA", "RECUSA", "AMEACA", "PEDIDO"] as const;
     for (const kind of outros) {
-      expect(rotasAbertasDe([fato({ kind })], "solarion-k0hc"), kind).toEqual([]);
+      expect(rotasAbertasDe([fato({ kind })], "ventrue-k0hc"), kind).toEqual([]);
     }
   });
 });

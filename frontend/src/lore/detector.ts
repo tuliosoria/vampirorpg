@@ -9,7 +9,7 @@ let memo: Detector | null = null;
  * palavra comum, e o resultado não muda enquanto a página vive. Fazer isso a
  * cada parágrafo renderizado seria desperdício puro.
  *
- * Usa o corpus estático, não a wiki: uma carta precisa saber quem é "Elara"
+ * Usa o corpus estático, não a wiki: uma carta precisa saber quem é "Inês"
  * antes de qualquer requisição terminar, e cartas aparecem em telas que nunca
  * carregam verbetes.
  */

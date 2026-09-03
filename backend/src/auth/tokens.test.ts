@@ -5,7 +5,7 @@ const SECRET = "test-secret";
 const base: PlayerTokenPayload = {
   type: "player",
   campaignId: "cidade-noturna",
-  houseId: "vargen",
+  houseId: "gangrel",
   displayName: "Elira",
   exp: Date.now() + 60_000,
 };

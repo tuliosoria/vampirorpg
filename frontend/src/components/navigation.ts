@@ -9,7 +9,7 @@ import type { NavLink } from "./NavMenu";
 
 export const WORLD_LINKS: NavLink[] = [
   { label: "A crônica", to: "/cidade", hint: "A wiki da Cidade, noite a noite" },
-  { label: "Os Clãs", to: "/clas", hint: "Quem divide a Cidade, com dossiê e símbolo", tambem: ["/cla"] },
+  { label: "Os Clãs", to: "/clas", hint: "Quem divida Cidade, com dossiê e símbolo", tambem: ["/cla"] },
   { label: "Personagens", to: "/personagens", hint: "O elenco da Cidade, com retrato e ficha" },
   { label: "Histórias Contadas", to: "/historias", hint: "Os verbetes da crônica, narrados em áudio" },
   { label: "Galeria", to: "/galeria", hint: "As imagens da crônica, noite a noite" },

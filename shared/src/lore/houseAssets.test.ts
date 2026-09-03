@@ -9,14 +9,14 @@ describe("houseShortName", () => {
   it("remove o prefixo que os clãs dividem entre si", () => {
     expect(houseShortName("Clã Ventrue")).toBe("ventrue");
     expect(houseShortName("Casa do Ouro")).toBe("ouro");
-    expect(houseShortName("Grande Casa Ulgar")).toBe("ulgar");
+    expect(houseShortName("Clã Ravnos")).toBe("ravnos");
   });
 
-  // Podar o prefixo de "Ordem do Sino" deixaria "sino", que aparece em muita
-  // coisa que não é a Ordem. Nomes curtos demais sobrevivem inteiros.
+  // Podar o prefixo de "Corte do Sangue" deixaria "sangue", que aparece em
+  // quase toda frase desta crônica. Nomes assim sobrevivem inteiros.
   it("preserva nomes que só se distinguem por inteiro", () => {
-    expect(houseShortName("Ordem do Sino")).toBe("ordem do sino");
-    expect(houseShortName("Irmandade dos Corvos")).toBe("irmandade dos corvos");
+    expect(houseShortName("Corte do Sangue")).toBe("corte do sangue");
+    expect(houseShortName("Ordem do Silêncio")).toBe("ordem do silencio");
   });
 });
 

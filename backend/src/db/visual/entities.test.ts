@@ -11,12 +11,12 @@ describe("db/visual/entities", () => {
     doc = { send: vi.fn(async (cmd: any) => { sent.push(cmd); return { Items: [], Item: undefined }; }) } as unknown as DynamoDBDocumentClient;
   });
   it("putEntity writes VENTITY SK", async () => {
-    await putEntity(doc, TABLE, CAMP, newVisualEntity({ id: "alic", campaignId: CAMP, entityType: "CHARACTER", canonicalName: "Alic", slug: "alic" }));
+    await putEntity(doc, TABLE, CAMP, newVisualEntity({ id: "alic", campaignId: CAMP, entityType: "CHARACTER", canonicalName: "Vasco", slug: "alic" }));
     expect(sent[0].input.Item.SK).toBe("VENTITY#alic");
     expect(sent[0].input.Item.PK).toBe("CAMPAIGN#CIDADE_NOTURNA");
   });
   it("getEntity maps the item", async () => {
-    (doc.send as any).mockResolvedValueOnce({ Item: { ...newVisualEntity({ id: "alic", campaignId: CAMP, entityType: "CHARACTER", canonicalName: "Alic", slug: "alic" }), PK: "x", SK: "y" } });
+    (doc.send as any).mockResolvedValueOnce({ Item: { ...newVisualEntity({ id: "alic", campaignId: CAMP, entityType: "CHARACTER", canonicalName: "Vasco", slug: "alic" }), PK: "x", SK: "y" } });
     const got = await getEntity(doc, TABLE, CAMP, "alic");
     expect(got?.id).toBe("alic");
     expect(got?.entityType).toBe("CHARACTER");
@@ -33,15 +33,15 @@ describe("getEntity trait coercion", () => {
       send: vi.fn(async () => ({
         Item: {
           PK: "CAMPAIGN#cidade-noturna",
-          SK: "VENTITY#khar-durak",
-          id: "khar-durak",
-          canonicalName: "Khar-Durak",
+          SK: "VENTITY#galeria-subterranea",
+          id: "galeria-subterranea",
+          canonicalName: "Galeria Subterrânea",
           immutableTraits: ["cidade escavada na montanha"],
         },
       })),
     } as unknown as DynamoDBDocumentClient;
 
-    const e = await getEntity(doc, "t", "cidade-noturna", "khar-durak");
+    const e = await getEntity(doc, "t", "cidade-noturna", "galeria-subterranea");
     expect(e?.immutableTraits).toEqual([
       expect.objectContaining({ text: "cidade escavada na montanha", source: "AUTHORED" }),
     ]);

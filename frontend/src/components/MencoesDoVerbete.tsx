@@ -9,7 +9,7 @@ import { SEATS, fullCodex, type Mencoes } from "@vampiro/content";
 /**
  * Quantos links cabem antes de o painel deixar de ser navegação.
  *
- * O verbete "Os Vinte e Sete Magos da Ordem dos Três" cita onze pessoas, e a
+ * O verbete "Os Vinte e Sete Magos da Corte do Sangue" cita onze pessoas, e a
  * seção "clas" inteira cita setenta. Uma parede de etiquetas não ajuda quem
  * está tentando escolher para onde ir.
  */

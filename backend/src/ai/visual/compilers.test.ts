@@ -19,7 +19,7 @@ function asset(over: Partial<VisualAsset> = {}): VisualAsset {
     mimeType: "image/png", width: 1536, height: 1024, aspectRatio: "3:2", checksum: "c",
     status: "READY", canonicalLevel: "CANONICAL", styleBibleVersion: 1, entityVersion: 1,
     generationId: null, parentAssetIds: [], referenceRoles: ["IDENTITY"], cameraAngle: "", viewType: "",
-    description: "Retrato de Alic", extractedVisualDescription: "cabelo escuro, cicatriz", consistencyScore: 92,
+    description: "Retrato de Vasco", extractedVisualDescription: "cabelo escuro, cicatriz", consistencyScore: 92,
     consistencyReport: null, tags: [], createdAt: "2026-01-01T00:00:00Z", ...over,
   };
 }
@@ -46,19 +46,19 @@ describe("selectReferences", () => {
 
 describe("compileVisualContext", () => {
   it("orders LOCKED and immutable traits before the user request and never includes secrets marker", () => {
-    const entity = newVisualEntity({ id: "alic", campaignId: "cidade-noturna", entityType: "CHARACTER", canonicalName: "Alic", slug: "alic", immutableTraits: [{ id: "t1", text: "cicatriz no olho esquerdo", source: "AUTHORED", originAssetId: null, createdAt: "" }] });
-    const pkg = compileVisualContext({ styleBible: bible, entity, canonicalCanon: "Alic é o príncipe da Cidade.", userRequest: "Alic sorrindo" });
+    const entity = newVisualEntity({ id: "alic", campaignId: "cidade-noturna", entityType: "CHARACTER", canonicalName: "Vasco", slug: "alic", immutableTraits: [{ id: "t1", text: "cicatriz no olho esquerdo", source: "AUTHORED", originAssetId: null, createdAt: "" }] });
+    const pkg = compileVisualContext({ styleBible: bible, entity, canonicalCanon: "Vasco é o príncipe da Cidade.", userRequest: "Vasco sorrindo" });
     expect(pkg.immutableTraits).toContain("cicatriz no olho esquerdo");
     expect(pkg.styleBible.version).toBe(1);
-    expect(pkg.userRequest).toBe("Alic sorrindo");
+    expect(pkg.userRequest).toBe("Vasco sorrindo");
     expect(pkg.canonicalCanon).toContain("príncipe");
   });
 });
 
 describe("compilePrompt", () => {
   it("carries the style, immutable traits and negative instructions", () => {
-    const entity = newVisualEntity({ id: "alic", campaignId: "cidade-noturna", entityType: "CHARACTER", canonicalName: "Alic", slug: "alic", immutableTraits: [{ id: "t1", text: "cicatriz no olho esquerdo", source: "AUTHORED", originAssetId: null, createdAt: "" }] });
-    const pkg = compileVisualContext({ styleBible: bible, entity, canonicalCanon: "canon", userRequest: "Alic sorrindo" });
+    const entity = newVisualEntity({ id: "alic", campaignId: "cidade-noturna", entityType: "CHARACTER", canonicalName: "Vasco", slug: "alic", immutableTraits: [{ id: "t1", text: "cicatriz no olho esquerdo", source: "AUTHORED", originAssetId: null, createdAt: "" }] });
+    const pkg = compileVisualContext({ styleBible: bible, entity, canonicalCanon: "canon", userRequest: "Vasco sorrindo" });
     const prompt = compilePrompt(pkg);
     expect(prompt).toContain("dark fantasy");
     expect(prompt).toContain("cicatriz no olho esquerdo");
@@ -121,7 +121,7 @@ describe("compilePrompt", () => {
 
   it("não traz nome de cenário no estilo padrão de uma campanha nova", () => {
     const seeded = buildStyleBibleV1("cidade-noturna", new Date().toISOString());
-    expect(seeded.renderingStyle).not.toMatch(/ravenloft/i);
+    expect(seeded.renderingStyle).not.toMatch(/vampiro/i);
   });
 
   it("omits the face-identity rule for image types with no figures", () => {
@@ -131,9 +131,9 @@ describe("compilePrompt", () => {
   });
 
   it("warns the model when the entity is locked", () => {
-    const entity = newVisualEntity({ id: "alic", campaignId: "cidade-noturna", entityType: "CHARACTER", canonicalName: "Alic", slug: "alic" });
+    const entity = newVisualEntity({ id: "alic", campaignId: "cidade-noturna", entityType: "CHARACTER", canonicalName: "Vasco", slug: "alic" });
     entity.status = "LOCKED";
-    const pkg = compileVisualContext({ styleBible: bible, entity, canonicalCanon: "", userRequest: "Alic" });
+    const pkg = compileVisualContext({ styleBible: bible, entity, canonicalCanon: "", userRequest: "Vasco" });
     expect(compilePrompt(pkg)).toMatch(/TRAVADA/);
   });
   it("VISUAL_SYSTEM_PROMPT identifies the art director role", () => {

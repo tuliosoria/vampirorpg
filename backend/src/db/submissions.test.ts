@@ -3,10 +3,10 @@ import { GetCommand, PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import { getSubmission, listSubmissions, putSubmission } from "./submissions";
 import type { Submission } from "@vampiro/content";
 
-const TABLE = "ravenloft-game";
+const TABLE = "vampirorpg-game";
 const CAMPAIGN = "cidade-noturna";
 const submission: Submission = {
-  houseId: "vargen-a1b2",
+  houseId: "gangrel-a1b2",
   orderText: "Defender a ponte.",
   submittedAt: "2026-07-18T00:00:00.000Z",
 };
@@ -22,12 +22,12 @@ describe("submissions db", () => {
     const command = doc.send.mock.calls[0][0];
     expect(command).toBeInstanceOf(PutCommand);
     expect(command.input.Item.PK).toBe("CAMPAIGN#CIDADE_NOTURNA");
-    expect(command.input.Item.SK).toBe("TURN#001#SUB#vargen-a1b2");
+    expect(command.input.Item.SK).toBe("TURN#001#SUB#gangrel-a1b2");
   });
 
   it("gets a submission or null", async () => {
     const doc = docReturning({ Item: submission });
-    await expect(getSubmission(doc as never, TABLE, CAMPAIGN, 1, "vargen-a1b2")).resolves.toEqual(submission);
+    await expect(getSubmission(doc as never, TABLE, CAMPAIGN, 1, "gangrel-a1b2")).resolves.toEqual(submission);
     expect(doc.send.mock.calls[0][0]).toBeInstanceOf(GetCommand);
 
     const emptyDoc = docReturning({});

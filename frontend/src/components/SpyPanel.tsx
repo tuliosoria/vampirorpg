@@ -86,7 +86,7 @@ export function SpyPanel({ playerToken, onChanged }: { playerToken: string; onCh
           <Stack spacing={2} sx={{ maxWidth: "80ch" }}>
             <TextField
               label="O que você quer saber?"
-              placeholder="Quem determinou a evacuação da Asteria, e por que a família real saiu por outra rota."
+              placeholder="Quem mandou selar as entradas da galeria, e por que a corte não foi avisada."
               value={pergunta}
               onChange={(e) => setPergunta(e.target.value.slice(0, SPY_QUESTION_MAX))}
               multiline

@@ -19,7 +19,7 @@ export interface HouseCharacter {
  * O canon não guarda id — o nome é a fonte. Endereçar uma carta a uma pessoa
  * precisa de uma chave curta e estável que sobreviva a reordenar o elenco, e
  * um slug do nome é isso. Só a primeira parte do nome entra: vários nomes aqui
- * embutem o cargo depois de uma vírgula ("Lorde Marcien Auremont, Comandante
+ * embutem o cargo depois de uma vírgula ("Lorde Vasco Ouro, Comandante
  * da Cavalaria…"), e o cargo não faz parte da identidade.
  */
 export function characterId(name: string): string {

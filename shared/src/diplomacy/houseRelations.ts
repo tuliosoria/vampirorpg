@@ -1,7 +1,7 @@
 /**
  * Como uma Casa se relaciona com outra: amizade, comércio e favores.
  *
- * É direcional de propósito. "A Casa do Ouro confia em Khazdrun" e "Khazdrun
+ * É direcional de propósito. "A Casa do Ouro confia em Nosferatu" e "Nosferatu
  * confia na Casa do Ouro" são afirmações diferentes, e é justamente essa
  * assimetria que gera política — alguém corteja, alguém desconfia, e os dois
  * seguem negociando porque precisam.

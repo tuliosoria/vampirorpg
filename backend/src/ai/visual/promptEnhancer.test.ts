@@ -32,14 +32,14 @@ describe("buildEnhancerUser", () => {
   it("passes the immutable traits so the brief cannot contradict canon", () => {
     const entity = newVisualEntity({
       id: "kd", campaignId: "cidade-noturna", entityType: "CITY",
-      canonicalName: "Khar-Durak", slug: "khar-durak",
+      canonicalName: "Galeria Subterrânea", slug: "galeria-subterranea",
       immutableTraits: [{ id: "t1", text: "escavada no interior de uma montanha à beira-mar", source: "AUTHORED", originAssetId: null, createdAt: "" }],
     });
     const pkg = compileVisualContext({ styleBible: bible, entity, canonicalCanon: "", userRequest: "a cidade ao amanhecer" });
     const user = buildEnhancerUser(pkg);
 
     expect(user).toContain("escavada no interior de uma montanha à beira-mar");
-    expect(user).toContain("Khar-Durak");
+    expect(user).toContain("Galeria Subterrânea");
     expect(user).toContain("a cidade ao amanhecer");
   });
 
@@ -82,7 +82,7 @@ describe("parseEnhancedBrief", () => {
 
 describe("concrete structure over metaphor", () => {
   it("forbids replacing a physical mechanism with a simile", () => {
-    // Ordu-Yildiz is defined by moving on fortified wagons. The enhancer wrote
+    // Rua Treze is defined by moving on fortified wagons. The enhancer wrote
     // "parece flutuar sobre as planícies" and the image came back as tents on
     // the ground: metaphor cannot be drawn.
     expect(ENHANCER_SYSTEM_PROMPT).toMatch(/NUNCA troque um mecanismo físico concreto por metáfora/);

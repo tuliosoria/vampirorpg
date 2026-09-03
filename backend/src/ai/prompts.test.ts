@@ -4,13 +4,13 @@ import { findPrivateInfoLeaks, buildChronicle, buildImagePrompt, buildHouseImage
 
 const houses: House[] = [
   {
-    houseId: "casa-vargen",
-    name: "Casa Vargen",
+    houseId: "cla-gangrel",
+    name: "Clã Gangrel",
     motto: "O Norte lembra.",
     emblem: { icon: "lobo", color1: "#3f3f46", color2: "#1e3a5f" },
     leaderName: "Aldric",
     heirName: "Sera",
-    castleName: "Droskar",
+    castleName: "Parque do Norte",
     townsText: "Vilas do norte.",
     historyText: "Uma casa antiga.",
     specialty: "Defesa das passagens.",
@@ -87,7 +87,7 @@ describe("buildPublicEventPrompt", () => {
     expect(prompt.system).toContain("sem cabeçalhos Markdown");
     expect(prompt.system).toContain("a Cidade é uma ilha cercada pela névoa.");
     expect(prompt.system).toContain("Turno 1: O gelo venceu a ponte.");
-    expect(prompt.user).toContain("Casa Vargen");
+    expect(prompt.user).toContain("Clã Gangrel");
     expect(prompt.user).toContain("Casa Miruna");
   });
 
@@ -103,9 +103,9 @@ describe("buildPublicEventPrompt", () => {
       "CASAS EM JOGO",
       "Casa Do Ouro",
       "WIKI PÚBLICA",
-      "Casa Khazdrun",
+      "Clã Nosferatu",
       "ÚLTIMOS 5 TURNOS",
-      "Informação privada para Casa Solarion: um culto viu sinais no rio.",
+      "Informação privada para Clã Ventrue: um culto viu sinais no rio.",
     ].join("\n");
 
     const prompt = buildPublicEventPrompt(houses, { publicEventContext: context });
@@ -114,7 +114,7 @@ describe("buildPublicEventPrompt", () => {
     expect(prompt.system).toContain("<contexto>");
     expect(prompt.system).toContain("</contexto>");
     expect(prompt.system).toContain("Casa Do Ouro");
-    expect(prompt.system).toContain("Informação privada para Casa Solarion");
+    expect(prompt.system).toContain("Informação privada para Clã Ventrue");
     expect(prompt.system).toContain("Não exponha diretamente informações privadas");
     expect(prompt.system).toContain("Não decida as ações das Casas nem os resultados.");
     expect(prompt.user).toContain("Use o CONTEXTO DA CAMPANHA");
@@ -161,18 +161,18 @@ describe("buildPublicEventPrompt", () => {
         turnId: 1,
         status: "RESOLVED",
         publicEvent: "A neve fechou a estrada do norte.",
-        privateInfo: { "casa-vargen": "Batedores viram luzes azuis na ponte." },
+        privateInfo: { "cla-gangrel": "Batedores viram luzes azuis na ponte." },
         createdAt: "2026-01-01T00:00:00.000Z",
         result: {
           publicResult: "A ponte caiu antes do amanhecer.",
-          houseResults: { "casa-vargen": "A guarda retornou com baixas." },
-          attributeDeltas: { "casa-vargen": { soldados: -1 } },
+          houseResults: { "cla-gangrel": "A guarda retornou com baixas." },
+          attributeDeltas: { "cla-gangrel": { soldados: -1 } },
           discoveries: ["Há túneis sob a estrada velha."],
         },
       },
     ];
     const submissionsByTurn = new Map<number, Submission[]>([
-      [1, [{ houseId: "casa-vargen", orderText: "Enviar patrulhas discretas.", submittedAt: "2026-01-02T00:00:00.000Z" }]],
+      [1, [{ houseId: "cla-gangrel", orderText: "Enviar patrulhas discretas.", submittedAt: "2026-01-02T00:00:00.000Z" }]],
     ]);
 
     const context = buildPublicEventContext({
@@ -186,17 +186,17 @@ describe("buildPublicEventPrompt", () => {
     expect(context).toContain("ENREDO");
     expect(context).toContain("a Cidade está cercada pela névoa.");
     expect(context).toContain("CASAS EM JOGO");
-    expect(context).toContain("Casa Vargen");
+    expect(context).toContain("Clã Gangrel");
     expect(context).toContain("Líder: Aldric");
     expect(context).toContain("História: Uma casa antiga.");
     expect(context).toContain("WIKI PÚBLICA");
     expect(context).toContain("Casa Do Ouro");
     expect(context).toContain("ÚLTIMOS 5 TURNOS");
     expect(context).toContain("Evento público: A neve fechou a estrada do norte.");
-    expect(context).toContain("Informação privada para Casa Vargen: Batedores viram luzes azuis na ponte.");
-    expect(context).toContain("Ordem da Casa Vargen: Enviar patrulhas discretas.");
-    expect(context).toContain("Resultado privado da Casa Vargen: A guarda retornou com baixas.");
-    expect(context).toContain("Mudanças de atributos: Casa Vargen: soldados -1");
+    expect(context).toContain("Informação privada para Clã Gangrel: Batedores viram luzes azuis na ponte.");
+    expect(context).toContain("Ordem da Clã Gangrel: Enviar patrulhas discretas.");
+    expect(context).toContain("Resultado privado da Clã Gangrel: A guarda retornou com baixas.");
+    expect(context).toContain("Mudanças de atributos: Clã Gangrel: soldados -1");
     expect(context).toContain("Descobertas: Há túneis sob a estrada velha.");
     expect(context).toContain("REGRA DE SIGILO");
     expect(context).toContain("não revele diretamente");
@@ -261,17 +261,17 @@ describe("buildPublicEventPrompt", () => {
       turnId: i + 1,
       status: "RESOLVED",
       publicEvent: huge,
-      privateInfo: { "casa-vargen": huge },
+      privateInfo: { "cla-gangrel": huge },
       createdAt: "2026-01-01T00:00:00.000Z",
       result: {
         publicResult: huge,
-        houseResults: { "casa-vargen": huge },
+        houseResults: { "cla-gangrel": huge },
         attributeDeltas: {},
         discoveries: [huge],
       },
     }));
     const submissionsByTurn = new Map<number, Submission[]>(
-      turns.map((turn) => [turn.turnId, [{ houseId: "casa-vargen", orderText: huge, submittedAt: "2026-01-02T00:00:00.000Z" }]]),
+      turns.map((turn) => [turn.turnId, [{ houseId: "cla-gangrel", orderText: huge, submittedAt: "2026-01-02T00:00:00.000Z" }]]),
     );
 
     const context = buildPublicEventContext({
@@ -296,7 +296,7 @@ describe("buildPublicEventPrompt", () => {
         turnId: 1,
         status: "RESOLVED",
         publicEvent: "Evento 1.",
-        privateInfo: { "casa-vargen": hugeSecret },
+        privateInfo: { "cla-gangrel": hugeSecret },
         createdAt: "2026-01-01T00:00:00.000Z",
       },
       {
@@ -308,7 +308,7 @@ describe("buildPublicEventPrompt", () => {
       },
     ];
     const submissionsByTurn = new Map<number, Submission[]>([
-      [2, [{ houseId: "casa-vargen", orderText: importantLateOrder, submittedAt: "2026-01-03T00:00:00.000Z" }]],
+      [2, [{ houseId: "cla-gangrel", orderText: importantLateOrder, submittedAt: "2026-01-03T00:00:00.000Z" }]],
     ]);
 
     const context = buildPublicEventContext({
@@ -375,20 +375,20 @@ describe("findPublicEventLeaks", () => {
       status: "RESOLVED",
       publicEvent: "A neve fechou a estrada do norte.",
       privateInfo: {
-        "casa-vargen": "Batedores viram luzes azuis na ponte.",
+        "cla-gangrel": "Batedores viram luzes azuis na ponte.",
         "casa-miruna": "Curto.",
       },
       createdAt: "2026-01-01T00:00:00.000Z",
       result: {
         publicResult: "A ponte caiu antes do amanhecer.",
-        houseResults: { "casa-vargen": "A guarda retornou com baixas." },
+        houseResults: { "cla-gangrel": "A guarda retornou com baixas." },
         attributeDeltas: {},
         discoveries: ["Há túneis sob a estrada velha."],
       },
     },
   ];
   const submissionsByTurn = new Map<number, Submission[]>([
-    [1, [{ houseId: "casa-vargen", orderText: "Enviar patrulhas discretas.", submittedAt: "2026-01-02T00:00:00.000Z" }]],
+    [1, [{ houseId: "cla-gangrel", orderText: "Enviar patrulhas discretas.", submittedAt: "2026-01-02T00:00:00.000Z" }]],
   ]);
 
   it("finds verbatim private context in a generated public event", () => {
@@ -412,18 +412,18 @@ describe("findPublicEventLeaks", () => {
         turnId: 1,
         status: "RESOLVED",
         publicEvent: "A neve fechou a estrada do norte.",
-        privateInfo: { "casa-vargen": "Batedores viram luzes azuis na ponte. O arauto mentiu sobre o selo real." },
+        privateInfo: { "cla-gangrel": "Batedores viram luzes azuis na ponte. O arauto mentiu sobre o selo real." },
         createdAt: "2026-01-01T00:00:00.000Z",
         result: {
           publicResult: "A ponte caiu antes do amanhecer.",
-          houseResults: { "casa-vargen": "A guarda retornou com baixas. O capitão escondeu o mapa antigo." },
+          houseResults: { "cla-gangrel": "A guarda retornou com baixas. O capitão escondeu o mapa antigo." },
           attributeDeltas: {},
           discoveries: ["Há túneis sob a estrada velha. A cripta leva ao salão do conde."],
         },
       },
     ];
     const longSubmissionsByTurn = new Map<number, Submission[]>([
-      [1, [{ houseId: "casa-vargen", orderText: "Enviar patrulhas discretas. Sabotar a ponte antes do amanhecer.", submittedAt: "2026-01-02T00:00:00.000Z" }]],
+      [1, [{ houseId: "cla-gangrel", orderText: "Enviar patrulhas discretas. Sabotar a ponte antes do amanhecer.", submittedAt: "2026-01-02T00:00:00.000Z" }]],
     ]);
 
     const leaks = findPublicEventLeaks(
@@ -444,7 +444,7 @@ describe("findPublicEventLeaks", () => {
       [
         1,
         [{
-          houseId: "casa-vargen",
+          houseId: "cla-gangrel",
           orderText: "Enviar patrulhas discretas; sabotar a ponte antes do amanhecer",
           submittedAt: "2026-01-02T00:00:00.000Z",
         }],
@@ -464,7 +464,7 @@ describe("findPublicEventLeaks", () => {
       [
         1,
         [{
-          houseId: "casa-vargen",
+          houseId: "cla-gangrel",
           orderText: "Enviar patrulhas discretas, sabotar a ponte antes do amanhecer",
           submittedAt: "2026-01-02T00:00:00.000Z",
         }],
@@ -485,7 +485,7 @@ describe("findPublicEventLeaks", () => {
         turnId: 1,
         status: "RESOLVED",
         publicEvent: "A neve fechou a estrada do norte.",
-        privateInfo: { "casa-vargen": "Batedores viram luzes azuis na ponte." },
+        privateInfo: { "cla-gangrel": "Batedores viram luzes azuis na ponte." },
         createdAt: "2026-01-01T00:00:00.000Z",
       },
     ];
@@ -506,7 +506,7 @@ describe("findPublicEventLeaks", () => {
         turnId: 1,
         status: "RESOLVED",
         publicEvent: "A neve fechou a estrada do norte.",
-        privateInfo: { "casa-vargen": longPrivate },
+        privateInfo: { "cla-gangrel": longPrivate },
         createdAt: "2026-01-01T00:00:00.000Z",
       },
     ];
@@ -525,7 +525,7 @@ describe("findPublicEventLeaks", () => {
         turnId: 1,
         status: "RESOLVED",
         publicEvent: "A neve fechou a estrada do norte.",
-        privateInfo: { "casa-vargen": "* Batedores viram luzes azuis na ponte." },
+        privateInfo: { "cla-gangrel": "* Batedores viram luzes azuis na ponte." },
         createdAt: "2026-01-01T00:00:00.000Z",
       },
     ];
@@ -570,7 +570,7 @@ describe("buildResolutionPrompt", () => {
 
     expect(prompt.system).toContain("RESTRIÇÕES");
     expect(prompt.system).toContain("JSON");
-    expect(prompt.user).toContain("Casa Vargen");
+    expect(prompt.user).toContain("Clã Gangrel");
     expect(prompt.user).toContain("Casa Miruna");
   });
 });
@@ -616,7 +616,7 @@ describe("buildPrivateInfoPrompt", () => {
    */
   it("manda escrever mentira plausível sem avisar a vítima", () => {
     const prompt = buildPrivateInfoPrompt(houses, "Evento.", undefined, [
-      { houseId: houses[0].houseId, tipo: "POLITICA", confiabilidade: "CERTEIRA", envenenadoPor: "khazdrun-wxey" },
+      { houseId: houses[0].houseId, tipo: "POLITICA", confiabilidade: "CERTEIRA", envenenadoPor: "nosferatu-wxey" },
     ]);
 
     expect(prompt.user).toContain("FALSA");
@@ -676,8 +676,8 @@ describe("visual directives", () => {
 describe("buildHouseImagePrompt", () => {
   const emblem = { icon: "lobo" as const, color1: "#3f3f46", color2: "#1e3a5f" };
   it("includes the house name, emblem icon and description", () => {
-    const prompt = buildHouseImagePrompt("Casa Vargen", "Guardiões do norte gelado.", emblem);
-    expect(prompt).toContain("Casa Vargen");
+    const prompt = buildHouseImagePrompt("Clã Gangrel", "Guardiões do norte gelado.", emblem);
+    expect(prompt).toContain("Clã Gangrel");
     expect(prompt.toLowerCase()).toContain("lobo");
     expect(prompt).toContain("Guardiões do norte gelado.");
   });
@@ -713,12 +713,12 @@ describe("findPrivateInfoLeaks", () => {
 describe("o contexto de quem resolve o turno", () => {
   const base = {
     gmEntries: [{ section: "verdades", title: "A Coroa de Ferro Branco", body: "O rei apagado ainda governa." }],
-    houses: [{ houseId: "h1", name: "Solarion", attributes: { riqueza: 1, recursos: 3, soldados: 1, controle: 3 },
+    houses: [{ houseId: "h1", name: "Ventrue", attributes: { riqueza: 1, recursos: 3, soldados: 1, controle: 3 },
                specialty: "astronomia", weakness: "isolamento", assets: ["Milícia Local"] }] as never,
-    letters: [{ fromHouseId: "h1", toHouseKey: "casa-karasoy", author: "PLAYER", body: "Proponho proteção mútua." }],
+    letters: [{ fromHouseId: "h1", toHouseKey: "cla-brujah", author: "PLAYER", body: "Proponho proteção mútua." }],
     projects: [{ houseId: "h1", title: "Torre de Vigilância", status: "ACTIVE", turnsCompleted: 2, durationTurns: 4, description: "Vigiar o vale." }],
-    pacts: [{ kind: "ACORDO", betweenA: "h1", betweenB: "casa-karasoy", summary: "Passagem pelo Oásis.", status: "ATIVO" }],
-    nameOf: (id: string) => (id === "h1" ? "Solarion" : id),
+    pacts: [{ kind: "ACORDO", betweenA: "h1", betweenB: "cla-brujah", summary: "Passagem pelo Oásis.", status: "ATIVO" }],
+    nameOf: (id: string) => (id === "h1" ? "Ventrue" : id),
   };
 
   // A resolução recebia o evento, uma linha de atributos por Casa e as ordens.
@@ -732,7 +732,7 @@ describe("o contexto de quem resolve o turno", () => {
 
   it("leva as cartas do turno, agrupadas por par", () => {
     const c = buildResolutionContext(base);
-    expect(c).toContain("Solarion ↔ casa-karasoy");
+    expect(c).toContain("Ventrue ↔ cla-brujah");
     expect(c).toContain("Proponho proteção mútua.");
   });
 

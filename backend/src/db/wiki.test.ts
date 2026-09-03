@@ -7,7 +7,7 @@ import { semearCanon, limparCanon } from "@vampiro/content/test-fixtures";
 beforeEach(semearCanon);
 afterEach(limparCanon);
 
-const TABLE = "ravenloft-game";
+const TABLE = "vampirorpg-game";
 const CAMPAIGN = "cidade-noturna";
 
 function docReturning(value: unknown) {
@@ -17,7 +17,7 @@ function docReturning(value: unknown) {
 const entry: WikiEntry = {
   entryId: "abc123",
   section: "clas",
-  title: "Casa Vargen",
+  title: "Clã Gangrel",
   body: "Os lobos do norte.",
   order: 0,
   updatedAt: "2026-01-01T00:00:00.000Z",
@@ -70,7 +70,7 @@ describe("wiki db", () => {
     const cmd = doc.send.mock.calls[0][0];
     expect(cmd).toBeInstanceOf(PutCommand);
     expect(cmd.input.Item.SK).toBe("WIKI#abc123");
-    expect(cmd.input.Item.title).toBe("Casa Vargen");
+    expect(cmd.input.Item.title).toBe("Clã Gangrel");
   });
 
   it("deletes an entry by id", async () => {
@@ -128,7 +128,7 @@ describe("listCanonWikiEntries", () => {
     const doc = docReturning({
       Items: [
         { entryId: "a", section: "disciplinas", title: "Magia na Cidade", body: "Rara.", order: 0, updatedAt: "" },
-        { entryId: "b", section: "clas", title: "Casa Vargen", body: "Os lobos.", order: 0, updatedAt: "" },
+        { entryId: "b", section: "clas", title: "Clã Gangrel", body: "Os lobos.", order: 0, updatedAt: "" },
       ],
     });
 

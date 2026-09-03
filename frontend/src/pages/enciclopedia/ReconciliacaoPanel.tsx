@@ -24,7 +24,7 @@ function fold(value: string): string {
 
 /**
  * Wiki titles are written `Nome — Epíteto`. A plain hyphen only separates when
- * it is surrounded by spaces: "Khar-Durak" and "Sahra-Lun" are single names and
+ * it is surrounded by spaces: "a Galeria Subterrânea" and "Cais Velho" are single names and
  * must never be cut down to "Khar" or "Sahra".
  */
 const EPITHET_SEPARATOR = /\s*[—–]\s*|\s+-\s+/;
@@ -36,8 +36,8 @@ function titleHead(title: string): string {
 
 /**
  * The keys an entity name may legitimately be known by, most specific first.
- * Seeded names carry the alternate name in parentheses — "Euralune (Ninho
- * Alto)", "Solarion (Sahra-Lun)" — and the wiki files those cities under the
+ * Seeded names carry the alternate name in parentheses — "Toreador (Ninho
+ * Alto)", "Ventrue (Cais Velho)" — and the wiki files those cities under the
  * parenthetical, not the outer name.
  */
 function nameKeys(name: string): string[] {

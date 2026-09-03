@@ -19,7 +19,7 @@ export function isWorldFactKind(v: unknown): v is WorldFactKind {
  * Uma coisa que a campanha não pode esquecer.
  *
  * Existe porque o que aconteceu só vivia como prosa. A afirmação errada de que
- * Khazdrun não enviou tropa nenhuma atravessou três turnos, o evento público, o
+ * Nosferatu não enviou tropa nenhuma atravessou três turnos, o evento público, o
  * resultado da Casa e três cartas já entregues — e corrigi-la exigiu varrer sete
  * turnos à mão procurando contradição. Uma linha consultável teria bastado.
  *
@@ -45,7 +45,7 @@ export interface WorldFact {
    *
    * O turno tem duas camadas — o que foi anunciado e o que cada Casa viveu por
    * dentro —, e a extração lê as duas. Sem esta marca, a investigação sigilosa
-   * de Khazdrun sobre moedas da Casa do Ouro viraria contexto de qualquer carta
+   * de Nosferatu sobre moedas da Casa do Ouro viraria contexto de qualquer carta
    * envolvendo a Casa do Ouro, e um NPC saberia o segredo que o jogador pagou
    * para descobrir. Fato privado nunca entra em carta; só o Mestre o lê.
    */

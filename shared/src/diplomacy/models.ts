@@ -51,9 +51,9 @@ export interface CampaignFact {
    * Casa do jogador. O razão é centrado nela de propósito.
    *
    * Um fato entre terceiros não cabe aqui, mesmo quando o jogador ficou sabendo
-   * dele: "Karasoy prometeu tropas à Coroa" é cânone do mundo e pertence ao
-   * texto do turno. Registrar isso no par Solarion↔Karasoy porque a carta que o
-   * contou foi endereçada a Solarion confunde quem lê — a carta é onde se
+   * dele: "Brujah prometeu tropas à Coroa" é cânone do mundo e pertence ao
+   * texto do turno. Registrar isso no par Ventrue↔Brujah porque a carta que o
+   * contou foi endereçada a Ventrue confunde quem lê — a carta é onde se
    * contou, não onde a promessa foi feita.
    */
   betweenA: string;

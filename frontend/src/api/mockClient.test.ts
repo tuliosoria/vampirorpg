@@ -12,7 +12,7 @@ const houseInput: CreateHouseInput = {
   emblem: { icon: "lobo", color1: "#3f3f46", color2: "#1e3a5f" },
   leaderName: "Aldric",
   heirName: "Sera",
-  castleName: "Droskar",
+  castleName: "Parque do Norte",
   townsText: "Vilas do norte.",
   historyText: "Uma casa antiga.",
   specialty: "Defesa",
@@ -107,7 +107,7 @@ describe("MockApiClient", () => {
     });
     await api.adminComposeTurn(adminToken, {
       publicEvent: "Uma nevasca cobre o vale.",
-      privateInfo: { "seed-vargen": "Os lobos farejam perigo." },
+      privateInfo: { "seed-gangrel": "Os lobos farejam perigo." },
     });
     await api.adminOpenTurn(adminToken);
 
@@ -246,25 +246,25 @@ describe("MockApiClient", () => {
       title: "Clã Toreador",
       body: "Os lobos do norte.",
       order: 1,
-      imageUrls: ["/houses/vargen.jpg"],
+      imageUrls: ["/houses/gangrel.jpg"],
     });
     expect(created.entryId).toBeTruthy();
-    expect(created.imageUrl).toBe("/houses/vargen.jpg");
+    expect(created.imageUrl).toBe("/houses/gangrel.jpg");
 
     const publicList = await api.getWiki();
     expect(publicList).toHaveLength(1);
     expect(publicList[0].title).toBe("Clã Toreador");
-    expect(publicList[0].imageUrl).toBe("/houses/vargen.jpg");
+    expect(publicList[0].imageUrl).toBe("/houses/gangrel.jpg");
 
     await api.adminUpdateWikiEntry(adminToken, created.entryId, {
       section: "clas",
       title: "Clã Toreador (caída)",
       body: "A muralha ruiu.",
       order: 1,
-      imageUrls: ["/houses/vargen-fallen.jpg"],
+      imageUrls: ["/houses/gangrel-fallen.jpg"],
     });
     expect((await api.getWiki())[0].title).toBe("Clã Toreador (caída)");
-    expect((await api.getWiki())[0].imageUrl).toBe("/houses/vargen-fallen.jpg");
+    expect((await api.getWiki())[0].imageUrl).toBe("/houses/gangrel-fallen.jpg");
 
     await api.adminDeleteWikiEntry(adminToken, created.entryId);
     expect(await api.getWiki()).toHaveLength(0);
@@ -332,12 +332,12 @@ describe("visual canon methods", () => {
   it("creates an entity and returns it from the list", async () => {
     const client = new MockApiClient();
     const created = await client.createVisualEntity("admin-token", {
-      canonicalName: "Ordem do Sino",
+      canonicalName: "Corte do Sangue",
       entityType: "HOUSE",
     });
-    expect(created.canonicalName).toBe("Ordem do Sino");
+    expect(created.canonicalName).toBe("Corte do Sangue");
     const all = await client.listVisualEntities();
-    expect(all.map((e) => e.canonicalName)).toContain("Ordem do Sino");
+    expect(all.map((e) => e.canonicalName)).toContain("Corte do Sangue");
   });
 
   it("updates an entity's immutable traits", async () => {

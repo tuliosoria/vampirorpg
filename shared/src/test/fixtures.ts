@@ -2,7 +2,7 @@
  * Um cânone sintético mínimo, só para os testes do motor.
  *
  * A crônica de verdade nasce vazia e é o Narrador quem a povoa, então nenhum
- * teste pode mais afirmar sobre "a Casa Valerius" nem sobre dezesseis sedes: o
+ * teste pode mais afirmar sobre "a Clã Ventrue" nem sobre dezesseis sedes: o
  * que restou para testar é o comportamento das funções, e comportamento precisa
  * de dados de entrada. Estes são esses dados — três clãs inventados que não
  * pertencem a nenhuma crônica e que ninguém vai confundir com conteúdo.

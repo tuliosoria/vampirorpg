@@ -16,7 +16,7 @@ vi.mock("../canon/escriba", async () => {
 
 const config = {
   campaignId: "cidade-noturna",
-  tableName: "ravenloft-game",
+  tableName: "vampirorpg-game",
   tokenSigningSecret: "segredo",
   tokenTtlSeconds: 3600,
 } as unknown as Config;
@@ -26,7 +26,7 @@ function req(over: Partial<HandlerRequest> = {}, tipo: "admin" | "player" = "adm
     tipo === "admin"
       ? signToken({ type: "admin", campaignId: "cidade-noturna", exp: Date.now() + 60_000 }, "segredo")
       : signToken(
-          { type: "player", campaignId: "cidade-noturna", houseId: "vargen", displayName: "Casa Vargen", exp: Date.now() + 60_000 },
+          { type: "player", campaignId: "cidade-noturna", houseId: "gangrel", displayName: "Clã Gangrel", exp: Date.now() + 60_000 },
           "segredo",
         );
   return {
@@ -41,14 +41,14 @@ function req(over: Partial<HandlerRequest> = {}, tipo: "admin" | "player" = "adm
 }
 
 const proposal = {
-  title: "Sera de Vargen",
+  title: "Sera de Gangrel",
   section: "clas",
   body: "Batedora das fronteiras.",
   summary: "Batedora.",
   entityType: "CHARACTER",
-  canonicalName: "Sera de Vargen",
+  canonicalName: "Sera de Gangrel",
   immutableTraits: [],
-  houseId: "Vargen",
+  houseId: "Gangrel",
 };
 
 const chat = vi.fn();
@@ -65,7 +65,7 @@ describe("escribaPreview", () => {
     const res = await escribaPreview(deps(), req({ body: { rawText: "Quero criar Sera." } }));
 
     expect(res.status).toBe(200);
-    expect(res.body).toMatchObject({ proposal: { title: "Sera de Vargen" }, review: { verdict: "OK" } });
+    expect(res.body).toMatchObject({ proposal: { title: "Sera de Gangrel" }, review: { verdict: "OK" } });
   });
 
   it("recusa quem não é Mestre", async () => {
@@ -77,11 +77,11 @@ describe("escribaPreview", () => {
 
 describe("escribaPublicar", () => {
   it("escreve o cânone e devolve os ids", async () => {
-    const res = await escribaPublicar(deps(), req({ body: { proposal, houseId: "vargen-x1", opId: "op-1" } }));
+    const res = await escribaPublicar(deps(), req({ body: { proposal, houseId: "gangrel-x1", opId: "op-1" } }));
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ wikiEntryId: "wiki01", visualEntityId: "ent01" });
-    expect(vi.mocked(escreverCanone).mock.calls[0][1]).toMatchObject({ houseId: "vargen-x1", opId: "op-1" });
+    expect(vi.mocked(escreverCanone).mock.calls[0][1]).toMatchObject({ houseId: "gangrel-x1", opId: "op-1" });
   });
 
   it("aceita cânone sem Casa", async () => {

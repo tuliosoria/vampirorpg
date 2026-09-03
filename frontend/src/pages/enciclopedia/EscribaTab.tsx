@@ -123,7 +123,7 @@ export function EscribaTab({ casas }: { casas: CasaDoSeletor[] }) {
         entityType: proposal.entityType ?? "",
         traits: proposal.immutableTraits.join("\n"),
         body: proposal.body,
-        // A Casa de propósito não vem da IA: ela devolve o nome ("Vargen") onde
+        // A Casa de propósito não vem da IA: ela devolve o nome ("Gangrel") onde
         // o banco espera o id sorteado. Quem escolhe é o Mestre, no seletor.
       }));
       setReview(parecer);

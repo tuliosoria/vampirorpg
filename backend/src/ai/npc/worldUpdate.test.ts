@@ -47,7 +47,7 @@ describe("updateNpcWorld", () => {
     // Segredo de Toreador: só NPCs de Toreador são candidatos neste turno.
     const deps = makeDeps();
     await updateNpcWorld(deps, turn({ publicEvent: "", privateInfo: { "eur-1": "Preparamos a defesa em segredo." } }));
-    // Todos os candidatos consultados são de casa-euralune.
+    // Todos os candidatos consultados são de cla-toreador.
     const chatMock = deps.chat as ReturnType<typeof vi.fn>;
     const consultedPrompts = chatMock.mock.calls.map((c: unknown[]) => c[1] as string);
     expect(consultedPrompts.every((u) => u.includes("cla-toreador"))).toBe(true);
@@ -56,12 +56,12 @@ describe("updateNpcWorld", () => {
   it("não reprocessa um NPC que já tem memória deste turno", async () => {
     const deps = makeDeps();
     // Pré-carrega um NPC como já processado no turno 4.
-    const seeded = { ...emptyDynamic("cla-tremere", "lady-celene-valerius"), memory: [{ turnNumber: 4, description: "já", impact: "" }] };
-    deps.store.set("casa-valerius#lady-celene-valerius", seeded);
+    const seeded = { ...emptyDynamic("cla-tremere", "lady-ines-do-vale"), memory: [{ turnNumber: 4, description: "já", impact: "" }] };
+    deps.store.set("cla-ventrue#lady-ines-do-vale", seeded);
 
     await updateNpcWorld(deps, turn({ publicEvent: "Evento público." }));
     // Esse NPC específico não foi reconsultado (o user prompt não o nomeia de novo para gravar).
-    const stillOne = deps.store.get("casa-valerius#lady-celene-valerius")!;
+    const stillOne = deps.store.get("cla-ventrue#lady-ines-do-vale")!;
     expect(stillOne.memory).toHaveLength(1);
   });
 
@@ -79,7 +79,7 @@ describe("updateNpcWorld", () => {
 describe("teto de NPCs por turno", () => {
   // Um evento público sem alvo é o pior caso: todo o Codex fica sabendo.
   const turnoQueTodosSabem = () =>
-    turn({ publicEvent: "A Marcha do Norte partiu de o centro velho e o reino inteiro comenta." });
+    turn({ publicEvent: "A Marcha do Norte partiu do centro velho e o reino inteiro comenta." });
 
   // As defesas que já existiam não limitavam o pior caso: um evento que toca
   // todo mundo virava noventa chamadas de IA numa aplicação de turno.
@@ -126,15 +126,15 @@ describe("quem entra na fila do estado vivo", () => {
       maxNpcs: 2,
       lastTouched: async () =>
         new Map([
-          ["casa-auremont:lorde-marcien-auremont", 9],
-          ["casa-do-ouro:principe-setimo", 9],
+          ["cla-ventrue:vasco-aranha", 9],
+          ["cla-nosferatu:rala", 9],
         ]),
     });
     await updateNpcWorld(deps, turn({ publicEvent: "A Coroa declarou lei marcial." }));
 
     const abertura = avaliados(deps).join("\n");
-    expect(abertura).not.toContain("Marcien");
-    expect(abertura).not.toContain("Sétimo");
+    expect(abertura).not.toContain("Vasco Aranha");
+    expect(abertura).not.toContain("Rala");
   });
 
   // Sem as deps novas o comportamento tem de continuar válido: o motor roda em

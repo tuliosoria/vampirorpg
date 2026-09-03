@@ -32,7 +32,7 @@ describe("aplicarCanon", () => {
   });
 
   // Uma ficha só alimenta cinco constantes; era esse espalhamento que obrigava
-  // quem inventasse uma Casa no Valdren a lembrar de cinco arquivos.
+  // quem inventasse uma Casa no jogo de origem a lembrar de cinco arquivos.
   it("distribui líder, elenco, perfil e dossiê pelas constantes do motor", () => {
     aplicarCanon([
       cla({

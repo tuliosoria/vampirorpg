@@ -14,7 +14,7 @@ afterEach(limparCanon);
 const config = { tableName: "t", campaignId: "cidade-noturna", tokenSigningSecret: "s3cret" } as unknown as Config;
 
 function playerReq(body: unknown) {
-  const token = signToken({ type: "player", campaignId: "cidade-noturna", houseId: "h-solarion", displayName: "Ventrue", exp: Date.now() + 60000 } as never, "s3cret");
+  const token = signToken({ type: "player", campaignId: "cidade-noturna", houseId: "h-ventrue", displayName: "Ventrue", exp: Date.now() + 60000 } as never, "s3cret");
   return { method: "POST", path: "/api/player/correspondencia", headers: { authorization: `Bearer ${token}` }, body, pathParams: {}, sourceIp: "1.2.3.4" } as never;
 }
 
@@ -24,7 +24,7 @@ function playerReq(body: unknown) {
  */
 function makeDeps(over: { houses?: any[]; turnStatus?: string; sent?: any[]; chat?: any } = {}) {
   const stored: any[] = [...(over.sent ?? [])];
-  const houses = over.houses ?? [{ houseId: "h-solarion", name: "Ventrue" }];
+  const houses = over.houses ?? [{ houseId: "h-ventrue", name: "Ventrue" }];
   const doc = {
     send: vi.fn(async (cmd: any) => {
       const sk = cmd?.input?.ExpressionAttributeValues?.[":sk"];
@@ -77,7 +77,7 @@ describe("sendMessage", () => {
     await expect(send()).rejects.toThrow(/Sem mensageiros/);
   });
 
-  it("recusa o segundo envio para Rimewatch, que fica a um envio só", async () => {
+  it("recusa o segundo envio para Antigo Sanatório, que fica a um envio só", async () => {
     const { deps } = makeDeps({ chat });
     const send = () => sendMessage(deps, playerReq({ toHouseKey: "cla-malkavian", body: "carta" }));
     await send();
@@ -102,7 +102,7 @@ describe("sendMessage", () => {
   it("recusa Casa conduzida por outro jogador, explicando o motivo", async () => {
     // Fase A não cobre jogador-a-jogador; a recusa precisa dizer isso, não
     // devolver um erro genérico.
-    const { deps } = makeDeps({ chat, houses: [{ houseId: "h-solarion", name: "Ventrue" }, { houseId: "h2", name: "Nosferatu" }] });
+    const { deps } = makeDeps({ chat, houses: [{ houseId: "h-ventrue", name: "Ventrue" }, { houseId: "h2", name: "Nosferatu" }] });
     await expect(sendMessage(deps, playerReq({ toHouseKey: "cla-nosferatu", body: "x" })))
       .rejects.toThrow(/outro jogador/);
   });

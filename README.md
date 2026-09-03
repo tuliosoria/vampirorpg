@@ -6,7 +6,7 @@ Cada jogador conduz um vampiro na mesma Cidade. A cada noite lê o que a Cidade
 viu e o que só ele sabe, escreve o que faz em texto livre, e o Narrador resolve.
 
 O site nasce **sem mundo**. Não há clã, bairro, personagem ou carta versionados
-em código: quem cria a Cidade é o Narrador, pela interface do Admin. O que está
+em código: quem crià Cidade é o Narrador, pela interface do Admin. O que está
 aqui é a máquina — turnos, correspondência, pactos, empreitadas, espionagem,
 mercado de rumores, NPCs vivos e enciclopédia visual — mais o esqueleto de
 cânone que ele preenche.

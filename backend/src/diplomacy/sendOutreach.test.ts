@@ -14,8 +14,8 @@ function deps(over: Partial<OutreachDeps> = {}): OutreachDeps {
     })),
     putFavor: vi.fn().mockResolvedValue(undefined),
     houses: [
-      { houseId: "khazdrun-wxey", name: "Khazdrun" },
-      { houseId: "solarion-k0hc", name: "Solarion" },
+      { houseId: "nosferatu-wxey", name: "Nosferatu" },
+      { houseId: "ventrue-k0hc", name: "Ventrue" },
       { houseId: "do-ouro-g0gg", name: "Do Ouro" },
     ],
     relations: [],
@@ -43,7 +43,7 @@ describe("sendOutreach", () => {
   it("grava no fio onde o jogador já procura correspondência", async () => {
     const enviadas = await sendOutreach(deps());
     for (const m of enviadas) {
-      expect(["khazdrun-wxey", "solarion-k0hc", "do-ouro-g0gg"]).toContain(m.fromHouseId);
+      expect(["nosferatu-wxey", "ventrue-k0hc", "do-ouro-g0gg"]).toContain(m.fromHouseId);
       expect(m.author).toBe("AI");
       expect(m.turnNumber).toBe(7);
     }
@@ -74,9 +74,9 @@ describe("sendOutreach", () => {
 
   it("não escreve por cima de conversa já viva no turno", async () => {
     const enviadas = await sendOutreach(deps({
-      alreadyTalking: new Set(["khazdrun-wxey~casa-valerius"]),
+      alreadyTalking: new Set(["nosferatu-wxey~cla-ventrue"]),
     }));
-    expect(enviadas.every((m) => !(m.fromHouseId === "khazdrun-wxey" && m.toHouseKey === "casa-valerius"))).toBe(true);
+    expect(enviadas.every((m) => !(m.fromHouseId === "nosferatu-wxey" && m.toHouseKey === "cla-ventrue"))).toBe(true);
   });
 });
 
@@ -91,7 +91,7 @@ describe("a torneira do Favor", () => {
     expect(favor.status).toBe("PENDING");
     expect(favor.reason).toMatch(/oferece .* e pede /);
     // Indexado pelo jogador: é ele quem aceita ou recusa.
-    expect(["khazdrun-wxey", "solarion-k0hc", "do-ouro-g0gg"]).toContain(favor.toHouseId);
+    expect(["nosferatu-wxey", "ventrue-k0hc", "do-ouro-g0gg"]).toContain(favor.toHouseId);
   });
 
   it("não inventa favor quando a carta não trouxe proposta", async () => {

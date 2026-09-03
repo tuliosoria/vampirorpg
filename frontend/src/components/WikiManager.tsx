@@ -129,7 +129,7 @@ export function WikiManager({ token }: { token: string }) {
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Comece pelo que os jogadores precisam saber na primeira noite: quem manda na corte,
-                quais clãs dividem a Cidade e onde ficam.
+                quais clãs dividna Cidade e onde ficam.
               </Typography>
             </Box>
           )}

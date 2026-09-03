@@ -26,7 +26,7 @@ const TIPO_ROTULO: Record<string, string> = {
  *
  * O rótulo dizia "com o Clã Brujah" para todos, e uma promessa listada assim
  * parece feita ENTRE as duas Casas — foi exatamente essa leitura que confundiu:
- * um registro de promessa apareceu na ficha de Solarion e ninguém sabia quem
+ * um registro de promessa apareceu na ficha de Ventrue e ninguém sabia quem
  * tinha prometido o quê a quem.
  */
 const MUTUO = new Set(["ALIANCA", "ACORDO"]);

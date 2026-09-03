@@ -15,20 +15,20 @@ function submission(over: Partial<CanonSubmission> = {}): CanonSubmission {
     ...newCanonSubmission({
       id: "sub1",
       campaignId: "cidade-noturna",
-      houseId: "vargen",
-      authorName: "Casa Vargen",
+      houseId: "gangrel",
+      authorName: "Clã Gangrel",
       rawText: "Quero criar Sera.",
       rawImageUrl: "https://cdn/canon/img1/original.png",
       rawImageKey: "canon/img1/original.png",
       proposal: {
-        title: "Sera de Vargen",
+        title: "Sera de Gangrel",
         section: "clas",
         body: "Batedora das fronteiras.",
         summary: "Batedora.",
         entityType: "CHARACTER",
-        canonicalName: "Sera de Vargen",
+        canonicalName: "Sera de Gangrel",
         immutableTraits: ["cicatriz no queixo"],
-        houseId: "vargen",
+        houseId: "gangrel",
       },
     }),
     ...over,
@@ -38,7 +38,7 @@ function submission(over: Partial<CanonSubmission> = {}): CanonSubmission {
 let ids = 0;
 const deps = () => ({
   doc: {} as never,
-  tableName: "ravenloft-game",
+  tableName: "vampirorpg-game",
   campaignId: "cidade-noturna",
   newId: () => `id${++ids}`,
 });
@@ -61,12 +61,12 @@ describe("publishCanonSubmission", () => {
 
     const entry = vi.mocked(wikiDb.putWikiEntry).mock.calls[0][3];
     expect(entry.section).toBe("clas");
-    expect(entry.title).toBe("Sera de Vargen");
+    expect(entry.title).toBe("Sera de Gangrel");
     expect(entry.imageUrl).toBe("https://cdn/canon/img1/original.png");
 
     const entity = vi.mocked(entitiesDb.putEntity).mock.calls[0][3];
     expect(entity.entityType).toBe("CHARACTER");
-    expect(entity.slug).toBe("sera-de-vargen");
+    expect(entity.slug).toBe("sera-de-gangrel");
     expect(entity.wikiEntryId).toBe("wiki01");
     expect(entity.status).toBe("CANONICAL");
     expect(entity.immutableTraits.length).toBe(1);
@@ -90,12 +90,12 @@ describe("publishCanonSubmission", () => {
   // Casas e devolve o nome. A entidade precisa carregar o id de quem enviou.
   it("atribui a entidade à Casa da sessão, não à que a IA escreveu", async () => {
     const save = vi.fn(async (s: CanonSubmission) => s);
-    const sub = submission({ houseId: "vargen-9x2k" });
-    sub.proposal = { ...sub.proposal, houseId: "Vargen" };
+    const sub = submission({ houseId: "gangrel-9x2k" });
+    sub.proposal = { ...sub.proposal, houseId: "Gangrel" };
     await publishCanonSubmission(deps(), sub, save);
 
     const entity = vi.mocked(entitiesDb.putEntity).mock.calls[0][3];
-    expect(entity.houseId).toBe("vargen-9x2k");
+    expect(entity.houseId).toBe("gangrel-9x2k");
   });
 
   it("skips steps whose id is already recorded", async () => {
@@ -142,12 +142,12 @@ describe("publishCanonSubmission", () => {
   });
 
   it("disambiguates a slug that is already taken", async () => {
-    vi.mocked(entitiesDb.listEntities).mockResolvedValueOnce([{ slug: "sera-de-vargen" } as never]);
+    vi.mocked(entitiesDb.listEntities).mockResolvedValueOnce([{ slug: "sera-de-gangrel" } as never]);
     const save = vi.fn(async (s: CanonSubmission) => s);
     await publishCanonSubmission(deps(), submission(), save);
     const entity = vi.mocked(entitiesDb.putEntity).mock.calls[0][3];
-    expect(entity.slug).not.toBe("sera-de-vargen");
-    expect(entity.slug.startsWith("sera-de-vargen-")).toBe(true);
+    expect(entity.slug).not.toBe("sera-de-gangrel");
+    expect(entity.slug.startsWith("sera-de-gangrel-")).toBe(true);
   });
 
   it("still approves when the entity re-link write throws", async () => {

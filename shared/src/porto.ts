@@ -93,8 +93,8 @@ export function briefingsDoPorto(
   // janela, uma única carta de veneno envenenaria a vítima para sempre.
   // A vítima é indexada por chave de sede porque os dois lados falam línguas
   // diferentes: `targetHouseId` de uma carta de modelo guarda a chave da
-  // geografia ("casa-solarion") enquanto `houseId` guarda o id do banco
-  // ("solarion-k0hc"). Comparar cru nunca casaria, e o veneno jamais pegaria.
+  // geografia ("cla-ventrue") enquanto `houseId` guarda o id do banco
+  // ("ventrue-k0hc"). Comparar cru nunca casaria, e o veneno jamais pegaria.
   const venenoPorVitima = new Map<string, string>();
   for (const c of cartas) {
     if (c.templateId !== TEMPLATE_RUMOR_FALSO) continue;

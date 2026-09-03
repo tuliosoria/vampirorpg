@@ -28,7 +28,7 @@ vi.mock("../db/turns", () => ({
 }));
 
 const config: Config = {
-  tableName: "ravenloft-game",
+  tableName: "vampirorpg-game",
   campaignId: "cidade-noturna",
   adminCodeHash: "x",
   tokenSigningSecret: "secret",
@@ -53,12 +53,12 @@ const req = (over = {}) => ({ method: "GET", path: "/", headers: {}, body: undef
 
 const createBody = {
   displayName: "Elira",
-  name: "Casa Várgen!",
-  motto: "O Norte lembra.",
+  name: "Clã Gángrel!",
+  motto: "A noite lembra.",
   emblem: { icon: "lobo", color1: "#3f3f46", color2: "#1e3a5f" },
   leaderName: "Aldric",
   heirName: "Sera",
-  castleName: "Droskar",
+  castleName: "Parque do Norte",
   townsText: "Vilas do norte.",
   historyText: "Uma casa antiga.",
   specialty: "Defesa.",
@@ -86,7 +86,7 @@ describe("getCampaign", () => {
 });
 
 describe("getHouseExample", () => {
-  it("returns the Vargen example from shared content", async () => {
+  it("returns the Gangrel example from shared content", async () => {
     const res = await getHouseExample(deps, req());
 
     expect(res).toEqual({ status: 200, body: EXEMPLO_DE_PERSONAGEM });
@@ -95,36 +95,36 @@ describe("getHouseExample", () => {
 
 describe("createAccountAndHouse", () => {
   it("creates a house with a provisional code hash and returns a player token", async () => {
-    vi.mocked(housesDb.createAccountAndHouse).mockResolvedValue({ houseId: "casa-vargen-abcd" });
+    vi.mocked(housesDb.createAccountAndHouse).mockResolvedValue({ houseId: "cla-gangrel-abcd" });
 
     const res = await createAccountAndHouse(deps, req({ method: "POST", body: createBody }));
 
     expect(res.status).toBe(200);
     const body = res.body as any;
-    expect(body.playerCode).toMatch(/^casa-vargen-[A-Z0-9]{4}$/);
-    expect(body.houseId).toBe("casa-vargen-abcd");
+    expect(body.playerCode).toMatch(/^cla-gangrel-[A-Z0-9]{4}$/);
+    expect(body.houseId).toBe("cla-gangrel-abcd");
     expect(body.displayName).toBe("Elira");
     expect(housesDb.createAccountAndHouse).toHaveBeenCalledWith(
       deps.doc,
-      "ravenloft-game",
+      "vampirorpg-game",
       "cidade-noturna",
       expect.objectContaining({ ...createBody, codeHash: hashCode(body.playerCode) }),
     );
     const payload = verifyToken(body.playerToken, config.tokenSigningSecret) as any;
-    expect(payload).toMatchObject({ type: "player", campaignId: "cidade-noturna", houseId: "casa-vargen-abcd", displayName: "Elira" });
+    expect(payload).toMatchObject({ type: "player", campaignId: "cidade-noturna", houseId: "cla-gangrel-abcd", displayName: "Elira" });
   });
 });
 
 describe("login", () => {
   it("returns a token for a valid code", async () => {
-    const code = "casa-vargen-4K7P";
-    vi.mocked(playersDb.getPlayerByCodeHash).mockResolvedValue({ houseId: "casa-vargen-abcd", displayName: "Elira", codeHash: hashCode(code) });
+    const code = "cla-gangrel-4K7P";
+    vi.mocked(playersDb.getPlayerByCodeHash).mockResolvedValue({ houseId: "cla-gangrel-abcd", displayName: "Elira", codeHash: hashCode(code) });
 
     const res = await login(deps, req({ method: "POST", body: { playerCode: code } }));
 
     expect(res.status).toBe(200);
-    expect(playersDb.getPlayerByCodeHash).toHaveBeenCalledWith(deps.doc, "ravenloft-game", hashCode(code));
-    expect((res.body as any).houseId).toBe("casa-vargen-abcd");
+    expect(playersDb.getPlayerByCodeHash).toHaveBeenCalledWith(deps.doc, "vampirorpg-game", hashCode(code));
+    expect((res.body as any).houseId).toBe("cla-gangrel-abcd");
   });
 
   it("rejects an unknown code with INVALID_CODE", async () => {
@@ -185,7 +185,7 @@ describe("createAccountAndHouse with images", () => {
     await createAccountAndHouse(depsImg as any, req({ method: "POST", path: "/api/create-account", body }) as any);
     expect(uploadHouseImage).toHaveBeenCalledTimes(2);
     expect(housesDb.setHouseImages).toHaveBeenCalledWith(
-      expect.anything(), "ravenloft-game", "cidade-noturna", "casa-1",
+      expect.anything(), "vampirorpg-game", "cidade-noturna", "casa-1",
       ["https://cdn/houses/casa-1/0.png", "https://cdn/houses/casa-1/1.png"],
     );
   });
@@ -199,7 +199,7 @@ describe("createAccountAndHouse with images", () => {
 });
 
 describe("generateHouseImage", () => {
-  const genBody = { name: "Casa Vargen", description: "Norte.", emblem: createBody.emblem };
+  const genBody = { name: "Clã Gangrel", description: "Norte.", emblem: createBody.emblem };
 
   it("returns IMAGE_DISABLED when no image fn", async () => {
     await expect(generateHouseImage(deps, req({ method: "POST", body: genBody }) as any))
@@ -246,14 +246,14 @@ describe("getChronicle", () => {
   it("nunca expõe informação privada do turno", async () => {
     vi.mocked(turnsDb.listTurns).mockResolvedValue([
       { ...baseTurn, turnId: 1, status: "RESOLVED", publicEvent: "A Convocação",
-        privateInfo: { "casa-vargen": "O traidor é o irmão dela." },
-        result: { publicResult: "As Casas responderam.", houseResults: { "casa-vargen": "Vargen hesitou." }, attributeDeltas: {}, discoveries: [] } } as any,
+        privateInfo: { "cla-gangrel": "O traidor é o irmão dela." },
+        result: { publicResult: "As Casas responderam.", houseResults: { "cla-gangrel": "Gangrel hesitou." }, attributeDeltas: {}, discoveries: [] } } as any,
     ]);
 
     const res = await getChronicle(deps, req());
     const chronicle = (res.body as any).chronicle as string;
 
     expect(chronicle).not.toContain("traidor");
-    expect(chronicle).not.toContain("Vargen hesitou");
+    expect(chronicle).not.toContain("Gangrel hesitou");
   });
 });

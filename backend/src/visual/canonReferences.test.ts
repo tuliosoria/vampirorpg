@@ -4,14 +4,14 @@ import { resolveCanonReferences } from "./canonReferences";
 
 const wiki: WikiEntry[] = [
   {
-    entryId: "w-karasoy", section: "clas", order: 0, updatedAt: "",
-    title: "Casa Karasoy — As Filhas da Estrela",
-    body: "> **Símbolo:** uma estrela de oito pontas sobre um cavalo branco.\n> **Sede:** Ordu-Yildiz.",
+    entryId: "w-brujah", section: "clas", order: 0, updatedAt: "",
+    title: "Clã Brujah — As Filhas da Estrela",
+    body: "> **Símbolo:** uma estrela de oito pontas sobre um cavalo branco.\n> **Sede:** Rua Treze.",
   },
   {
-    entryId: "w-vargen", section: "clas", order: 0, updatedAt: "",
-    title: "Casa Vargen — Os Lobos da Fronteira",
-    body: "> **Símbolo:** um lobo cinzento diante de uma fogueira branca.\n> **Sede:** Droskar.",
+    entryId: "w-gangrel", section: "clas", order: 0, updatedAt: "",
+    title: "Clã Gangrel — Os Lobos da Fronteira",
+    body: "> **Símbolo:** um lobo cinzento diante de uma fogueira branca.\n> **Sede:** Parque do Norte.",
   },
 ];
 
@@ -33,74 +33,74 @@ function asset(over: Partial<VisualAsset> & { id: string; entityId: string | nul
   };
 }
 
-const entities = [entity("karasoy", "Casa Karasoy", "w-karasoy"), entity("vargen", "Casa Vargen", "w-vargen")];
-const emblemKarasoy = asset({ id: "em-karasoy", entityId: "karasoy" });
-const emblemVargen = asset({ id: "em-vargen", entityId: "vargen" });
+const entities = [entity("brujah", "Clã Brujah", "w-brujah"), entity("gangrel", "Clã Gangrel", "w-gangrel")];
+const emblemBrujah = asset({ id: "em-brujah", entityId: "brujah" });
+const emblemGangrel = asset({ id: "em-gangrel", entityId: "gangrel" });
 
 describe("resolveCanonReferences", () => {
   it("attaches the emblem of the House the request names", () => {
     // Prose cannot pin heraldry: "estrela de oito pontas sobre um cavalo branco"
     // is satisfied by countless drawings, so only the image holds it steady.
     const out = resolveCanonReferences({
-      requestText: "a capital de Karasoy, Ordu-Yildiz",
-      entity: null, wikiEntries: wiki, entities, assets: [emblemKarasoy, emblemVargen],
+      requestText: "a capital de Brujah, Rua Treze",
+      entity: null, wikiEntries: wiki, entities, assets: [emblemBrujah, emblemGangrel],
     });
-    expect(out.map((a) => a.id)).toEqual(["em-karasoy"]);
+    expect(out.map((a) => a.id)).toEqual(["em-brujah"]);
   });
 
   it("does not attach a House the request never mentions", () => {
     const out = resolveCanonReferences({
-      requestText: "a capital de Karasoy",
-      entity: null, wikiEntries: wiki, entities, assets: [emblemKarasoy, emblemVargen],
+      requestText: "a capital de Brujah",
+      entity: null, wikiEntries: wiki, entities, assets: [emblemBrujah, emblemGangrel],
     });
-    expect(out.map((a) => a.id)).not.toContain("em-vargen");
+    expect(out.map((a) => a.id)).not.toContain("em-gangrel");
   });
 
   it("prefers an explicit emblem over an unrelated canonical image", () => {
-    const cityShot = asset({ id: "city", entityId: "karasoy", assetType: "ESTABLISHING" });
+    const cityShot = asset({ id: "city", entityId: "brujah", assetType: "ESTABLISHING" });
     const out = resolveCanonReferences({
-      requestText: "Karasoy", entity: null, wikiEntries: wiki, entities,
-      assets: [cityShot, emblemKarasoy],
+      requestText: "Brujah", entity: null, wikiEntries: wiki, entities,
+      assets: [cityShot, emblemBrujah],
     });
-    expect(out.map((a) => a.id)).toEqual(["em-karasoy"]);
+    expect(out.map((a) => a.id)).toEqual(["em-brujah"]);
   });
 
   it("falls back to any canonical image when no emblem exists", () => {
-    const cityShot = asset({ id: "city", entityId: "karasoy", assetType: "ESTABLISHING" });
+    const cityShot = asset({ id: "city", entityId: "brujah", assetType: "ESTABLISHING" });
     const out = resolveCanonReferences({
-      requestText: "Karasoy", entity: null, wikiEntries: wiki, entities, assets: [cityShot],
+      requestText: "Brujah", entity: null, wikiEntries: wiki, entities, assets: [cityShot],
     });
     expect(out.map((a) => a.id)).toEqual(["city"]);
   });
 
   it("ignores drafts, which are not canon", () => {
-    const draft = asset({ id: "d", entityId: "karasoy", canonicalLevel: "DRAFT" });
+    const draft = asset({ id: "d", entityId: "brujah", canonicalLevel: "DRAFT" });
     const out = resolveCanonReferences({
-      requestText: "Karasoy", entity: null, wikiEntries: wiki, entities, assets: [draft],
+      requestText: "Brujah", entity: null, wikiEntries: wiki, entities, assets: [draft],
     });
     expect(out).toEqual([]);
   });
 
   it("skips the entity being drawn, whose identity refs are attached separately", () => {
     const out = resolveCanonReferences({
-      requestText: "Karasoy", entity: entities[0], wikiEntries: wiki, entities,
-      assets: [emblemKarasoy],
+      requestText: "Brujah", entity: entities[0], wikiEntries: wiki, entities,
+      assets: [emblemBrujah],
     });
     expect(out).toEqual([]);
   });
 
   it("returns nothing when no entity is linked to the matched entry", () => {
-    const unlinked = [entity("karasoy", "Casa Karasoy", null)];
+    const unlinked = [entity("brujah", "Clã Brujah", null)];
     const out = resolveCanonReferences({
-      requestText: "Karasoy", entity: null, wikiEntries: wiki, entities: unlinked, assets: [emblemKarasoy],
+      requestText: "Brujah", entity: null, wikiEntries: wiki, entities: unlinked, assets: [emblemBrujah],
     });
     expect(out).toEqual([]);
   });
 
   it("caps how many emblems it attaches", () => {
     const out = resolveCanonReferences({
-      requestText: "Karasoy e Vargen", entity: null, wikiEntries: wiki, entities,
-      assets: [emblemKarasoy, emblemVargen], limit: 1,
+      requestText: "Brujah e Gangrel", entity: null, wikiEntries: wiki, entities,
+      assets: [emblemBrujah, emblemGangrel], limit: 1,
     });
     expect(out).toHaveLength(1);
   });

@@ -4,9 +4,9 @@ import { fold } from "./mortality.js";
 /**
  * Descobre quais imagens do acervo pertencem a uma Casa.
  *
- * O acervo não guarda "esta imagem é da Casa Vargen": guarda a entidade
+ * O acervo não guarda "esta imagem é da Clã Gangrel": guarda a entidade
  * retratada, que tanto pode ser a Casa quanto a cidade-sede dela. A página da
- * Casa precisa das duas — a muralha de Rimewatch é o que Rimerberg tem de mais
+ * Casa precisa das duas — a muralha do Antigo Sanatório é o que Malkavian tem de mais
  * reconhecível, e o verbete da cidade é o único lugar onde ela é descrita.
  */
 
@@ -14,7 +14,7 @@ import { fold } from "./mortality.js";
 export function houseShortName(name: string): string {
   const f = fold(name).trim();
   const stripped = f.replace(/^(casa do|casa da|casa de|casa|cla|grande casa)\s+/, "");
-  // "Ordem do Sino" e "Irmandade dos Corvos" não sobrevivem à poda: o que
+  // "Corte do Sangue" e "Corte do Sangue" não sobrevivem à poda: o que
   // distingue as duas é justamente o nome inteiro.
   return stripped.length >= 4 ? stripped : f;
 }
@@ -31,7 +31,7 @@ export function houseTerms(houseKey: string): string[] {
  * Se um texto — nome de entidade, título de verbete — se refere a esta Casa.
  *
  * Casar por chave não basta: as entidades do acervo foram batizadas à mão e
- * usam nomes como "Solarion (Sahra-Lun)" ou "Khar-Durak", nunca "casa-solarion".
+ * usam nomes como "Nosferatu (Cais Velho)" ou "Galeria Subterrânea", nunca "cla-nosferatu".
  */
 export function mentionsHouse(text: string | null | undefined, houseKey: string): boolean {
   if (!text) return false;

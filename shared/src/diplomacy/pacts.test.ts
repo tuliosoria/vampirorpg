@@ -13,8 +13,8 @@ import {
 import { semearCanon, limparCanon } from "../test/fixtures.js";
 
 const ROTA =
-  "Rota Comercial de Raven's Cross — proposta de Euralune. Posto comum por 90 dias. " +
-  "Euralion envia 12 cavaleiros de hipogrifo e 24 aves de recado; Solarion envia 6 lentes de longo alcance.";
+  "Rota Comercial de Ferro-velho — proposta de Toreador. Posto comum por 90 dias. " +
+  "Euralion envia 12 cavaleiros de hipogrifo e 24 aves de recado; Ventrue envia 6 lentes de longo alcance.";
 
 describe("applyDeltas", () => {
   it("move os eixos e respeita os limites da escala", () => {
@@ -68,8 +68,8 @@ describe("o que o pacto deixa no mundo", () => {
   // Um pacto que não deixa nada é uma frase. A embaixada é o que faz o jogador
   // ver na ficha que aquela carta aconteceu.
   it("nomeia embaixada para aliança e entreposto para acordo", () => {
-    expect(pactAssetName("ALIANCA", "Raven's Cross")).toBe("Embaixada em Raven's Cross");
-    expect(pactAssetName("ACORDO", "Raven's Cross")).toBe("Entreposto em Raven's Cross");
+    expect(pactAssetName("ALIANCA", "Ferro-velho")).toBe("Embaixada em Ferro-velho");
+    expect(pactAssetName("ACORDO", "Ferro-velho")).toBe("Entreposto em Ferro-velho");
   });
 
   it("ainda nomeia algo quando o pacto não tem lugar", () => {
@@ -81,7 +81,7 @@ describe("o que o pacto deixa no mundo", () => {
 describe("classificação", () => {
   it("lê aliança no texto e cai em acordo no resto", () => {
     expect(pactKindFor("Aliança de defesa mútua entre as Casas.")).toBe("ALIANCA");
-    expect(pactKindFor("Embaixada permanente em Raven's Cross.")).toBe("ALIANCA");
+    expect(pactKindFor("Embaixada permanente em Ferro-velho.")).toBe("ALIANCA");
     expect(pactKindFor(ROTA)).toBe("ACORDO");
   });
 });
@@ -97,22 +97,22 @@ describe("o que pode ser respondido", () => {
 
 describe("o preço político", () => {
   const rels = [
-    { fromKey: "casa-valerius", toKey: "casa-drakorys", amizade: 2 },
+    { fromKey: "cla-ventrue", toKey: "casa-drakorys", amizade: 2 },
     { fromKey: "casa-do-ouro", toKey: "casa-drakorys", amizade: 15 },
-    { fromKey: "casa-karasoy", toKey: "casa-drakorys", amizade: 50 },
+    { fromKey: "cla-brujah", toKey: "casa-drakorys", amizade: 50 },
   ];
 
   // Um teto de pactos seria regra artificial. O limite verdadeiro é que os seus
-  // aliados se odeiam: fechar com Krythos afasta a Coroa.
+  // aliados se odeiam: fechar com fora da cidade afasta a Coroa.
   it("só ofende quem já era inimigo declarado de quem você abraçou", () => {
     const f = politicalFallout("casa-drakorys", "ALIANCA", rels);
-    expect(f.map((x) => x.seatKey)).toEqual(["casa-valerius", "casa-do-ouro"]);
-    expect(f.map((x) => x.seatKey)).not.toContain("casa-karasoy");
+    expect(f.map((x) => x.seatKey)).toEqual(["cla-ventrue", "casa-do-ouro"]);
+    expect(f.map((x) => x.seatKey)).not.toContain("cla-brujah");
   });
 
   it("cobra mais caro de quem odeia mais", () => {
-    const [valerius, ouro] = politicalFallout("casa-drakorys", "ALIANCA", rels);
-    expect(Math.abs(valerius.amizade)).toBeGreaterThan(Math.abs(ouro.amizade));
+    const [ventrue, ouro] = politicalFallout("casa-drakorys", "ALIANCA", rels);
+    expect(Math.abs(ventrue.amizade)).toBeGreaterThan(Math.abs(ouro.amizade));
   });
 
   // Comerciar não é abraçar: um entreposto custa metade de uma aliança.
@@ -123,10 +123,10 @@ describe("o preço político", () => {
   });
 
   // Relação intocada é médio, e médio não gera ofensa: uma Casa sem opinião
-  // sobre Krythos não se importa que você negocie com Krythos.
+  // sobre fora da cidade não se importa que você negocie com fora da cidade.
   it("não cobra nada quando ninguém declarou inimizade", () => {
     expect(politicalFallout("casa-drakorys", "ALIANCA", [])).toEqual([]);
-    expect(politicalFallout("casa-drakorys", "ALIANCA", [{ fromKey: "casa-karasoy", toKey: "casa-drakorys", amizade: 50 }])).toEqual([]);
+    expect(politicalFallout("casa-drakorys", "ALIANCA", [{ fromKey: "cla-brujah", toKey: "casa-drakorys", amizade: 50 }])).toEqual([]);
   });
 
   it("não faz a própria Casa se ofender consigo mesma", () => {

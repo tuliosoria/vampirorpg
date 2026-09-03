@@ -7,46 +7,46 @@ function entry(over: Partial<WikiEntry> & { title: string; body: string }): Wiki
 }
 
 // Real shapes from the live wiki.
-const rimerberg = entry({
-  title: "Casa Rimerberg — Os Vigias da Última Neve",
+const malkavian = entry({
+  title: "Clã Malkavian — Os Vigias da Última Neve",
   body: `> **Lema:** "Enquanto houver luz, há aviso."
 > **Símbolo:** uma torre negra sob três flocos.
 > **Território:** extremo norte.
-> **Sede:** Rimewatch.
+> **Sede:** Antigo Sanatório.
 > **Status:** Grande Casa menor, de importância estratégica.
 
 ### Origem
 
-Rimerberg foi fundada para manter Rimewatch.`,
+Malkavian foi fundada para manter Antigo Sanatório.`,
 });
 
-const vargen = entry({
-  title: "Casa Vargen — Os Lobos da Fronteira",
+const gangrel = entry({
+  title: "Clã Gangrel — Os Lobos da Fronteira",
   body: `> **Lema:** "Ninguém fica para trás na neve."
 > **Símbolo:** um lobo cinzento diante de uma fogueira branca.
 > **Território:** Marcas do Norte.
-> **Sede:** Droskar.`,
+> **Sede:** Parque do Norte.`,
 });
 
-const rimewatch = entry({
-  title: "Rimewatch — A Última Vigília",
+const sanatorio = entry({
+  title: "Antigo Sanatório — A Última Vigília",
   section: "lugares",
-  body: "Rimewatch é a última grande fortaleza antes das geleiras. Possui muralhas, quartéis, cisternas aquecidas, depósitos, uma capela da Ordem do Sino e o Farol de Gelo.",
+  body: "Antigo Sanatório é a última grande fortaleza antes das geleiras. Possui muralhas, quartéis, cisternas aquecidas, depósitos, uma capela da Corte do Sangue e o Farol de Gelo.",
 });
 
-const all = [rimerberg, vargen, rimewatch];
+const all = [malkavian, gangrel, sanatorio];
 
 describe("extractCanonFacts", () => {
   it("pulls the structured header fields", () => {
-    const f = extractCanonFacts(rimerberg.body);
+    const f = extractCanonFacts(malkavian.body);
     expect(f.simbolo).toBe("uma torre negra sob três flocos");
-    expect(f.sede).toBe("Rimewatch");
+    expect(f.sede).toBe("Antigo Sanatório");
     expect(f.territorio).toBe("extremo norte");
     expect(f.lema).toContain("Enquanto houver luz");
   });
 
   it("returns an empty object for an entry with no header block", () => {
-    expect(extractCanonFacts(rimewatch.body)).toEqual({});
+    expect(extractCanonFacts(sanatorio.body)).toEqual({});
   });
 
   it("ignores a symbol quoted later in the prose", () => {
@@ -58,125 +58,127 @@ describe("extractCanonFacts", () => {
 
 describe("titleHead / significantTokens", () => {
   it("takes the name before the epithet", () => {
-    expect(titleHead("Casa Rimerberg — Os Vigias da Última Neve")).toBe("Casa Rimerberg");
+    expect(titleHead("Clã Malkavian — Os Vigias da Última Neve")).toBe("Clã Malkavian");
   });
 
   it("drops words that would match every house", () => {
-    expect(significantTokens("Casa Rimerberg — Os Vigias")).toEqual(["rimerberg"]);
+    expect(significantTokens("Clã Malkavian — Os Vigias")).toEqual(["malkavian"]);
   });
 });
 
 describe("findCanonMatches", () => {
   it("resolves a short request to the right city entry", () => {
-    const m = findCanonMatches("desenhe uma muralha de Rimewatch", all);
-    expect(m.map((x) => x.entry.title)).toContain("Rimewatch — A Última Vigília");
+    const m = findCanonMatches("desenhe uma muralha de Antigo Sanatório", all);
+    expect(m.map((x) => x.entry.title)).toContain("Antigo Sanatório — A Última Vigília");
   });
 
-  it("does NOT attribute Vargen's wolf to a Rimewatch request", () => {
-    // The user believed Rimerberg's emblem was a wolf. It is Vargen's. A system
+  it("does NOT attribute Gangrel's wolf to a Antigo Sanatório request", () => {
+    // The user believed Malkavian's emblem was a wolf. It is Gangrel's. A system
     // that guesses would inject the wrong house's emblem into canon.
-    const m = findCanonMatches("uma muralha de Rimewatch", all);
+    const m = findCanonMatches("uma muralha de Antigo Sanatório", all);
     const rendered = renderCanonMatches(m);
     expect(rendered).not.toMatch(/lobo/i);
   });
 
   it("finds the house when the house name is used", () => {
-    const m = findCanonMatches("o estandarte da Casa Rimerberg", all);
-    expect(m[0].entry.title).toBe("Casa Rimerberg — Os Vigias da Última Neve");
+    const m = findCanonMatches("o estandarte da Clã Malkavian", all);
+    expect(m[0].entry.title).toBe("Clã Malkavian — Os Vigias da Última Neve");
     expect(m[0].facts.simbolo).toBe("uma torre negra sob três flocos");
   });
 
   it("matches case- and accent-insensitively", () => {
-    expect(findCanonMatches("A ÚLTIMA VIGÍLIA em rimewatch", all).length).toBeGreaterThan(0);
+    expect(findCanonMatches("A ÚLTIMA VIGÍLIA no ANTIGO SANATÓRIO", all).length).toBeGreaterThan(0);
   });
 
   it("returns nothing when the request names no known entity", () => {
     expect(findCanonMatches("um pônei feliz num campo", all)).toEqual([]);
   });
 
+  // O teto vale para as entradas diretas; a Sede ainda pode trazer a que
+  // completa o par, e aqui ela já está entre as escolhidas.
   it("caps how many entries it injects", () => {
-    expect(findCanonMatches("Rimewatch Rimerberg Vargen", all, 2)).toHaveLength(2);
+    expect(findCanonMatches("Antigo Sanatório Malkavian", all, 2)).toHaveLength(2);
   });
 
   it("prefers the more distinctive match first", () => {
-    const m = findCanonMatches("Rimerberg", all);
-    expect(m[0].entry.title).toContain("Rimerberg");
+    const m = findCanonMatches("Malkavian", all);
+    expect(m[0].entry.title).toContain("Malkavian");
   });
 });
 
 describe("renderCanonMatches", () => {
   it("labels the symbol as something that must appear on insignia", () => {
-    const rendered = renderCanonMatches(findCanonMatches("Casa Rimerberg", all));
+    const rendered = renderCanonMatches(findCanonMatches("Clã Malkavian", all));
     expect(rendered).toMatch(/Símbolo.*torre negra sob três flocos/);
   });
 
   it("strips the markdown blockquote markers from the prose", () => {
-    expect(renderCanonMatches(findCanonMatches("Casa Rimerberg", all))).not.toMatch(/^>/m);
+    expect(renderCanonMatches(findCanonMatches("Clã Malkavian", all))).not.toMatch(/^>/m);
   });
 });
 
 describe("seat linkage", () => {
   it("pulls the owning house's emblem when the request only names its seat", () => {
-    // "Rimewatch" contains no token matching "Casa Rimerberg", but Rimerberg
-    // declares `Sede: Rimewatch`, which is how the heraldry gets found.
-    const m = findCanonMatches("desenhe uma muralha de Rimewatch", all);
+    // "Antigo Sanatório" contains no token matching "Clã Malkavian", but Malkavian
+    // declares `Sede: Antigo Sanatório`, which is how the heraldry gets found.
+    const m = findCanonMatches("desenhe uma muralha de Antigo Sanatório", all);
     const titles = m.map((x) => x.entry.title);
-    expect(titles).toContain("Rimewatch — A Última Vigília");
-    expect(titles).toContain("Casa Rimerberg — Os Vigias da Última Neve");
+    expect(titles).toContain("Antigo Sanatório — A Última Vigília");
+    expect(titles).toContain("Clã Malkavian — Os Vigias da Última Neve");
     expect(renderCanonMatches(m)).toMatch(/torre negra sob três flocos/);
   });
 
   it("still does not drag in the neighbouring house's wolf", () => {
-    const rendered = renderCanonMatches(findCanonMatches("desenhe uma muralha de Rimewatch", all));
+    const rendered = renderCanonMatches(findCanonMatches("desenhe uma muralha de Antigo Sanatório", all));
     expect(rendered).not.toMatch(/lobo/i);
   });
 
   it("does not add a house whose seat is unrelated", () => {
-    const m = findCanonMatches("Droskar", all);
-    expect(m.map((x) => x.entry.title)).toContain("Casa Vargen — Os Lobos da Fronteira");
+    const m = findCanonMatches("Parque do Norte", all);
+    expect(m.map((x) => x.entry.title)).toContain("Clã Gangrel — Os Lobos da Fronteira");
   });
 });
 
 describe("seat linkage, House -> City", () => {
-  // The failure that motivated this: "a capital de Karasoy" pulled only the
+  // The failure that motivated this: "a capital de Brujah" pulled only the
   // House article. The city article is the sole place the fortified wagons and
   // wheels are described, so with it missing the model had nothing concrete and
   // rendered a city defined by movement as tents standing on the ground.
-  const karasoy = entry({
-    title: "Casa Karasoy — As Filhas da Estrela",
-    body: "> **Símbolo:** uma estrela de oito pontas sobre um cavalo branco.\n> **Sede:** Ordu-Yildiz, cidade móvel.",
+  const brujah = entry({
+    title: "Clã Brujah — As Filhas da Estrela",
+    body: "> **Símbolo:** uma estrela de oito pontas sobre um cavalo branco.\n> **Sede:** Rua Treze, cidade móvel.",
   });
   const orduYildiz = entry({
-    title: "Ordu-Yildiz — A Cidade que Cavalga",
+    title: "Rua Treze — A Cidade que Cavalga",
     section: "lugares",
-    body: "Ordu-Yildiz é formada por carroças fortificadas, tendas, estábulos, santuários e oficinas móveis.",
+    body: "Rua Treze é formada por carroças fortificadas, tendas, estábulos, santuários e oficinas móveis.",
   });
-  const set = [karasoy, orduYildiz, vargen];
+  const set = [brujah, orduYildiz, gangrel];
 
   it("reaches the seat's own article from the House name", () => {
-    const titles = findCanonMatches("criar a capital de Karasoy", set).map((m) => m.entry.title);
-    expect(titles).toContain("Casa Karasoy — As Filhas da Estrela");
-    expect(titles).toContain("Ordu-Yildiz — A Cidade que Cavalga");
+    const titles = findCanonMatches("criar a capital de Brujah", set).map((m) => m.entry.title);
+    expect(titles).toContain("Clã Brujah — As Filhas da Estrela");
+    expect(titles).toContain("Rua Treze — A Cidade que Cavalga");
   });
 
   it("carries the concrete structure into the rendered canon", () => {
-    const rendered = renderCanonMatches(findCanonMatches("a capital de Karasoy", set));
+    const rendered = renderCanonMatches(findCanonMatches("a capital de Brujah", set));
     expect(rendered).toMatch(/carroças fortificadas/);
   });
 
   it("parses a seat written as prose with an aside", () => {
-    // "Ordu-Yildiz, cidade móvel" names the city plus a description.
-    expect(seatName("Ordu-Yildiz, cidade móvel")).toBe("ordu-yildiz");
+    // "Rua Treze, cidade móvel" names the place plus a description.
+    expect(seatName("Rua Treze, cidade móvel")).toBe("rua treze");
     expect(seatName(undefined)).toBeNull();
   });
 
   it("still resolves City -> House in the other direction", () => {
-    const titles = findCanonMatches("as ruas de Ordu-Yildiz", set).map((m) => m.entry.title);
-    expect(titles).toContain("Casa Karasoy — As Filhas da Estrela");
+    const titles = findCanonMatches("as ruas de Rua Treze", set).map((m) => m.entry.title);
+    expect(titles).toContain("Clã Brujah — As Filhas da Estrela");
   });
 
   it("does not drag in an unrelated House", () => {
-    const rendered = renderCanonMatches(findCanonMatches("a capital de Karasoy", set));
+    const rendered = renderCanonMatches(findCanonMatches("a capital de Brujah", set));
     expect(rendered).not.toMatch(/lobo/i);
   });
 });

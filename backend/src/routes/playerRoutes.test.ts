@@ -22,7 +22,7 @@ vi.mock("../db/submissions", () => ({
 }));
 
 const config: Config = {
-  tableName: "ravenloft-game",
+  tableName: "vampirorpg-game",
   campaignId: "cidade-noturna",
   adminCodeHash: "x",
   tokenSigningSecret: "secret",
@@ -43,7 +43,7 @@ const config: Config = {
   draftIngestToken: "",
 };
 const deps = { doc: { send: vi.fn() } as any, config };
-const token = (houseId = "casa-vargen") =>
+const token = (houseId = "cla-gangrel") =>
   signToken({ type: "player", campaignId: "cidade-noturna", houseId, displayName: "Elira", exp: Date.now() + 60000 }, "secret");
 const authReq = (over = {}) => ({
   method: "GET",
@@ -55,13 +55,13 @@ const authReq = (over = {}) => ({
 });
 
 const house: House = {
-  houseId: "casa-vargen",
-  name: "Casa Vargen",
+  houseId: "cla-gangrel",
+  name: "Clã Gangrel",
   motto: "O Norte lembra.",
   emblem: { icon: "lobo", color1: "#3f3f46", color2: "#1e3a5f" },
   leaderName: "Aldric",
   heirName: "Sera",
-  castleName: "Droskar",
+  castleName: "Parque do Norte",
   townsText: "Vilas do norte.",
   historyText: "Uma casa antiga.",
   specialty: "Defesa.",
@@ -74,7 +74,7 @@ const openTurn: Turn = {
   turnId: 1,
   status: "OPEN",
   publicEvent: "A neve bloqueia as estradas.",
-  privateInfo: { "casa-vargen": "Os lobos viram rastros na névoa." },
+  privateInfo: { "cla-gangrel": "Os lobos viram rastros na névoa." },
   createdAt: "2026-01-02T00:00:00.000Z",
 };
 
@@ -88,7 +88,7 @@ beforeEach(() => {
 
 describe("getGame", () => {
   it("returns the house, active turn, private information, and submission", async () => {
-    vi.mocked(submissionsDb.getSubmission).mockResolvedValue({ houseId: "casa-vargen", orderText: "Ordem", submittedAt: "2026-01-03T00:00:00.000Z" });
+    vi.mocked(submissionsDb.getSubmission).mockResolvedValue({ houseId: "cla-gangrel", orderText: "Ordem", submittedAt: "2026-01-03T00:00:00.000Z" });
 
     const res = await getGame(deps, authReq());
 
@@ -118,7 +118,7 @@ describe("getGame", () => {
       status: "RESOLVED",
       result: {
         publicResult: "O reino sobreviveu à noite.",
-        houseResults: { "casa-vargen": "Vargen segurou a passagem." },
+        houseResults: { "cla-gangrel": "Gangrel segurou a passagem." },
         attributeDeltas: {},
         discoveries: ["Há mortos sob o lago."],
       },
@@ -133,7 +133,7 @@ describe("getGame", () => {
       {
         turnId: 1,
         publicResult: "O reino sobreviveu à noite.",
-        privateResult: "Vargen segurou a passagem.",
+        privateResult: "Gangrel segurou a passagem.",
         discoveries: ["Há mortos sob o lago."],
         resultImageUrl: "https://example.com/resultado.png",
         attributeChanges: [],
@@ -147,10 +147,10 @@ describe("getGame", () => {
       status: "RESOLVED",
       result: {
         publicResult: "Público.",
-        houseResults: { "casa-vargen": "Privado." },
-        attributeDeltas: { "casa-vargen": { controle: -1 } },
+        houseResults: { "cla-gangrel": "Privado." },
+        attributeDeltas: { "cla-gangrel": { controle: -1 } },
         attributeChanges: {
-          "casa-vargen": [{ key: "controle", before: 3, after: 2 }],
+          "cla-gangrel": [{ key: "controle", before: 3, after: 2 }],
           "casa-baixa": [{ key: "riqueza", before: 1, after: 3 }],
         },
         discoveries: [],
@@ -172,8 +172,8 @@ describe("getGame", () => {
       status: "RESOLVED",
       result: {
         publicResult: "Público.",
-        houseResults: { "casa-vargen": "Privado." },
-        attributeDeltas: { "casa-vargen": { controle: -1 } },
+        houseResults: { "cla-gangrel": "Privado." },
+        attributeDeltas: { "cla-gangrel": { controle: -1 } },
         attributeChanges: {},
         discoveries: [],
       },
@@ -192,8 +192,8 @@ describe("getGame", () => {
       status: "RESOLVED",
       result: {
         publicResult: "Público.",
-        houseResults: { "casa-vargen": "Privado." },
-        attributeDeltas: { "casa-vargen": { controle: -1, soldados: 0, recursos: 2 } },
+        houseResults: { "cla-gangrel": "Privado." },
+        attributeDeltas: { "cla-gangrel": { controle: -1, soldados: 0, recursos: 2 } },
         discoveries: [],
       },
     };
@@ -215,7 +215,7 @@ describe("getGame", () => {
       status: "RESOLVED",
       result: {
         publicResult: "Turno 1 público.",
-        houseResults: { "casa-vargen": "Vargen no turno 1." },
+        houseResults: { "cla-gangrel": "Gangrel no turno 1." },
         attributeDeltas: {},
         discoveries: [],
       },
@@ -226,7 +226,7 @@ describe("getGame", () => {
       status: "RESOLVED",
       result: {
         publicResult: "Turno 2 público.",
-        houseResults: { "casa-vargen": "Vargen no turno 2." },
+        houseResults: { "cla-gangrel": "Gangrel no turno 2." },
         attributeDeltas: {},
         discoveries: [],
       },
@@ -239,8 +239,8 @@ describe("getGame", () => {
 
     const history = (res.body as any).turnHistory;
     expect(history.map((h: any) => h.turnId)).toEqual([1, 2]);
-    expect(history[0].privateResult).toBe("Vargen no turno 1.");
-    expect(history[1].privateResult).toBe("Vargen no turno 2.");
+    expect(history[0].privateResult).toBe("Gangrel no turno 1.");
+    expect(history[1].privateResult).toBe("Gangrel no turno 2.");
   });
 });
 
@@ -262,8 +262,8 @@ describe("submitOrder", () => {
 
     expect(res.status).toBe(200);
     expect((res.body as any).submittedAt).toEqual(expect.any(String));
-    expect(submissionsDb.putSubmission).toHaveBeenCalledWith(deps.doc, "ravenloft-game", "cidade-noturna", 1, {
-      houseId: "casa-vargen",
+    expect(submissionsDb.putSubmission).toHaveBeenCalledWith(deps.doc, "vampirorpg-game", "cidade-noturna", 1, {
+      houseId: "cla-gangrel",
       orderText: "Fortificar a passagem e erguer paliçadas.",
       submittedAt: expect.any(String),
     });

@@ -11,8 +11,8 @@ import type { NpcDynamic, NpcRelation } from "@vampiro/content";
  * A relação injetada é só a da Casa que escreve: a leitura que este NPC tem de
  * quem está do outro lado da carta, nas cinco dimensões mais o resumo em prosa.
  * As memórias são as dele — o que ele viveu e por isso pensa como pensa —, e é
- * o que deixa a IA citar o passado ("Solarion já mostrou reconhecer uma ameaça
- * antes dos outros, como na crise de Véspera").
+ * o que deixa a IA citar o passado ("Ventrue já mostrou reconhecer uma ameaça
+ * antes dos outros, como na crise de Haddad").
  */
 export function buildRoleplayBlock(input: {
   dynamic: NpcDynamic;

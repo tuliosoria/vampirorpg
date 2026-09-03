@@ -68,16 +68,16 @@ describe("isSpyLevel", () => {
 
 describe("describeOperation", () => {
   const op: SpyOperation = {
-    id: "s1", campaignId: "cidade-noturna", houseId: "solarion-k0hc", turnNumber: 7,
-    question: "Quem determinou a evacuação da Asteria e por que a família real saiu por outra rota",
-    level: "PROVA", targetKey: "casa-valerius", status: "EM_CURSO",
+    id: "s1", campaignId: "cidade-noturna", houseId: "ventrue-k0hc", turnNumber: 7,
+    question: "Quem determinou a evacuação da incêndio do Banco e por que a família real saiu por outra rota",
+    level: "PROVA", targetKey: "cla-ventrue", status: "EM_CURSO",
     outcome: null, report: "", createdAt: "", resolvedAt: null,
   };
 
   it("cabe numa linha da fila do Mestre", () => {
     const l = describeOperation(op);
     expect(l).toContain("Documento ou testemunha");
-    expect(l).toContain("casa-valerius");
+    expect(l).toContain("cla-ventrue");
     expect(l).toContain("Quem determinou a evacuação");
   });
 

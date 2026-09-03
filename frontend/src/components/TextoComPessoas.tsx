@@ -32,7 +32,7 @@ export interface TextoComPessoasProps {
 /**
  * O texto como está, com o nome de quem tem ficha virando link.
  *
- * Nasceu de uma pergunta simples — "eu não lembrava quem era Dama Elara" — e
+ * Nasceu de uma pergunta simples — "eu não lembrava quem era Dama Inês" — e
  * responde onde ela aparece: no meio da carta, sem obrigar ninguém a abrir a
  * lista de personagens em outra aba e procurar pelo nome.
  *

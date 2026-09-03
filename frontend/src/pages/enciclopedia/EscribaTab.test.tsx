@@ -10,8 +10,8 @@ import { saveAdminToken, clearAdminToken } from "../../auth/adminSession";
 const TOKEN = "mock-admin-token";
 
 const casas = [
-  { houseId: "vargen-x1", name: "Clã Toreador" },
-  { houseId: "solarion-k0", name: "Clã Ventrue" },
+  { houseId: "gangrel-x1", name: "Clã Toreador" },
+  { houseId: "ventrue-k0", name: "Clã Ventrue" },
 ];
 
 async function setup(client = new MockApiClient()) {

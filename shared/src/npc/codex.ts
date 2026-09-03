@@ -7,7 +7,7 @@ import { NPC_BIOGRAPHIES } from "../lore/biographies.js";
 /**
  * O NPC Codex: quem cada personagem é.
  *
- * Identidade é canon e muda quase nunca. Um ataque a Ninho Alto não torna
+ * Identidade é canon e muda quase nunca. Um ataque ao Teatro Municipal não torna
  * alguém reservado em impulsivo — o que muda é a opinião dele sobre quem
  * atacou, e isso é Estado e Relações (World Memory / Relationship Engine),
  * nunca Identidade. Por isso o Codex vive aqui, em `shared`, e não no banco.
@@ -16,7 +16,7 @@ import { NPC_BIOGRAPHIES } from "../lore/biographies.js";
 export type NpcTier = "MAJOR" | "RELEVANT" | "MINOR";
 
 /**
- * A afiliação de um NPC. Uma Casa, uma organização (Ordem dos Três, Corvos) ou
+ * A afiliação de um NPC. Uma Casa, uma organização (Corte do Sangue, Corvos) ou
  * a Coroa — pela chave. É por ela que a conversa acha o destinatário e o
  * orçamento de mensageiros mede a distância.
  */

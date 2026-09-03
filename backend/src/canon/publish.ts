@@ -98,7 +98,7 @@ export async function publishCanonSubmission(
       wikiEntryId: current.wikiEntryId,
       // A Casa vem da sessão de quem enviou, não do campo homônimo da proposta:
       // aquele é texto livre da IA, que não conhece os ids sorteados das Casas
-      // e devolve o nome ("Solarion") onde se espera o id ("solarion-k0hc").
+      // e devolve o nome ("Ventrue") onde se espera o id ("ventrue-k0hc").
       houseId: current.houseId,
     });
     entity.status = "CANONICAL";

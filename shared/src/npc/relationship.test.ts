@@ -26,22 +26,22 @@ describe("seedRelationsFromPersona", () => {
 });
 
 describe("applyImpact", () => {
-  const base = emptyDynamic("casa-euralune", "brannic-euralune");
+  const base = emptyDynamic("cla-toreador", "brannic-toreador");
 
   it("aplica deltas e faz clamp em 0–100", () => {
     const impact: NpcImpact = {
       affected: true,
-      relationshipChanges: { "casa-valerius": { trust: -80, fear: +90, resentment: +95 } },
+      relationshipChanges: { "cla-ventrue": { trust: -80, fear: +90, resentment: +95 } },
     };
-    const next = applyImpact({ ...base, relations: { "casa-valerius": { trust: 46, respect: 50, fear: 15, resentment: 10, obligation: 20, summary: "" } } }, impact, 4, "t");
-    const rel = next.relations["casa-valerius"];
+    const next = applyImpact({ ...base, relations: { "cla-ventrue": { trust: 46, respect: 50, fear: 15, resentment: 10, obligation: 20, summary: "" } } }, impact, 4, "t");
+    const rel = next.relations["cla-ventrue"];
     expect(rel.trust).toBe(0); // 46 - 80, com piso em 0
     expect(rel.fear).toBe(100); // 15 + 90, com teto em 100
     expect(rel.resentment).toBe(100);
   });
 
   it("registra a memória com o turno de origem", () => {
-    const impact: NpcImpact = { affected: true, newMemory: "Forças do rei atacaram Ninho Alto.", relationshipChanges: { "casa-valerius": { trust: -35 } } };
+    const impact: NpcImpact = { affected: true, newMemory: "Forças do rei atacaram Teatro Municipal.", relationshipChanges: { "cla-ventrue": { trust: -35 } } };
     const next = applyImpact(base, impact, 4, "t");
     expect(next.memory).toHaveLength(1);
     expect(next.memory[0].turnNumber).toBe(4);
@@ -50,7 +50,7 @@ describe("applyImpact", () => {
 
   // Idempotência: reprocessar o mesmo turno não empilha a mesma lembrança.
   it("não duplica a memória ao reprocessar o mesmo turno", () => {
-    const impact: NpcImpact = { affected: true, newMemory: "O ataque a Ninho Alto." };
+    const impact: NpcImpact = { affected: true, newMemory: "O ataque a Teatro Municipal." };
     const once = applyImpact(base, impact, 4, "t");
     const twice = applyImpact(once, impact, 4, "t");
     expect(twice.memory).toHaveLength(1);

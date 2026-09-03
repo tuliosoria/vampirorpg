@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { loadConfig } from "./config";
 
 const env = {
-  TABLE_NAME: "ravenloft-game",
+  TABLE_NAME: "vampirorpg-game",
   CAMPAIGN_ID: "cidade-noturna",
   ADMIN_CODE_HASH: "abc",
   TOKEN_SIGNING_SECRET: "secret",
@@ -12,7 +12,7 @@ const env = {
 describe("loadConfig", () => {
   it("reads config from the environment", () => {
     const config = loadConfig(env);
-    expect(config.tableName).toBe("ravenloft-game");
+    expect(config.tableName).toBe("vampirorpg-game");
     expect(config.campaignId).toBe("cidade-noturna");
     expect(config.allowedOrigin).toBe("http://localhost:5173");
     expect(config.tokenTtlSeconds).toBeGreaterThan(0);
