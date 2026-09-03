@@ -78,8 +78,8 @@ describe("getCampaign", () => {
       status: 200,
       body: {
         id: "cidade-noturna",
-        title: "a Cidade",
-        introduction: "Um reino cercado pela névoa. Cada jogador lidera uma Grande Casa. Suas decisões, escritas em texto livre, criam a história do reino.",
+        title: "A Cidade",
+        introduction: "Uma cidade que não sabe quem a governa depois que escurece. Cada jogador conduz um vampiro; o que ele escreve, em texto livre, vira a história da noite.",
       },
     });
   });

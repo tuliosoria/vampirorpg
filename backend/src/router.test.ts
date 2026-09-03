@@ -93,7 +93,7 @@ describe("route", () => {
     const res = await route(deps, req("GET", "/api/campaign"));
 
     expect(res.status).toBe(200);
-    expect((res.body as any).title).toBe("a Cidade");
+    expect((res.body as any).title).toBe("A Cidade");
   });
 
   it("dispatches GET /api/house-example", async () => {

@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: Vampiro O Noites da Cidade - backend
+Description: vampirorpg - backend da cronica
 
 Parameters:
   AdminCodeHash:
@@ -71,7 +71,7 @@ Resources:
   GameTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: ravenloft-game
+      TableName: vampirorpg-game
       BillingMode: PAY_PER_REQUEST
       PointInTimeRecoverySpecification:
         PointInTimeRecoveryEnabled: true
@@ -89,7 +89,7 @@ Resources:
   ImagesBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub "ravenloft-images-${AWS::AccountId}"
+      BucketName: !Sub "vampirorpg-images-${AWS::AccountId}"
       PublicAccessBlockConfiguration:
         BlockPublicAcls: false
         BlockPublicPolicy: false
@@ -115,7 +115,7 @@ Resources:
   SharpLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
-      LayerName: ravenloft-sharp
+      LayerName: vampirorpg-sharp
       Description: sharp image library with linux-x64 native binaries
       ContentUri: layers/sharp/
       CompatibleRuntimes:
@@ -126,8 +126,8 @@ Resources:
   SeedImagesLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
-      LayerName: ravenloft-seed-images
-      Description: Canonical seed images for the visual encyclopedia (mounted at /opt/seed-images)
+      LayerName: vampirorpg-seed-images
+      Description: "Imagens canonicas do acervo, montadas em /opt/seed-images. Nasce vazia: quem povoa e o Narrador."
       ContentUri: layers/seed-images/
       CompatibleRuntimes:
         - nodejs22.x

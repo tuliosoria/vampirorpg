@@ -60,8 +60,8 @@ export async function getCampaign(deps: Deps, _req: HandlerRequest): Promise<Han
       id: deps.config.campaignId,
       // O cenário não tem mais nome de campanha: o site é sobre a Cidade, e a
       // porta para jogar chama-se "Jogar".
-      title: "a Cidade",
-      introduction: "Um reino cercado pela névoa. Cada jogador lidera uma Grande Casa. Suas decisões, escritas em texto livre, criam a história do reino.",
+      title: "A Cidade",
+      introduction: "Uma cidade que não sabe quem a governa depois que escurece. Cada jogador conduz um vampiro; o que ele escreve, em texto livre, vira a história da noite.",
     },
   };
 }

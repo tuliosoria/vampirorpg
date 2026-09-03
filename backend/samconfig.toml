@@ -1,7 +1,7 @@
 version = 0.1
 
 [default.global.parameters]
-stack_name = "ravenloft-winter"
+stack_name = "vampirorpg"
 
 [default.deploy.parameters]
 region = "us-east-1"
@@ -20,10 +20,10 @@ fail_on_empty_changeset = false
 #   OpenAiSyncImage*  -> House emblems and turn images, generated inside the
 #                        HTTP request, which API Gateway caps at 30s
 parameter_overrides = [
-  # As duas origens que podem falar com a API. O domínio próprio vem primeiro
-  # porque é o oficial: quem pedir de uma origem fora da lista recebe este, e o
+  # As origens que podem falar com a API. O domínio próprio vem primeiro porque
+  # é o oficial: quem pedir de uma origem fora da lista recebe este, e o
   # navegador dele bloqueia. A URL do Amplify fica para os links já salvos.
-  "AllowedOrigin=https://cidaderpg.com,https://main.d1emmrcvmpw55g.amplifyapp.com",
+  "AllowedOrigin=https://vampirorpg.com,https://www.vampirorpg.com,https://main.d3co8wcisz2isc.amplifyapp.com",
   "OpenAiImageModel=gpt-image-2",
   "OpenAiImageSize=1536x1024",
   "OpenAiImageQuality=medium",

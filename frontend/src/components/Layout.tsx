@@ -110,7 +110,7 @@ export function Layout({
               a Cidade
             </Typography>
             <Typography variant="caption" sx={{ color: "text.secondary" }}>
-              Um reino cercado pela névoa
+              A cidade não sabe quem manda depois que escurece
             </Typography>
           </Box>
           <Divider />
