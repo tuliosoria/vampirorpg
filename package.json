@@ -1,0 +1,24 @@
+{
+  "name": "vampirorpg",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "shared",
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "build:shared": "npm run build --workspace shared",
+    "dev": "npm run dev --workspace frontend",
+    "build": "npm run build:shared && npm run build --workspace frontend",
+    "build:backend": "npm run build:shared && npm run build --workspace backend",
+    "reset-campaign": "npm run build:shared && node backend/scripts/reset-campaign.mjs",
+    "deploy:backend": "npm run build:backend && cd backend && sam deploy",
+    "test": "npm run build:shared && npm run test --workspace shared --if-present && npm run test --workspace backend --if-present && npm run test --workspace frontend"
+  },
+  "devDependencies": {
+    "pdf-parse": "^1.1.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}

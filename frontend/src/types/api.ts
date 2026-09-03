@@ -1,0 +1,236 @@
+import type { BriefingDoPorto, Pendencias } from "@vampiro/content";
+import type {
+  House,
+  Attributes,
+  AttributeKey,
+  TurnStatus,
+  TurnResult,
+  TurnDraft,
+  Submission,
+  HouseExample,
+  Emblem,
+  WikiEntry,
+  GmEntry,
+  ProjectCard,
+  ProjectTemplate,
+  Favor,
+  CustomProjectInput,
+  EnhanceCardInput,
+  CustomCardDraft,
+  NpcDynamic,
+} from "@vampiro/content";
+
+export type {
+  House,
+  Attributes,
+  TurnStatus,
+  TurnResult,
+  TurnDraft,
+  Submission,
+  HouseExample,
+  Emblem,
+  WikiEntry,
+  GmEntry,
+  ProjectCard,
+  ProjectTemplate,
+  Favor,
+  CustomProjectInput,
+  EnhanceCardInput,
+  CustomCardDraft,
+  NpcDynamic,
+};
+
+export interface ProjectsView {
+  templates: ProjectTemplate[];
+  recommended: string[];
+  projects: ProjectCard[];
+  favors: Favor[];
+  slotLimit: number;
+  stability: number;
+  attributes: { riqueza: number; recursos: number; soldados: number; controle: number };
+  /**
+   * O recurso do turno. `porProjeto` é o que já foi distribuído e `tetoPorProjeto`
+   * o quanto cada carta ativa ainda aceita — a tela não recalcula nenhum dos dois.
+   *
+   * `distribuiu` separa dois estados que `porProjeto: {}` confunde: a Casa que
+   * ainda não mexeu em nada (e cujas cartas vão andar um turno pelo padrão) e a
+   * que distribuiu de propósito sem dar Energia a ninguém (e cujas cartas ficam
+   * paradas). Sem esse campo a tela afirmaria o contrário do que o turno faz.
+   */
+  energia: { total: number; porProjeto: Record<string, number>; tetoPorProjeto: Record<string, number>; distribuiu: boolean };
+}
+
+export interface WikiEntryInput {
+  section: string;
+  title: string;
+  body: string;
+  order: number;
+  imageUrl?: string;
+  imageUrls?: string[];
+}
+
+export interface GmEntryInput {
+  section: string;
+  title: string;
+  body: string;
+  order: number;
+}
+
+export type ApiErrorCode =
+  | "ACCOUNT_EXISTS"
+  | "INVALID_CODE"
+  | "TURN_LOCKED"
+  | "INVALID_ATTRIBUTES"
+  | "INVALID_BODY"
+  | "NO_HOUSE"
+  | "BAD_STATUS"
+  | "AI_DISABLED"
+  | "AI_PARSE"
+  | "AI_QUOTA"
+  | "AI_AUTH"
+  | "AI_ERROR"
+  | "AI_LEAKED_PRIVATE_CONTEXT"
+  | "IMAGE_DISABLED"
+  | "IMAGE_ERROR"
+  | "RATE_LIMITED"
+  | "SESSION_EXPIRED"
+  | "NETWORK"
+  | "INTERNAL"
+  | "NOT_FOUND";
+
+export class ApiError extends Error {
+  constructor(public code: ApiErrorCode, message: string) {
+    super(message);
+    this.name = "ApiError";
+  }
+}
+
+export interface CampaignSummary {
+  id: string;
+  title: string;
+  introduction: string;
+}
+
+export interface CreateHouseInput {
+  displayName: string;
+  name: string;
+  motto: string;
+  emblem: Emblem;
+  leaderName: string;
+  heirName: string;
+  castleName: string;
+  townsText: string;
+  historyText: string;
+  specialty: string;
+  weakness: string;
+  attributes: Attributes;
+  images?: string[];
+}
+
+export interface AdminUpdateHouseInput {
+  houseId: string;
+  name: string;
+  motto: string;
+  emblem: Emblem;
+  leaderName: string;
+  heirName: string;
+  castleName: string;
+  townsText: string;
+  historyText: string;
+  specialty: string;
+  weakness: string;
+  attributes: Attributes;
+}
+
+export interface CreateAccountResult {
+  playerCode: string;
+  playerToken: string;
+  houseId: string;
+  displayName: string;
+}
+
+export interface LoginResult {
+  playerToken: string;
+  houseId: string;
+  displayName: string;
+}
+
+export interface TurnHistoryAttributeChange {
+  key: AttributeKey;
+  delta: number;
+  before?: number;
+  after?: number;
+  /** Por que mudou, quando a causa foi automática e não o Mestre. */
+  motivo?: string;
+}
+
+export interface TurnHistoryEntry {
+  turnId: number;
+  publicResult?: string;
+  privateResult?: string;
+  discoveries: string[];
+  resultImageUrl?: string;
+  attributeChanges?: TurnHistoryAttributeChange[];
+}
+
+export interface PlayerGameView {
+  house: House;
+  turnId: number | null;
+  turnStatus: TurnStatus | null;
+  publicEvent: string;
+  eventImageUrl?: string;
+  privateInformation: string;
+  submission: Submission | null;
+  turnHistory: TurnHistoryEntry[];
+}
+
+export interface GalleryEntry {
+  turnId: number;
+  publicEvent: string;
+  eventImageUrl?: string;
+  publicResult: string;
+  resultImageUrl?: string;
+}
+
+export interface SubmitOrderInput {
+  orderText: string;
+}
+
+export interface AdminDashboard {
+  /** O que está parado esperando o Mestre. Ver `Pendencias`. */
+  pendencias: Pendencias;
+  /**
+   * O que o Porto deve neste turno. O Recurso já foi cobrado e a carta já
+   * concluiu, mas o briefing só existe se alguém o escrever agora — então a
+   * dívida precisa estar à vista antes de o turno abrir.
+   */
+  portoPendente?: BriefingDoPorto[];
+  turnId: number | null;
+  turnStatus: TurnStatus | null;
+  publicEvent: string;
+  eventImageUrl?: string;
+  resultImageUrl?: string;
+  privateInfo: Record<string, string>;
+  result: TurnResult | null;
+  houses: House[];
+  submissions: Submission[];
+}
+
+export interface ComposeTurnInput {
+  publicEvent: string;
+  privateInfo: Record<string, string>;
+}
+
+export interface AiStatus {
+  configured: boolean;
+  status: "OK" | "DOWN" | "NOT_CONFIGURED";
+  model: string;
+  code?: string;
+  message?: string;
+}
+
+export interface WorldBible {
+  lore: string;
+  visualDirectives: string;
+  updatedAt: string;
+}

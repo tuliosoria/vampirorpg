@@ -1,0 +1,173 @@
+import { useState, useSyncExternalStore, type ReactNode } from "react";
+import { Link as RouterLink } from "react-router-dom";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import Container from "@mui/material/Container";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Drawer from "@mui/material/Drawer";
+import IconButton from "@mui/material/IconButton";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemText from "@mui/material/ListItemText";
+import ListSubheader from "@mui/material/ListSubheader";
+import Divider from "@mui/material/Divider";
+import MenuIcon from "@mui/icons-material/Menu";
+import { WIKI_GROUPS, wikiSectionLabel } from "@vampiro/content";
+import { adminTokenSnapshot, subscribeAdminToken } from "../auth/adminSession";
+import { Fog } from "./Fog";
+import { NavMenu } from "./NavMenu";
+import { ENTER_LINKS, PLAY_LINKS, STUDIO_LINKS, WORLD_LINKS } from "./navigation";
+import { CorrespondenceBell } from "./CorrespondenceBell";
+
+export function Layout({
+  children,
+  action,
+  bleed = false,
+  prosa = false,
+}: {
+  children: ReactNode;
+  action?: ReactNode;
+  /**
+   * Renderiza o conteúdo sem a faixa central, para páginas que precisam
+   * encostar nas bordas da janela — hoje só a home, por causa do hero em
+   * vídeo. Quem usa isto passa a ser responsável pela própria largura.
+   */
+  bleed?: boolean;
+  /**
+   * Aperta a faixa central até a medida de leitura.
+   *
+   * O padrão era o contrário — tudo cabia em 900px e nenhuma página pedia
+   * largura, então um monitor de 2000px exibia uma tira no meio com o resto
+   * vazio. Painel, turno e grade são superfícies de trabalho e ganham com o
+   * espaço; quem precisa de medida curta é texto corrido, porque linha longa
+   * demais cansa a leitura. Então a exceção passou a ser a prosa.
+   */
+  prosa?: boolean;
+}) {
+  const [navOpen, setNavOpen] = useState(false);
+  const close = () => setNavOpen(false);
+  // As ferramentas de autoria não são um item escondido dentro de conteúdo de
+  // jogador: são um destino próprio, que só existe para quem é mestre.
+  //
+  // Precisa ser reativo. A versão anterior lia o token uma vez na montagem,
+  // apostando que entrar como mestre mudaria de rota e remontaria o Layout —
+  // e não muda: a página de admin troca estado interno e fica onde está. O
+  // resultado era o Estúdio, e portanto a Enciclopédia, invisíveis mesmo
+  // depois do login. O snapshot é cacheado, então o custo de decodificar o
+  // token não volta para o caminho de render.
+  const isAdmin = !!useSyncExternalStore(subscribeAdminToken, adminTokenSnapshot, () => null);
+
+  return (
+    <Box sx={{ minHeight: "100dvh", display: "flex", flexDirection: "column", position: "relative" }}>
+      <Fog />
+      <AppBar position="sticky" elevation={0} sx={{ zIndex: (t) => t.zIndex.appBar }}>
+        <Toolbar sx={{ gap: 1 }}>
+          <IconButton
+            edge="start"
+            color="inherit"
+            aria-label="Abrir navegação"
+            onClick={() => setNavOpen(true)}
+            sx={{ mr: 0.5 }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Box
+            component={RouterLink}
+            to="/"
+            sx={{ flexGrow: 1, minWidth: 0, textDecoration: "none", color: "inherit" }}
+          >
+            {/* Uma palavra só. O cenário é a Cidade; a campanha não tem mais
+                nome próprio competindo com ele no canto da tela. */}
+            <Typography
+              variant="h3"
+              component="div"
+              noWrap
+              sx={{ fontSize: "1.15rem", lineHeight: 1.2, letterSpacing: "0.02em" }}
+            >
+              a Cidade
+            </Typography>
+          </Box>
+          <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 0.5 }}>
+            <NavMenu label="O Mundo" links={WORLD_LINKS} />
+            <NavMenu label="Jogar" links={PLAY_LINKS} />
+            {isAdmin && <NavMenu label="Estúdio" links={STUDIO_LINKS} />}
+          </Box>
+          {/* A carta não pertence a nenhuma página: chega enquanto o jogador
+              está lendo a wiki. Por isso o aviso vive no cabeçalho. */}
+          <CorrespondenceBell />
+          {/* Entrar existia só na home. Quem estava lendo a wiki e quisesse
+              jogar tinha de voltar para a raiz para achar a porta. */}
+          <NavMenu label="Entrar" links={ENTER_LINKS} variant="outlined" sx={{ ml: 1 }} />
+          {action}
+        </Toolbar>
+      </AppBar>
+      <Drawer anchor="left" open={navOpen} onClose={close}>
+        <Box sx={{ width: 280 }} role="navigation">
+          <Box sx={{ px: 2, py: 2 }}>
+            <Typography variant="h3" sx={{ fontSize: "1.1rem" }}>
+              a Cidade
+            </Typography>
+            <Typography variant="caption" sx={{ color: "text.secondary" }}>
+              Um reino cercado pela névoa
+            </Typography>
+          </Box>
+          <Divider />
+          <List>
+            <ListItem disablePadding>
+              <ListItemButton component={RouterLink} to="/" onClick={close}>
+                <ListItemText primary="Início" />
+              </ListItemButton>
+            </ListItem>
+            {[...WORLD_LINKS, ...PLAY_LINKS, ...(isAdmin ? STUDIO_LINKS : []), ...ENTER_LINKS].map((link) => (
+              <ListItem key={link.to} disablePadding>
+                <ListItemButton component={RouterLink} to={link.to} onClick={close}>
+                  <ListItemText primary={link.label} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+          <Divider />
+          {/* A crônica por grupo. A lista plana das vinte e três seções era
+              uma parede: quem chegava não sabia por onde começar. */}
+          {WIKI_GROUPS.map((group) => (
+            <List
+              key={group.id}
+              dense
+              subheader={
+                <ListSubheader component="div" disableSticky>
+                  {group.label}
+                </ListSubheader>
+              }
+            >
+              {group.sections.map((id) => (
+                <ListItem key={id} disablePadding>
+                  <ListItemButton component={RouterLink} to={`/cidade/${id}`} onClick={close}>
+                    <ListItemText primary={wikiSectionLabel(id)} />
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </List>
+          ))}
+        </Box>
+      </Drawer>
+      {bleed ? (
+        <Box component="main" sx={{ flexGrow: 1, width: "100%", position: "relative", zIndex: 1 }}>
+          {children}
+        </Box>
+      ) : (
+        <Container
+          component="main"
+          // `xl` ainda trava em 1536px e deixa quatrocentos pixels vazios num
+          // monitor grande. Sem teto, a página ocupa o que existe — os blocos de
+          // texto têm medida própria, então a leitura não sofre com isso.
+          maxWidth={prosa ? "md" : false}
+          sx={{ py: { xs: 3, sm: 4 }, flexGrow: 1, width: "100%", position: "relative", zIndex: 1 }}
+        >
+          {children}
+        </Container>
+      )}
+    </Box>
+  );
+}

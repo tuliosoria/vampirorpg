@@ -1,0 +1,253 @@
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { HttpApiClient } from "./httpClient";
+import { ApiError, type CreateHouseInput } from "../types/api";
+
+const BASE = "https://api.example.com";
+
+function jsonResponse(status: number, body: unknown): Response {
+  return new Response(body === undefined ? "" : JSON.stringify(body), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+const fetchMock = vi.fn();
+
+const houseInput: CreateHouseInput = {
+  displayName: "Elira",
+  name: "Clã Toreador",
+  motto: "O Norte lembra.",
+  emblem: { icon: "lobo", color1: "#3f3f46", color2: "#1e3a5f" },
+  leaderName: "Aldric",
+  heirName: "Sera",
+  castleName: "Droskar",
+  townsText: "Vilas do norte.",
+  historyText: "Uma casa antiga.",
+  specialty: "Defesa",
+  weakness: "Pouca comida",
+  attributes: { riqueza: 1, recursos: 2, soldados: 5, controle: 2 },
+};
+
+beforeEach(() => {
+  fetchMock.mockReset();
+  vi.stubGlobal("fetch", fetchMock);
+});
+afterEach(() => vi.unstubAllGlobals());
+
+describe("HttpApiClient", () => {
+  it("GETs campaign and house example from public endpoints", async () => {
+    fetchMock
+      .mockResolvedValueOnce(jsonResponse(200, { id: "cidade-noturna", title: "T", introduction: "I" }))
+      .mockResolvedValueOnce(jsonResponse(200, houseInput));
+    const client = new HttpApiClient(`${BASE}/`);
+
+    await expect(client.getCampaign()).resolves.toMatchObject({ id: "cidade-noturna" });
+    await expect(client.getHouseExample()).resolves.toMatchObject({ name: "Clã Toreador" });
+
+    expect(fetchMock.mock.calls[0][0]).toBe("https://api.example.com/api/campaign");
+    expect(fetchMock.mock.calls[1][0]).toBe("https://api.example.com/api/house-example");
+  });
+
+  describe("HttpApiClient visual", () => {
+    it("getVisualGallery unwraps entries", async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, { entries: [{ id: "a1" }] }));
+      const client = new HttpApiClient("https://api.test");
+      const res = await client.getVisualGallery();
+      expect(fetchMock).toHaveBeenCalledWith("https://api.test/api/visual/gallery", expect.objectContaining({ method: "GET" }));
+      expect(res).toEqual([{ id: "a1" }]);
+    });
+
+    it("createVisualGeneration posts requestText and entityId", async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(202, { generationId: "g1", status: "PENDING" }));
+      const client = new HttpApiClient("https://api.test");
+      const res = await client.createVisualGeneration({ requestText: "castelo", entityId: "e1" });
+      const call = fetchMock.mock.calls[0];
+      expect(call[0]).toBe("https://api.test/api/visual/generations");
+      expect(call[1].method).toBe("POST");
+      expect(JSON.parse(call[1].body as string)).toEqual({ requestText: "castelo", entityId: "e1" });
+      expect(res).toEqual({ generationId: "g1", status: "PENDING" });
+    });
+
+    it("previewVisualContext includes backend-required request text", async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, { operation: "EDIT", referenceCount: 2, warnings: [] }));
+      const client = new HttpApiClient("https://api.test");
+      const res = await client.previewVisualContext({ entityId: "e1" });
+      const call = fetchMock.mock.calls[0];
+      expect(call[0]).toBe("https://api.test/api/visual/context/preview");
+      expect(call[1].method).toBe("POST");
+      expect(JSON.parse(call[1].body as string)).toEqual({ requestText: "preview", entityId: "e1" });
+      expect(res).toEqual({ operation: "EDIT", referenceCount: 2, warnings: [] });
+    });
+
+    it("getVisualGeneration fetches by id", async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, { id: "g1", status: "COMPLETED", outputAssetIds: ["a1"] }));
+      const client = new HttpApiClient("https://api.test");
+      const res = await client.getVisualGeneration("g1");
+      expect(fetchMock).toHaveBeenCalledWith("https://api.test/api/visual/generations/g1", expect.objectContaining({ method: "GET" }));
+      expect(res.status).toBe("COMPLETED");
+    });
+
+    it("getVisualAsset fetches by id", async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, { id: "a1", storageUrl: "https://img/x.png" }));
+      const client = new HttpApiClient("https://api.test");
+      const res = await client.getVisualAsset("a1");
+      expect(fetchMock).toHaveBeenCalledWith("https://api.test/api/visual/assets/a1", expect.objectContaining({ method: "GET" }));
+      expect(res.id).toBe("a1");
+    });
+
+    it("canonizeAsset posts to the canonize endpoint", async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, { id: "a1", canonicalLevel: "CANONICAL" }));
+      const client = new HttpApiClient("https://api.test");
+      const res = await client.canonizeAsset("a1");
+      expect(fetchMock).toHaveBeenCalledWith("https://api.test/api/visual/assets/a1/canonize", expect.objectContaining({ method: "POST" }));
+      expect(res.canonicalLevel).toBe("CANONICAL");
+    });
+  });
+
+  it("POSTs create-account and player login with JSON bodies", async () => {
+    fetchMock
+      .mockResolvedValueOnce(jsonResponse(200, { playerCode: "RVN-1234", playerToken: "tok", houseId: "house-1", displayName: "Elira" }))
+      .mockResolvedValueOnce(jsonResponse(200, { playerToken: "tok", houseId: "house-1", displayName: "Elira" }));
+
+    await new HttpApiClient(BASE).createAccountAndHouse(houseInput);
+    await new HttpApiClient(BASE).login("RVN-1234");
+
+    expect(fetchMock.mock.calls[0][0]).toBe("https://api.example.com/api/create-account");
+    expect(fetchMock.mock.calls[0][1].method).toBe("POST");
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual(houseInput);
+    expect(fetchMock.mock.calls[1][0]).toBe("https://api.example.com/api/player/login");
+    expect(JSON.parse(fetchMock.mock.calls[1][1].body)).toEqual({ playerCode: "RVN-1234" });
+  });
+
+  it("uses Bearer auth for player game and order submission", async () => {
+    fetchMock
+      .mockResolvedValueOnce(jsonResponse(200, { house: {}, turnId: 1 }))
+      .mockResolvedValueOnce(jsonResponse(200, { submittedAt: "2026-01-01T00:00:00.000Z" }));
+
+    await new HttpApiClient(BASE).getGame("player-token");
+    await new HttpApiClient(BASE).submitOrder("player-token", { orderText: "Avançar." });
+
+    expect(fetchMock.mock.calls[0][0]).toBe("https://api.example.com/api/player/game");
+    expect(fetchMock.mock.calls[0][1].headers.Authorization).toBe("Bearer player-token");
+    expect(fetchMock.mock.calls[1][0]).toBe("https://api.example.com/api/player/order");
+    expect(fetchMock.mock.calls[1][1].method).toBe("PUT");
+    expect(fetchMock.mock.calls[1][1].headers.Authorization).toBe("Bearer player-token");
+    expect(JSON.parse(fetchMock.mock.calls[1][1].body)).toEqual({ orderText: "Avançar." });
+  });
+
+  it("maps admin endpoints to the deployed API contract", async () => {
+    fetchMock.mockImplementation(() =>
+      Promise.resolve(jsonResponse(200, { adminToken: "admin-token", privateInfo: {}, nextTurnId: 2 })),
+    );
+    const client = new HttpApiClient(BASE);
+
+    await client.adminLogin("secret");
+    await client.getAdminDashboard("admin-token");
+    await client.adminComposeTurn("admin-token", { publicEvent: "Neve.", privateInfo: {} });
+    await client.adminOpenTurn("admin-token");
+    await client.adminLockTurn("admin-token");
+    await client.adminUnlockTurn("admin-token");
+    await client.adminDraftPrivateInfo("admin-token");
+    await client.adminDraftResolution("admin-token");
+    await client.adminApplyResolution("admin-token", { publicResult: "Fim.", houseResults: {}, attributeDeltas: {}, discoveries: [] });
+    await client.adminDeleteHouse("admin-token", "house-1");
+
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+      `${BASE}/api/admin/login`,
+      `${BASE}/api/admin/dashboard`,
+      `${BASE}/api/admin/turn/compose`,
+      `${BASE}/api/admin/turn/open`,
+      `${BASE}/api/admin/turn/lock`,
+      `${BASE}/api/admin/turn/unlock`,
+      `${BASE}/api/admin/turn/draft-private`,
+      `${BASE}/api/admin/turn/draft-resolution`,
+      `${BASE}/api/admin/turn/apply`,
+      `${BASE}/api/admin/house/delete`,
+    ]);
+    expect(JSON.parse(fetchMock.mock.calls[9][1].body)).toEqual({
+      houseId: "house-1",
+    });
+  });
+
+  it("unwraps privateInfo from admin draft private response", async () => {
+    fetchMock.mockResolvedValue(jsonResponse(200, { privateInfo: { "house-1": "Segredo." } }));
+    await expect(new HttpApiClient(BASE).adminDraftPrivateInfo("admin-token")).resolves.toEqual({
+      "house-1": "Segredo.",
+    });
+  });
+
+  it("maps known and unknown error bodies to ApiError codes", async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(400, { code: "TURN_LOCKED", message: "Turno trancado." }));
+    await expect(new HttpApiClient(BASE).submitOrder("tok", { orderText: "" })).rejects.toMatchObject({
+      name: "ApiError",
+      code: "TURN_LOCKED",
+      message: "Turno trancado.",
+    });
+
+    fetchMock.mockResolvedValueOnce(jsonResponse(500, { code: "STRANGE", message: "Falhou." }));
+    await expect(new HttpApiClient(BASE).getCampaign()).rejects.toMatchObject({
+      code: "INTERNAL",
+      message: "Falhou.",
+    });
+  });
+
+  it("preserves AI_LEAKED_PRIVATE_CONTEXT server error codes", async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(400, {
+      code: "AI_LEAKED_PRIVATE_CONTEXT",
+      message: "Evento público contém contexto privado.",
+    }));
+
+    await expect(new HttpApiClient(BASE).adminDraftPublicEvent("admin-token")).rejects.toMatchObject({
+      code: "AI_LEAKED_PRIVATE_CONTEXT",
+      message: "Evento público contém contexto privado.",
+    });
+  });
+
+  it("throws ApiError NETWORK when fetch rejects", async () => {
+    fetchMock.mockRejectedValue(new TypeError("Failed to fetch"));
+    const err = await new HttpApiClient(BASE).getCampaign().catch((e) => e);
+    expect(err).toBeInstanceOf(ApiError);
+    expect(err.code).toBe("NETWORK");
+  });
+
+  it("posts to the house image generate endpoint and returns the data url", async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(200, { image: "data:image/png;base64,ZZ" }));
+    const client = new HttpApiClient(BASE);
+    const out = await client.generateHouseImage({
+      name: "Clã Toreador",
+      description: "Norte.",
+      emblem: { icon: "lobo", color1: "#3f3f46", color2: "#1e3a5f" },
+    });
+    expect(out.image).toBe("data:image/png;base64,ZZ");
+    expect(fetchMock).toHaveBeenCalledWith(
+      `${BASE}/api/house-image/generate`,
+      expect.objectContaining({ method: "POST" }),
+    );
+  });
+
+  it("uploads a turn image with FormData and bearer auth", async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(200, { imageUrl: "https://cdn/turns/004/event.jpg?v=1" }));
+    const file = new File(["jpg"], "evento.jpg", { type: "image/jpeg" });
+
+    await expect(new HttpApiClient(BASE).adminUploadTurnImage("admin-token", "event", file)).resolves.toEqual({
+      imageUrl: "https://cdn/turns/004/event.jpg?v=1",
+    });
+
+    expect(fetchMock.mock.calls[0][0]).toBe(`${BASE}/api/admin/turn/image/upload`);
+    expect(fetchMock.mock.calls[0][1].method).toBe("POST");
+    expect(fetchMock.mock.calls[0][1].headers.Authorization).toBe("Bearer admin-token");
+    expect(fetchMock.mock.calls[0][1].headers["Content-Type"]).toBeUndefined();
+    const body = fetchMock.mock.calls[0][1].body as FormData;
+    expect(body.get("kind")).toBe("event");
+    expect(body.get("image")).toBe(file);
+  });
+
+  it("maps RATE_LIMITED errors from the generate endpoint", async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(429, { code: "RATE_LIMITED", message: "limite" }));
+    const err = await new HttpApiClient(BASE)
+      .generateHouseImage({ name: "C", description: "", emblem: { icon: "lobo", color1: "#3f3f46", color2: "#1e3a5f" } })
+      .catch((e) => e);
+    expect(err).toBeInstanceOf(ApiError);
+    expect(err.code).toBe("RATE_LIMITED");
+  });
+});

@@ -1,0 +1,263 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Vampiro O Noites da Cidade - backend
+
+Parameters:
+  AdminCodeHash:
+    Type: String
+    NoEcho: true
+  TokenSigningSecret:
+    Type: String
+    NoEcho: true
+  AllowedOrigin:
+    # Lista de verdade, e não string com vírgula: o SAM não resolve !Split
+    # dentro do CorsConfiguration de um HttpApi — ele repassa a string inteira
+    # como um item só, e aí nenhuma origem casa e o navegador bloqueia tudo.
+    Type: CommaDelimitedList
+    Default: "http://localhost:5173"
+  DraftIngestToken:
+    Type: String
+    NoEcho: true
+    Default: ""
+    Description: "Segredo dedicado que autoriza só enviar rascunho de turno. Vazio = desabilitado (só admin)."
+  OpenAiApiKey:
+    Type: String
+    NoEcho: true
+    Default: ""
+  OpenAiModel:
+    Type: String
+    Default: "gpt-4o-mini"
+  # A diplomacia é onde a inteligência do modelo aparece: uma carta precisa
+  # comparar duas despensas e fechar uma troca. O resto segue no modelo padrão
+  # até sabermos o custo do maior em produção.
+  OpenAiDiplomacyModel:
+    Type: String
+    Default: "gpt-5.5"
+  OpenAiImageModel:
+    Type: String
+    Default: "gpt-image-1"
+  OpenAiImageSize:
+    Type: String
+    Default: "1536x1024"
+  OpenAiImageQuality:
+    Type: String
+    Default: "medium"
+    AllowedValues: ["low", "medium", "high"]
+  OpenAiSyncImageModel:
+    Type: String
+    Default: "gpt-image-1"
+    Description: "Image model for synchronous routes (House emblem, turn image). Must finish inside API Gateway's 30s cap."
+  OpenAiSyncImageQuality:
+    Type: String
+    Default: "low"
+    AllowedValues: ["low", "medium", "high"]
+    Description: "medium takes ~19s and leaves too little room under API Gateway's 30s cap once thumbnailing and S3 upload are added."
+  OpenAiSyncImageSize:
+    Type: String
+    Default: "1024x1024"
+  OpenAiImageInputFidelity:
+    Type: String
+    Default: "high"
+    AllowedValues: ["high", "low", "none"]
+    Description: "Use 'none' to omit the parameter. gpt-image-2 rejects it; gpt-image-1.5 accepts it."
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 256
+    Runtime: nodejs22.x
+
+Resources:
+  GameTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ravenloft-game
+      BillingMode: PAY_PER_REQUEST
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      AttributeDefinitions:
+        - AttributeName: PK
+          AttributeType: S
+        - AttributeName: SK
+          AttributeType: S
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+        - AttributeName: SK
+          KeyType: RANGE
+
+  ImagesBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "ravenloft-images-${AWS::AccountId}"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+
+  ImagesBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref ImagesBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: PublicReadForImages
+            Effect: Allow
+            Principal: "*"
+            Action: "s3:GetObject"
+            Resource: !Sub "${ImagesBucket.Arn}/*"
+
+  SharpLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: ravenloft-sharp
+      Description: sharp image library with linux-x64 native binaries
+      ContentUri: layers/sharp/
+      CompatibleRuntimes:
+        - nodejs22.x
+      CompatibleArchitectures:
+        - x86_64
+
+  SeedImagesLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: ravenloft-seed-images
+      Description: Canonical seed images for the visual encyclopedia (mounted at /opt/seed-images)
+      ContentUri: layers/seed-images/
+      CompatibleRuntimes:
+        - nodejs22.x
+
+  ApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handler.handler
+      CodeUri: dist/
+      Layers:
+        - !Ref SharpLayer
+        - !Ref SeedImagesLayer
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref GameTable
+          CAMPAIGN_ID: cidade-noturna
+          SEED_IMAGE_DIR: /opt/seed-images
+          ADMIN_CODE_HASH: !Ref AdminCodeHash
+          TOKEN_SIGNING_SECRET: !Ref TokenSigningSecret
+          ALLOWED_ORIGIN: !Join [",", !Ref AllowedOrigin]
+          DRAFT_INGEST_TOKEN: !Ref DraftIngestToken
+          OPENAI_API_KEY: !Ref OpenAiApiKey
+          OPENAI_MODEL: !Ref OpenAiModel
+          OPENAI_DIPLOMACY_MODEL: !Ref OpenAiDiplomacyModel
+          OPENAI_IMAGE_MODEL: !Ref OpenAiImageModel
+          OPENAI_IMAGE_SIZE: !Ref OpenAiImageSize
+          OPENAI_IMAGE_QUALITY: !Ref OpenAiImageQuality
+          OPENAI_IMAGE_INPUT_FIDELITY: !Ref OpenAiImageInputFidelity
+          OPENAI_SYNC_IMAGE_MODEL: !Ref OpenAiSyncImageModel
+          OPENAI_SYNC_IMAGE_QUALITY: !Ref OpenAiSyncImageQuality
+          OPENAI_SYNC_IMAGE_SIZE: !Ref OpenAiSyncImageSize
+          IMAGES_BUCKET: !Ref ImagesBucket
+          VISUAL_WORKER_FUNCTION_NAME: !Ref VisualWorkerFunction
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:GetItem
+                - dynamodb:PutItem
+                - dynamodb:UpdateItem
+                - dynamodb:DeleteItem
+                - dynamodb:Query
+                - dynamodb:Scan
+                - dynamodb:BatchWriteItem
+                - dynamodb:ConditionCheckItem
+                - dynamodb:TransactWriteItems
+              Resource:
+                - !GetAtt GameTable.Arn
+            - Effect: Allow
+              Action:
+                - s3:PutObject
+              Resource:
+                - !Sub "${ImagesBucket.Arn}/*"
+            - Effect: Allow
+              Action:
+                - lambda:InvokeFunction
+              Resource:
+                - !GetAtt VisualWorkerFunction.Arn
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /{proxy+}
+            Method: ANY
+
+  VisualWorkerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: visualWorkerHandler.handler
+      CodeUri: dist/
+      Timeout: 900
+      MemorySize: 1024
+      Layers:
+        - !Ref SharpLayer
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref GameTable
+          CAMPAIGN_ID: cidade-noturna
+          ADMIN_CODE_HASH: !Ref AdminCodeHash
+          TOKEN_SIGNING_SECRET: !Ref TokenSigningSecret
+          ALLOWED_ORIGIN: !Join [",", !Ref AllowedOrigin]
+          DRAFT_INGEST_TOKEN: !Ref DraftIngestToken
+          OPENAI_API_KEY: !Ref OpenAiApiKey
+          OPENAI_MODEL: !Ref OpenAiModel
+          OPENAI_DIPLOMACY_MODEL: !Ref OpenAiDiplomacyModel
+          OPENAI_IMAGE_MODEL: !Ref OpenAiImageModel
+          OPENAI_IMAGE_SIZE: !Ref OpenAiImageSize
+          OPENAI_IMAGE_QUALITY: !Ref OpenAiImageQuality
+          OPENAI_IMAGE_INPUT_FIDELITY: !Ref OpenAiImageInputFidelity
+          OPENAI_SYNC_IMAGE_MODEL: !Ref OpenAiSyncImageModel
+          OPENAI_SYNC_IMAGE_QUALITY: !Ref OpenAiSyncImageQuality
+          OPENAI_SYNC_IMAGE_SIZE: !Ref OpenAiSyncImageSize
+          IMAGES_BUCKET: !Ref ImagesBucket
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:GetItem
+                - dynamodb:PutItem
+                - dynamodb:UpdateItem
+                - dynamodb:DeleteItem
+                - dynamodb:Query
+              Resource:
+                - !GetAtt GameTable.Arn
+            - Effect: Allow
+              Action:
+                - s3:PutObject
+              Resource:
+                - !Sub "${ImagesBucket.Arn}/*"
+
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration:
+        # É o gateway, e não a Lambda, que responde o CORS desta API.
+        AllowOrigins: !Ref AllowedOrigin
+        AllowMethods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        AllowHeaders:
+          - Content-Type
+          - Authorization
+
+Outputs:
+  ApiBaseUrl:
+    Description: Base URL of the HTTP API
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+  TableName:
+    Value: !Ref GameTable

@@ -1,0 +1,290 @@
+import { useCallback, useEffect, useState } from "react";
+import Alert from "@mui/material/Alert";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Chip from "@mui/material/Chip";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import type { TurnDraft } from "@vampiro/content";
+import { WikiMarkdown } from "../WikiMarkdown";
+import { useApi } from "../../api/ApiProvider";
+
+interface House {
+  houseId: string;
+  name: string;
+}
+
+/**
+ * Mostra o rascunho de turno que o Claude enviou, para o Mestre revisar,
+ * carregar nos campos do turno (e então editar/salvar como sempre) ou descartar.
+ * As chaves de info privada do rascunho podem vir por nome de Casa ou por id;
+ * aqui casamos com as Casas vivas e reescrevemos por houseId.
+ */
+export function TurnDraftBanner({ adminToken, houses, turnStatus, onLoad, onImageSet, onLoadResolution, onPublished }: {
+  adminToken: string;
+  houses: House[];
+  /**
+   * Em que estado está o turno. Os campos de compor (evento + info privada) só
+   * existem na tela em DRAFT, então carregar neles com o turno trancado
+   * escrevia num formulário que ninguém via — parecia que o botão não fazia
+   * nada. Aqui o botão diz por que não dá.
+   */
+  turnStatus?: string | null;
+  onLoad: (publicEvent: string, privateInfo: Record<string, string>) => void;
+  onImageSet?: (url: string) => void;
+  onLoadResolution?: (publicResult: string, houseResults: Record<string, string>, discoveries: string[]) => void;
+  onPublished?: () => void;
+}) {
+  const api = useApi();
+  const [draft, setDraft] = useState<TurnDraft | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const [resLoaded, setResLoaded] = useState(false);
+  const [imageSet, setImageSet] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const refresh = useCallback(async () => {
+    try {
+      const res = await api.adminGetTurnDraft(adminToken);
+      setDraft(res.draft);
+    } catch {
+      // Sem rascunho o painel some; não é erro que precise assustar o Mestre.
+    }
+  }, [api, adminToken]);
+
+  useEffect(() => {
+    void refresh();
+  }, [refresh]);
+
+  if (!draft) return null;
+
+  const norm = (s: string) => s.trim().toLowerCase();
+  const byName = new Map(houses.map((h) => [norm(h.name), h.houseId]));
+  const byId = new Set(houses.map((h) => h.houseId));
+  const mapped: Record<string, string> = {};
+  const unmatched: string[] = [];
+  for (const [key, text] of Object.entries(draft.privateInfo)) {
+    const houseId = byId.has(key) ? key : byName.get(norm(key));
+    if (houseId) mapped[houseId] = text;
+    else unmatched.push(key);
+  }
+
+  const mapByHouse = (rec: Record<string, string>): Record<string, string> => {
+    const out: Record<string, string> = {};
+    for (const [key, text] of Object.entries(rec)) {
+      const houseId = byId.has(key) ? key : byName.get(norm(key));
+      if (houseId) out[houseId] = text;
+    }
+    return out;
+  };
+
+  const load = () => {
+    onLoad(draft.publicEvent, mapped);
+    setLoaded(true);
+  };
+
+  const loadResolution = () => {
+    if (!draft.resolution) return;
+    onLoadResolution?.(draft.resolution.publicResult, mapByHouse(draft.resolution.houseResults), draft.resolution.discoveries);
+    setResLoaded(true);
+  };
+
+  const useImage = async () => {
+    if (!draft?.eventImageUrl) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await api.adminSetTurnImageUrl(adminToken, "event", draft.eventImageUrl);
+      onImageSet?.(draft.eventImageUrl);
+      setImageSet(true);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Falha ao definir a imagem do turno.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const publish = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      await api.adminPublishTurnDraft(adminToken);
+      setDraft(null);
+      onPublished?.();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Falha ao publicar o turno.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const discard = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      await api.adminDiscardTurnDraft(adminToken);
+      setDraft(null);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Falha ao descartar.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const houseName = (houseId: string) => houses.find((h) => h.houseId === houseId)?.name ?? houseId;
+
+  // Os campos de compor só são renderizados com o turno em DRAFT. Sem turno
+  // conhecido, deixamos passar — quem não sabe o estado não deve bloquear.
+  const podeCompor = !turnStatus || turnStatus === "DRAFT";
+
+  /**
+   * Um rascunho só interessa quando o turno pode consumi-lo.
+   *
+   * Evento e informação privada se compõem num turno em DRAFT; resultado se
+   * aplica num turno LOCKED. Depois de o turno ser aberto ou resolvido, a parte
+   * correspondente já foi usada — e o banner continuava exibindo os cinco mil
+   * caracteres dela no topo do painel, todo dia, sem nada a fazer com eles.
+   */
+  const temComposicao = !!(draft.publicEvent || Object.keys(mapped).length > 0 || draft.eventImageUrl);
+  const temResolucao = !!(draft.resolution && (draft.resolution.publicResult || Object.keys(draft.resolution.houseResults).length > 0));
+  const composicaoServe = temComposicao && podeCompor;
+  const resolucaoServe = temResolucao && (!turnStatus || turnStatus === "LOCKED");
+
+  // Nada aplicável: uma linha que diz o que há e por que não serve agora — e
+  // não o cartão inteiro com cinco mil caracteres de texto já usado.
+  //
+  // A linha continua dizendo o motivo porque, sem ele, o Mestre que acabou de
+  // mandar um rascunho pensaria que o envio falhou. E continua oferecendo o
+  // descarte: esconder de vez prenderia um rascunho velho no banco sem limpeza.
+  if (!composicaoServe && !resolucaoServe) {
+    const oQue = temResolucao ? "um resultado proposto" : "um evento proposto";
+    const porQue = temResolucao
+      ? "ele só entra nos campos com o turno em LOCKED"
+      : "os campos de compor só aparecem com o turno em DRAFT";
+    return (
+      <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap sx={{ color: "text.secondary" }}>
+        <Typography variant="caption">
+          Há {oQue} guardado{draft.createdAt ? `, de ${new Date(draft.createdAt).toLocaleDateString("pt-BR")}` : ""} — {porQue}, e o turno está {turnStatus ?? "sem estado"}.
+        </Typography>
+        <Button size="small" color="inherit" disabled={busy} onClick={() => void discard()}>Descartar</Button>
+      </Stack>
+    );
+  }
+
+  return (
+    <Card component="section" variant="outlined" sx={{ borderColor: "primary.main" }}>
+      <CardContent>
+        <Stack spacing={1.5}>
+          <Box>
+            <Typography variant="h6">📝 Rascunho de turno pendente</Typography>
+            {draft.createdAt && (
+              <Typography variant="caption" color="text.secondary">
+                Recebido em {new Date(draft.createdAt).toLocaleString("pt-BR")}
+              </Typography>
+            )}
+          </Box>
+
+          {draft.note && <Alert severity="info" sx={{ whiteSpace: "pre-wrap" }}>{draft.note}</Alert>}
+
+          {composicaoServe && (
+          <Box>
+            <Typography variant="overline" color="text.secondary">Evento público</Typography>
+            {draft.publicEvent
+              ? <WikiMarkdown body={draft.publicEvent} />
+              : <Typography variant="body2" color="text.secondary"><em>(vazio)</em></Typography>}
+          </Box>
+          )}
+
+          {Object.keys(mapped).length > 0 && (
+            <Box>
+              <Typography variant="overline" color="text.secondary">Info privada para</Typography>
+              <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: "wrap", mt: 0.5 }}>
+                {Object.keys(mapped).map((houseId) => (
+                  <Chip key={houseId} size="small" label={houseName(houseId)} />
+                ))}
+              </Stack>
+            </Box>
+          )}
+
+          {unmatched.length > 0 && (
+            <Alert severity="warning">
+              Info privada para Casas não reconhecidas (serão ignoradas ao carregar): {unmatched.join(", ")}
+            </Alert>
+          )}
+
+          {draft.eventImageUrl && (
+            <Box>
+              <Typography variant="overline" color="text.secondary">Imagem sugerida para o turno</Typography>
+              <Box sx={{ mt: 0.5, display: "flex", gap: 1.5, alignItems: "flex-start", flexWrap: "wrap" }}>
+                <Box
+                  component="img"
+                  src={draft.eventImageUrl}
+                  alt="Imagem sugerida do turno"
+                  sx={{ width: 120, height: 180, objectFit: "cover", borderRadius: 1, flexShrink: 0 }}
+                />
+                <Button variant="outlined" onClick={() => void useImage()} disabled={busy || imageSet}>
+                  {imageSet ? "Imagem definida ✓" : "Usar como imagem do turno"}
+                </Button>
+              </Box>
+            </Box>
+          )}
+
+          {resolucaoServe && draft.resolution && (
+            <Box sx={{ borderTop: 1, borderColor: "divider", pt: 1.5 }}>
+              <Typography variant="overline" color="text.secondary">Resultado proposto do turno atual</Typography>
+              {draft.resolution.publicResult && (
+                <Box sx={{ mb: 1 }}><WikiMarkdown body={draft.resolution.publicResult} /></Box>
+              )}
+              {/* O texto privado inteiro, e não só uma etiqueta com o nome da
+                  Casa. Era possível ver que existiam quatro mil caracteres de
+                  resultado para uma Casa e impossível lê-los antes de carregar
+                  nos campos — ou seja, revisar exigia primeiro aceitar. */}
+              {Object.entries(mapByHouse(draft.resolution.houseResults)).map(([houseId, texto]) => (
+                <Box key={houseId} sx={{ mb: 1.5 }}>
+                  <Typography variant="overline" color="text.secondary">Privado: {houseName(houseId)}</Typography>
+                  <WikiMarkdown body={texto} />
+                </Box>
+              ))}
+              <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: "wrap", mb: 1 }}>
+                {draft.resolution.discoveries.length > 0 && (
+                  <Chip size="small" color="secondary" label={`${draft.resolution.discoveries.length} descoberta(s)`} />
+                )}
+              </Stack>
+              <Button size="small" variant="contained" onClick={loadResolution} disabled={busy}>
+                Carregar resultado nos campos
+              </Button>
+              {resLoaded && <Alert severity="success" sx={{ mt: 1 }}>Resultado carregado. Revise os deltas e aplique o turno.</Alert>}
+            </Box>
+          )}
+
+          {error && <Alert severity="error">{error}</Alert>}
+          {loaded && <Alert severity="success">Carregado nos campos abaixo. Revise, ajuste e salve o turno.</Alert>}
+
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} useFlexGap sx={{ flexWrap: "wrap" }}>
+            <Button variant="contained" color="secondary" onClick={() => void publish()} disabled={busy}>
+              Publicar turno (evento + imagem + abrir)
+            </Button>
+            <Button variant="outlined" onClick={load} disabled={busy || !podeCompor}>Carregar nos campos</Button>
+            <Button variant="text" color="inherit" onClick={() => void discard()} disabled={busy}>
+              Descartar rascunho
+            </Button>
+          </Stack>
+          {!podeCompor && (
+            <Alert severity="info">
+              O turno atual está <strong>{turnStatus}</strong>, e os campos de compor (evento público e informação
+              privada) só aparecem com o turno em DRAFT. Para usar este rascunho agora: ou clique em "Publicar turno",
+              que escreve tudo e abre o turno de uma vez, ou rode e aplique o turno atual primeiro — o próximo nasce em
+              DRAFT e aí os campos aparecem.
+            </Alert>
+          )}
+          <Typography variant="caption" color="text.secondary">
+            "Publicar turno" escreve o evento, define a imagem e abre o turno para os jogadores de uma vez. Use
+            "Carregar nos campos" se preferir revisar e abrir manualmente.
+          </Typography>
+        </Stack>
+      </CardContent>
+    </Card>
+  );
+}

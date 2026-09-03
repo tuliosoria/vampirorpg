@@ -1,0 +1,156 @@
+import { EXEMPLO_DE_PERSONAGEM } from "@vampiro/content";
+import type { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+import type { ChatFn } from "../ai/openai";
+import type { ImageFn, ImageEditFn } from "../ai/images";
+import type { ImageStore } from "../storage/images";
+import type { Config, HandlerRequest, HandlerResponse } from "../types/domain";
+import { HttpError } from "../types/domain";
+import { createAccountAndHouse as dbCreateAccountAndHouse, setHouseImages } from "../db/houses";
+import { listTurns } from "../db/turns";
+import { listWikiEntries } from "../db/wiki";
+import { getPlayerByCodeHash } from "../db/players";
+import { hitRateLimit } from "../db/rateLimit";
+import { buildHouseImagePrompt } from "../ai/prompts";
+import { buildPublicChronicle } from "../ai/diplomacy/chronicle";
+import { parseCreateHouseBody, parseLoginBody, parseHouseImageGenerateBody } from "../validation/schemas";
+import { generatePlayerCode, hashCode } from "../auth/codes";
+import { signToken, type PlayerTokenPayload } from "../auth/tokens";
+
+export interface Deps {
+  doc: DynamoDBDocumentClient;
+  config: Config;
+  chat?: ChatFn;
+  /** O modelo maior, usado onde a carta precisa realmente raciocinar. */
+  chatDiplomacia?: ChatFn;
+  image?: ImageFn;
+  imageStore?: ImageStore;
+  imageEdit?: ImageEditFn;
+  invokeWorker?: (payload: { campaignId: string; generationId: string }) => Promise<void>;
+}
+
+export function playerToken(config: Config, houseId: string, displayName: string): string {
+  const payload: PlayerTokenPayload = {
+    type: "player",
+    campaignId: config.campaignId,
+    houseId,
+    displayName,
+    exp: Date.now() + config.tokenTtlSeconds * 1000,
+  };
+  return signToken(payload, config.tokenSigningSecret);
+}
+
+function dataUrlToBuffer(dataUrl: string): Buffer {
+  const comma = dataUrl.indexOf(",");
+  return Buffer.from(dataUrl.slice(comma + 1), "base64");
+}
+
+export async function uploadHouseImages(deps: Deps, houseId: string, images: string[]): Promise<void> {
+  if (!deps.imageStore || images.length === 0) return;
+  const urls: string[] = [];
+  for (let i = 0; i < images.length; i++) {
+    urls.push(await deps.imageStore.uploadHouseImage(houseId, i, dataUrlToBuffer(images[i])));
+  }
+  await setHouseImages(deps.doc, deps.config.tableName, deps.config.campaignId, houseId, urls);
+}
+
+export async function getCampaign(deps: Deps, _req: HandlerRequest): Promise<HandlerResponse> {
+  return {
+    status: 200,
+    body: {
+      id: deps.config.campaignId,
+      // O cenário não tem mais nome de campanha: o site é sobre a Cidade, e a
+      // porta para jogar chama-se "Jogar".
+      title: "a Cidade",
+      introduction: "Um reino cercado pela névoa. Cada jogador lidera uma Grande Casa. Suas decisões, escritas em texto livre, criam a história do reino.",
+    },
+  };
+}
+
+export async function getHouseExample(_deps: Deps, _req: HandlerRequest): Promise<HandlerResponse> {
+  return { status: 200, body: EXEMPLO_DE_PERSONAGEM };
+}
+
+export async function createAccountAndHouse(deps: Deps, req: HandlerRequest): Promise<HandlerResponse> {
+  const input = parseCreateHouseBody(req.body);
+  const provisionalPrefix = input.name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 12) || "casa";
+  const playerCode = generatePlayerCode(provisionalPrefix);
+  const codeHash = hashCode(playerCode);
+  const { houseId } = await dbCreateAccountAndHouse(
+    deps.doc,
+    deps.config.tableName,
+    deps.config.campaignId,
+    { ...input, codeHash },
+  );
+  await uploadHouseImages(deps, houseId, input.images);
+  const token = playerToken(deps.config, houseId, input.displayName);
+  return { status: 200, body: { playerCode, playerToken: token, houseId, displayName: input.displayName } };
+}
+
+export async function login(deps: Deps, req: HandlerRequest): Promise<HandlerResponse> {
+  const { playerCode } = parseLoginBody(req.body);
+  const profile = await getPlayerByCodeHash(deps.doc, deps.config.tableName, hashCode(playerCode));
+  if (!profile) throw new HttpError(401, "INVALID_CODE", "Código inválido.");
+  const token = playerToken(deps.config, profile.houseId, profile.displayName);
+  return {
+    status: 200,
+    body: { playerToken: token, houseId: profile.houseId, displayName: profile.displayName },
+  };
+}
+
+export async function getGallery(deps: Deps, _req: HandlerRequest): Promise<HandlerResponse> {
+  const turns = await listTurns(deps.doc, deps.config.tableName, deps.config.campaignId);
+  const entries = turns
+    .map((t) => {
+      const eventImageUrl = t.status === "DRAFT" ? undefined : t.eventImageUrl;
+      const resultImageUrl = t.status === "RESOLVED" && t.result ? t.resultImageUrl : undefined;
+      return {
+        turnId: t.turnId,
+        publicEvent: t.publicEvent,
+        eventImageUrl,
+        publicResult: t.result?.publicResult ?? "",
+        resultImageUrl,
+      };
+    })
+    .filter((entry) => entry.eventImageUrl || entry.resultImageUrl);
+  return { status: 200, body: { entries } };
+}
+
+export async function getWiki(deps: Deps, _req: HandlerRequest): Promise<HandlerResponse> {
+  const entries = await listWikiEntries(deps.doc, deps.config.tableName, deps.config.campaignId);
+  return { status: 200, body: { entries } };
+}
+
+/**
+ * A crônica pública da campanha, em texto corrido.
+ *
+ * A página de cada Casa precisa dela para marcar quem já morreu: o elenco é
+ * cânone do mundo e não guarda `alive`, então a morte é derivada aqui. Reusa
+ * buildPublicChronicle, que só junta o que os turnos resolvidos tornaram
+ * público — `privateInfo` nunca entra.
+ */
+export async function getChronicle(deps: Deps, _req: HandlerRequest): Promise<HandlerResponse> {
+  const turns = await listTurns(deps.doc, deps.config.tableName, deps.config.campaignId);
+  return { status: 200, body: { chronicle: buildPublicChronicle(turns) } };
+}
+
+const HOUSE_IMAGE_LIMIT = 5;
+const HOUSE_IMAGE_WINDOW_SECONDS = 3600;
+
+export async function generateHouseImage(deps: Deps, req: HandlerRequest): Promise<HandlerResponse> {
+  if (!deps.image) throw new HttpError(503, "IMAGE_DISABLED", "Geração de imagens não configurada.");
+  const ip = req.sourceIp || "unknown";
+  const count = await hitRateLimit(deps.doc, deps.config.tableName, `house-image#${ip}`, HOUSE_IMAGE_WINDOW_SECONDS);
+  if (count > HOUSE_IMAGE_LIMIT) {
+    throw new HttpError(429, "RATE_LIMITED", "Limite de gerações por hora atingido. Tente novamente mais tarde.");
+  }
+  const { name, description, emblem } = parseHouseImageGenerateBody(req.body);
+  const prompt = buildHouseImagePrompt(name, description, emblem);
+  const buffer = await deps.image(prompt);
+  return { status: 200, body: { image: `data:image/png;base64,${buffer.toString("base64")}` } };
+}

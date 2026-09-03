@@ -1,0 +1,176 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+import { sendMessage, houseKeyForName, withdrawLetter } from "./diplomacyRoutes";
+import * as messagesDb from "../db/diplomacy/messages";
+import * as adminAuth from "../auth/adminAuth";
+import type { Deps } from "./publicRoutes";
+import type { Config } from "../types/domain";
+import { signToken } from "../auth/tokens";
+import { semearCanon, limparCanon } from "@vampiro/content/test-fixtures";
+
+beforeEach(semearCanon);
+afterEach(limparCanon);
+
+const config = { tableName: "t", campaignId: "cidade-noturna", tokenSigningSecret: "s3cret" } as unknown as Config;
+
+function playerReq(body: unknown) {
+  const token = signToken({ type: "player", campaignId: "cidade-noturna", houseId: "h-solarion", displayName: "Ventrue", exp: Date.now() + 60000 } as never, "s3cret");
+  return { method: "POST", path: "/api/player/correspondencia", headers: { authorization: `Bearer ${token}` }, body, pathParams: {}, sourceIp: "1.2.3.4" } as never;
+}
+
+/**
+ * Um fake do DynamoDB que responde por prefixo de SK, guardando as mensagens
+ * gravadas para que o orçamento seja exercido de verdade entre chamadas.
+ */
+function makeDeps(over: { houses?: any[]; turnStatus?: string; sent?: any[]; chat?: any } = {}) {
+  const stored: any[] = [...(over.sent ?? [])];
+  const houses = over.houses ?? [{ houseId: "h-solarion", name: "Ventrue" }];
+  const doc = {
+    send: vi.fn(async (cmd: any) => {
+      const sk = cmd?.input?.ExpressionAttributeValues?.[":sk"];
+      const key = cmd?.input?.Key?.SK;
+      if (cmd?.input?.Item) { stored.push(cmd.input.Item); return {}; }
+      if (key?.startsWith?.("HOUSE#")) return { Item: houses[0] };
+      if (sk === "HOUSE#") return { Items: houses };
+      if (sk === "TURN#") return { Items: [{ SK: "TURN#0002", turnId: 2, status: over.turnStatus ?? "OPEN", publicEvent: "o centro velho foi atacada." }] };
+      if (sk === "WIKI#") return { Items: [] };
+      if (typeof sk === "string" && sk.startsWith("DIPLMSG#")) {
+        return { Items: stored.filter((m) => typeof m.SK === "string" && m.SK.startsWith(sk)) };
+      }
+      return { Items: [] };
+    }),
+  } as unknown as DynamoDBDocumentClient;
+  return { deps: { doc, config, chat: over.chat } as unknown as Deps, stored };
+}
+
+describe("houseKeyForName", () => {
+  it("liga a Casa viva à chave canônica", () => {
+    // As Casas vivas guardam nomes curtos; as chaves seguem os títulos do wiki.
+    expect(houseKeyForName("Ventrue")).toBe("cla-ventrue");
+    expect(houseKeyForName("Do Ouro")).toBe("casa-do-ouro");
+    expect(houseKeyForName("Nosferatu")).toBe("cla-nosferatu");
+  });
+
+  it("devolve null para nome desconhecido", () => {
+    expect(houseKeyForName("Casa Inventada")).toBeNull();
+  });
+});
+
+describe("sendMessage", () => {
+  const chat = vi.fn(async () => "Brujah responde com cautela.");
+
+  it("grava a carta e a resposta da Casa", async () => {
+    const { deps, stored } = makeDeps({ chat });
+    const res = await sendMessage(deps, playerReq({ toHouseKey: "cla-brujah", body: "Propomos uma aliança." }));
+    expect(res.status).toBe(201);
+    expect((res.body as any).sent.author).toBe("PLAYER");
+    expect((res.body as any).reply.author).toBe("AI");
+    expect(stored.filter((s) => s.SK?.startsWith("DIPLMSG#"))).toHaveLength(2);
+  });
+
+  it("recusa o terceiro envio para uma Casa próxima no mesmo turno", async () => {
+    // Ventrue↔Brujah dá dois envios; o terceiro fica sem mensageiro.
+    const { deps } = makeDeps({ chat });
+    const send = () => sendMessage(deps, playerReq({ toHouseKey: "cla-brujah", body: "carta" }));
+    await send();
+    await send();
+    await expect(send()).rejects.toThrow(/Sem mensageiros/);
+  });
+
+  it("recusa o segundo envio para Rimewatch, que fica a um envio só", async () => {
+    const { deps } = makeDeps({ chat });
+    const send = () => sendMessage(deps, playerReq({ toHouseKey: "cla-malkavian", body: "carta" }));
+    await send();
+    await expect(send()).rejects.toThrow(/dias de viagem/);
+  });
+
+  it("mantém orçamentos separados por par", async () => {
+    // Gastar com Brujah não pode consumir o de Gangrel.
+    const { deps } = makeDeps({ chat });
+    await sendMessage(deps, playerReq({ toHouseKey: "cla-brujah", body: "a" }));
+    await sendMessage(deps, playerReq({ toHouseKey: "cla-brujah", body: "b" }));
+    const res = await sendMessage(deps, playerReq({ toHouseKey: "cla-gangrel", body: "c" }));
+    expect(res.status).toBe(201);
+  });
+
+  it("recusa quando o turno não está aberto", async () => {
+    const { deps } = makeDeps({ chat, turnStatus: "LOCKED" });
+    await expect(sendMessage(deps, playerReq({ toHouseKey: "cla-brujah", body: "x" })))
+      .rejects.toThrow(/turno aberto/);
+  });
+
+  it("recusa Casa conduzida por outro jogador, explicando o motivo", async () => {
+    // Fase A não cobre jogador-a-jogador; a recusa precisa dizer isso, não
+    // devolver um erro genérico.
+    const { deps } = makeDeps({ chat, houses: [{ houseId: "h-solarion", name: "Ventrue" }, { houseId: "h2", name: "Nosferatu" }] });
+    await expect(sendMessage(deps, playerReq({ toHouseKey: "cla-nosferatu", body: "x" })))
+      .rejects.toThrow(/outro jogador/);
+  });
+
+  it("recusa escrever para a própria Casa", async () => {
+    const { deps } = makeDeps({ chat });
+    await expect(sendMessage(deps, playerReq({ toHouseKey: "cla-ventrue", body: "x" })))
+      .rejects.toThrow(/para si mesmo/);
+  });
+
+  it("recusa destinatário inexistente", async () => {
+    const { deps } = makeDeps({ chat });
+    await expect(sendMessage(deps, playerReq({ toHouseKey: "casa-inventada", body: "x" })))
+      .rejects.toThrow(/desconhecida/);
+  });
+
+  it("não perde a carta quando a IA falha", async () => {
+    // O envio já foi cobrado; apagar a carta puniria o jogador por uma falha
+    // que não é dele.
+    const failing = vi.fn(async () => { throw new Error("openai fora do ar"); });
+    const { deps, stored } = makeDeps({ chat: failing });
+    const res = await sendMessage(deps, playerReq({ toHouseKey: "cla-brujah", body: "carta" }));
+    expect(res.status).toBe(201);
+    expect((res.body as any).reply).toBeNull();
+    expect((res.body as any).replyFailed).toBe(true);
+    expect(stored.filter((s) => s.SK?.startsWith("DIPLMSG#"))).toHaveLength(1);
+  });
+
+  it("recusa corpo vazio antes de gastar qualquer chamada", async () => {
+    const { deps } = makeDeps({ chat });
+    await expect(sendMessage(deps, playerReq({ toHouseKey: "cla-brujah", body: "   " })))
+      .rejects.toThrow(/Escreva a mensagem/);
+  });
+});
+
+describe("retirar carta do mundo", () => {
+  const adminDeps = () => ({ doc: {} as never, config } as unknown as Deps);
+  const adminReq = (id: string) =>
+    ({ method: "DELETE", path: "/", headers: {}, body: undefined, pathParams: { id } }) as never;
+
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    vi.spyOn(adminAuth, "requireAdmin").mockReturnValue(undefined as never);
+  });
+
+  // O Mestre escolheu que as cartas de NPC chegam sem fila de aprovação, com a
+  // condição de poder tirar do ar a que sair errada.
+  it("apaga uma carta escrita pela IA", async () => {
+    const carta = { id: "out-1", author: "AI", turnNumber: 7, fromHouseId: "casa-a", toHouseKey: "cla-tremere" };
+    vi.spyOn(messagesDb, "listAllMessages").mockResolvedValue([carta] as never);
+    const del = vi.spyOn(messagesDb, "deleteMessage").mockResolvedValue();
+    const res = await withdrawLetter(adminDeps(), adminReq("out-1"));
+    expect(res.status).toBe(200);
+    expect(del).toHaveBeenCalled();
+  });
+
+  // Apagar o que um jogador escreveu reescreveria a história dele.
+  it("recusa apagar carta de jogador", async () => {
+    const carta = { id: "p-1", author: "PLAYER", turnNumber: 7, fromHouseId: "casa-a", toHouseKey: "cla-tremere" };
+    vi.spyOn(messagesDb, "listAllMessages").mockResolvedValue([carta] as never);
+    const del = vi.spyOn(messagesDb, "deleteMessage").mockResolvedValue();
+    await expect(withdrawLetter(adminDeps(), adminReq("p-1"))).rejects.toMatchObject({ status: 409 });
+    expect(del).not.toHaveBeenCalled();
+  });
+
+  it("devolve 404 para carta que não existe", async () => {
+    vi.spyOn(messagesDb, "listAllMessages").mockResolvedValue([]);
+    const res = await withdrawLetter(adminDeps(), adminReq("nada"));
+    expect(res.status).toBe(404);
+  });
+});
