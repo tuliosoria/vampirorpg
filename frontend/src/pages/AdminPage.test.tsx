@@ -187,7 +187,7 @@ describe("AdminPage", () => {
     const client = makeClient();
     render(
       <ApiProvider client={client}>
-        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=turno"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -207,7 +207,7 @@ describe("AdminPage", () => {
     const client = makeClient();
     render(
       <ApiProvider client={client}>
-        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=turno"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -227,7 +227,7 @@ describe("AdminPage", () => {
     const client = makeClient();
     render(
       <ApiProvider client={client}>
-        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=turno"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -253,7 +253,7 @@ describe("AdminPage", () => {
       .mockResolvedValue({ ...draftDashboard, publicEvent: "Evento salvo no servidor.", eventImageUrl: "https://img/uploaded.png" });
     render(
       <ApiProvider client={client}>
-        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=turno"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -290,7 +290,7 @@ describe("AdminPage", () => {
       });
     render(
       <ApiProvider client={client}>
-        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=turno"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -317,7 +317,7 @@ describe("AdminPage", () => {
     );
     render(
       <ApiProvider client={client}>
-        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=turno"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -337,7 +337,7 @@ describe("AdminPage", () => {
     sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
       <ApiProvider client={client}>
-        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=turno"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -356,7 +356,7 @@ describe("AdminPage", () => {
     sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
       <ApiProvider client={client}>
-        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=turno"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -372,7 +372,7 @@ describe("AdminPage", () => {
     sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
       <ApiProvider client={client}>
-        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=turno"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -393,14 +393,14 @@ describe("AdminPage", () => {
     sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
       <ApiProvider client={client}>
-        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=turno"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
     );
 
     await screen.findByRole("heading", { name: /painel do turno 2/i });
-    await goToTab(/personagens/i);
+    await goToTab(/^jogadores$/i);
     await screen.findByRole("heading", { name: /gerenciar personagens/i });
     await userEvent.click(screen.getByRole("button", { name: /adicionar personagem/i }));
 
@@ -422,14 +422,14 @@ describe("AdminPage", () => {
     sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
       <ApiProvider client={client}>
-        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=turno"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
     );
 
     await screen.findByRole("heading", { name: /painel do turno 2/i });
-    await goToTab(/personagens/i);
+    await goToTab(/^jogadores$/i);
     await screen.findByRole("heading", { name: /gerenciar personagens/i });
     await userEvent.click(screen.getByRole("button", { name: /^editar$/i }));
     await userEvent.click(screen.getByRole("button", { name: /salvar alterações/i }));
@@ -447,14 +447,14 @@ describe("AdminPage", () => {
     sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
       <ApiProvider client={client}>
-        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=turno"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
     );
 
     await screen.findByRole("heading", { name: /painel do turno 2/i });
-    await goToTab(/personagens/i);
+    await goToTab(/^jogadores$/i);
     await screen.findByRole("heading", { name: /gerenciar personagens/i });
     await userEvent.click(screen.getByRole("button", { name: /^deletar$/i }));
 
@@ -469,7 +469,7 @@ describe("AdminPage", () => {
     sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
       <ApiProvider client={client}>
-        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=turno"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -478,18 +478,21 @@ describe("AdminPage", () => {
     await screen.findByRole("heading", { name: /painel do turno 2/i });
     expect(screen.getByRole("heading", { name: /compor turno/i })).toBeInTheDocument();
 
-    // Duas fileiras: o grupo diz onde estou, a seção diz qual ferramenta. A
-    // Cidade abre nos Clãs, porque sem clã cadastrado nada mais tem a quem
-    // pertencer.
-    await goToTab(/^estúdio$/i);
+    // Duas fileiras, e só duas: o grupo diz onde estou, a seção diz qual
+    // ferramenta. O Mundo abre na Cidade, que é onde uma crônica vazia começa.
+    await goToTab(/^mundo$/i);
     expect(screen.queryByRole("heading", { name: /compor turno/i })).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/nome da cidade/i)).toBeInTheDocument();
 
-    await goToTab(/^bíblia$/i);
-    expect(screen.getByRole("heading", { name: /bíblia do mundo/i })).toBeInTheDocument();
-
-    await goToTab(/^prompts$/i);
+    await goToTab(/^imagens$/i);
+    await goToTab(/^estilo$/i);
     expect(screen.getByRole("heading", { name: /prompts de imagem/i })).toBeInTheDocument();
-    expect(screen.queryByRole("heading", { name: /bíblia do mundo/i })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/nome da cidade/i)).not.toBeInTheDocument();
+
+    await goToTab(/^sistema$/i);
+    await goToTab(/bíblia \(antiga\)/i);
+    expect(screen.getByRole("heading", { name: /bíblia do mundo/i })).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: /prompts de imagem/i })).not.toBeInTheDocument();
   });
 
   it("não carrega mais as abas mortas de Galeria e Senhas", async () => {
@@ -497,7 +500,7 @@ describe("AdminPage", () => {
     sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
       <ApiProvider client={client}>
-        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=turno"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -505,8 +508,12 @@ describe("AdminPage", () => {
 
     await screen.findByRole("heading", { name: /painel do turno 2/i });
     expect(screen.queryByRole("tab", { name: /em breve/i })).not.toBeInTheDocument();
-    // Quatro grupos no primeiro nível, no lugar das doze abas em fila.
-    expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Noite", "Personagens", "Estúdio", "Sistema"]);
+    // Cinco grupos no primeiro nível, no lugar das doze abas em fila.
+    // A primeira fileira, só. A segunda é das seções do grupo aberto.
+    const grupos = screen.getAllByRole("tablist")[0];
+    expect(within(grupos).getAllByRole("tab").map((t) => t.textContent)).toEqual(
+      ["Mundo", "Noite", "Jogadores", "Imagens", "Sistema"],
+    );
   });
 
   it("opens the tab from the ?tab= query param", async () => {
@@ -524,7 +531,7 @@ describe("AdminPage", () => {
     expect(await screen.findByRole("heading", { name: /gerenciar personagens/i })).toBeInTheDocument();
   });
 
-  it("falls back to the turnos tab for an unknown or disabled tab param", async () => {
+  it("cai no Mundo para um tab desconhecido ou desativado", async () => {
     const client = makeClient();
     sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
@@ -536,6 +543,6 @@ describe("AdminPage", () => {
     );
 
     await screen.findByRole("heading", { name: /painel do turno 2/i });
-    expect(screen.getByRole("heading", { name: /compor turno/i })).toBeInTheDocument();
+    expect(await screen.findByLabelText(/nome da cidade/i)).toBeInTheDocument();
   });
 });

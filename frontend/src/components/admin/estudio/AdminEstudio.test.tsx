@@ -14,12 +14,12 @@ import { AdminEstudio } from "./AdminEstudio";
  */
 beforeEach(limparCanonAplicado);
 
-async function abrir(client: MockApiClient) {
+async function abrir(client: MockApiClient, secao = "cidade") {
   await act(async () => {
     render(
       <ApiProvider client={client}>
         <CanonProvider>
-          <AdminEstudio adminToken="t" />
+          <AdminEstudio adminToken="t" secao={secao} />
         </CanonProvider>
       </ApiProvider>,
     );
@@ -27,11 +27,12 @@ async function abrir(client: MockApiClient) {
 }
 
 describe("AdminEstudio", () => {
-  it("abre nas cinco abas mais a Cidade", async () => {
-    await abrir(new MockApiClient());
-    for (const aba of ["Cidade", "Bairros", "Personagens", "Locais", "Tramas", "Contos"]) {
-      expect(await screen.findByRole("tab", { name: new RegExp(`^${aba}`) })).toBeInTheDocument();
-    }
+  // A navegação é a fileira do painel, e não uma segunda por dentro: abrir a
+  // seção já mostra o formulário, sem clique intermediário.
+  it("cada seção abre direto no seu formulário", async () => {
+    await abrir(new MockApiClient(), "bairros");
+    expect(await screen.findByRole("button", { name: /Novo bairro/i })).toBeInTheDocument();
+    expect(screen.queryByRole("tab")).not.toBeInTheDocument();
   });
 
   it("a cidade nasce vazia e aceita nome, descrição e segredos", async () => {
@@ -47,8 +48,7 @@ describe("AdminEstudio", () => {
   // O cadeado não esconde nada — o backend é quem impede o campo de sair. Ele
   // existe para o Narrador saber, ao escrever, o que está do lado de dentro.
   it("marca com cadeado o que nunca chega ao jogador", async () => {
-    await abrir(new MockApiClient());
-    await act(async () => { await userEvent.click(screen.getByRole("tab", { name: /^Personagens/ })); });
+    await abrir(new MockApiClient(), "personagens");
     await act(async () => { await userEvent.click(screen.getByRole("button", { name: /Novo personagem/i })); });
 
     expect(screen.getByLabelText(/🔒 Objetivos/)).toBeInTheDocument();
@@ -59,8 +59,7 @@ describe("AdminEstudio", () => {
   // Guardar clã num lobisomem colocaria um estranho no elenco na próxima
   // aplicação do cânone; o formulário nem oferece o campo.
   it("o campo de clã só aparece para vampiro", async () => {
-    await abrir(new MockApiClient());
-    await act(async () => { await userEvent.click(screen.getByRole("tab", { name: /^Personagens/ })); });
+    await abrir(new MockApiClient(), "personagens");
     await act(async () => { await userEvent.click(screen.getByRole("button", { name: /Novo personagem/i })); });
 
     expect(screen.queryByLabelText("Clã")).not.toBeInTheDocument();
@@ -75,19 +74,28 @@ describe("AdminEstudio", () => {
     expect(screen.getByLabelText("Clã")).toBeInTheDocument();
   });
 
-  it("um bairro salvo aparece na lista e vira opção de local", async () => {
+  it("um bairro salvo aparece na lista", async () => {
     const client = new MockApiClient();
-    await abrir(client);
-    await act(async () => { await userEvent.click(screen.getByRole("tab", { name: /^Bairros/ })); });
+    await abrir(client, "bairros");
     await act(async () => { await userEvent.click(screen.getByRole("button", { name: /Novo bairro/i })); });
     await act(async () => {
       await userEvent.type(screen.getByLabelText("Nome do bairro"), "Centro Velho");
       await userEvent.click(screen.getByRole("button", { name: /^Salvar$/i }));
     });
-
     expect(await screen.findByText("Centro Velho")).toBeInTheDocument();
+  });
 
-    await act(async () => { await userEvent.click(screen.getByRole("tab", { name: /^Locais/ })); });
+  /**
+   * O que amarra a cosmologia: o bairro escrito numa seção vira escolha na
+   * outra. Sem isso as fichas seriam sete formulários soltos em vez de uma rede.
+   */
+  it("o bairro escrito vira opção no formulário de local", async () => {
+    const client = new MockApiClient();
+    await client.saveEstudioItem("t", "bairros", {
+      id: "centro-velho", nome: "Centro Velho", descricao: "", atmosfera: "", segredos: "", atualizadoEm: "",
+    });
+
+    await abrir(client, "locais");
     await act(async () => { await userEvent.click(screen.getByRole("button", { name: /Novo local/i })); });
     await act(async () => { fireEvent.mouseDown(screen.getByRole("combobox", { name: "Bairro" })); });
     expect(await screen.findByRole("option", { name: "Centro Velho" })).toBeInTheDocument();
@@ -95,8 +103,7 @@ describe("AdminEstudio", () => {
 
   it("a trama nasce invisível, e o que sai para o jogador não a contém", async () => {
     const client = new MockApiClient();
-    await abrir(client);
-    await act(async () => { await userEvent.click(screen.getByRole("tab", { name: /^Tramas/ })); });
+    await abrir(client, "tramas");
     await act(async () => { await userEvent.click(screen.getByRole("button", { name: /Nova trama/i })); });
     await act(async () => {
       await userEvent.type(screen.getByLabelText("Nome da trama"), "A dívida do porto");

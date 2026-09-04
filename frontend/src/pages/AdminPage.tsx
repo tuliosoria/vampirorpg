@@ -301,19 +301,36 @@ export function AdminPage() {
           />
         )}
 
-        {group.value === "clas" && section === "clas" && (
+        {/* Mundo: as sete fichas, cada uma numa aba da mesma fileira. O clã tem
+            formulário próprio porque carrega coordenada e escassez, que não
+            cabem no formulário genérico. */}
+        {group.value === "mundo" && section === "clas" && token && <AdminClaFichasTab adminToken={token} />}
+        {group.value === "mundo" && section !== "clas" && token && (
+          <AdminEstudio adminToken={token} secao={section} />
+        )}
+
+        {group.value === "turno" && section === "registro" && token && <AdminRegistroTab adminToken={token} />}
+
+        {group.value === "jogadores" && section === "fichas" && (
           <AdminHousesTab dashboard={dashboard} busy={busy} runAction={runAction} />
         )}
-        {group.value === "clas" && section === "relacoes" && token && <AdminRelationsTab adminToken={token} />}
-        {group.value === "clas" && section === "vivos" && token && <AdminLivingTab adminToken={token} busy={busy} />}
+        {group.value === "jogadores" && section === "relacoes" && token && <AdminRelationsTab adminToken={token} />}
+        {group.value === "jogadores" && section === "vivos" && token && <AdminLivingTab adminToken={token} busy={busy} />}
 
-        {group.value === "mundo" && section === "estudio" && token && <AdminEstudio adminToken={token} />}
+        {group.value === "imagens" && section === "gerador" && <EstudioTab isAdmin />}
+        {group.value === "imagens" && section === "entidades" && <EntidadesTab />}
+        {group.value === "imagens" && section === "acervo" && <AcervoTab isAdmin />}
+        {group.value === "imagens" && section === "prompts" && (
+          <AdminPromptsTab
+            busy={busy}
+            runAction={runAction}
+            worldLore={worldLore}
+            worldVisualDirectives={worldVisualDirectives}
+            setWorldVisualDirectives={setWorldVisualDirectives}
+          />
+        )}
 
-        {group.value === "mundo" && section === "clas" && token && <AdminClaFichasTab adminToken={token} />}
-
-        {group.value === "mundo" && section === "registro" && token && <AdminRegistroTab adminToken={token} />}
-
-        {group.value === "mundo" && section === "biblia" && (
+        {group.value === "sistema" && section === "biblia" && (
           <AdminLoreTab
             token={token}
             busy={busy}
@@ -323,29 +340,14 @@ export function AdminPage() {
             worldVisualDirectives={worldVisualDirectives}
           />
         )}
-        {group.value === "mundo" && section === "canonico" && token && (
+        {group.value === "sistema" && section === "canonico" && token && (
           <AdminCanonTab adminToken={token} busy={busy} onError={setError} onChanged={() => { if (token) void refresh(token); }} />
         )}
-        {group.value === "mundo" && section === "prompts" && (
-          <AdminPromptsTab
-            busy={busy}
-            runAction={runAction}
-            worldLore={worldLore}
-            worldVisualDirectives={worldVisualDirectives}
-            setWorldVisualDirectives={setWorldVisualDirectives}
-          />
-        )}
-        {/* As ferramentas visuais saíram da Enciclopédia pública: são trabalho
-            de Mestre, e conviviam com conteúdo de jogador separadas só por um
-            isAdmin invisível. */}
-        {group.value === "mundo" && section === "acervo" && <AcervoTab isAdmin />}
-        {group.value === "mundo" && section === "entidades" && <EntidadesTab />}
-        {group.value === "mundo" && section === "escriba" && (
+        {group.value === "sistema" && section === "escriba" && (
           <EscribaTab casas={dashboard?.houses ?? []} />
         )}
-        {group.value === "mundo" && section === "imagens" && <EstudioTab isAdmin />}
 
-        {group.value === "sistema" && <AdminSystemTab busy={busy} runAction={runAction} adminToken={token ?? ""} />}
+        {group.value === "sistema" && section === "campanha" && <AdminSystemTab busy={busy} runAction={runAction} adminToken={token ?? ""} />}
       </Stack>
     </Layout>
   );

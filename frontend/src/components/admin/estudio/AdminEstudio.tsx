@@ -5,8 +5,6 @@ import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Stack from "@mui/material/Stack";
-import Tab from "@mui/material/Tab";
-import Tabs from "@mui/material/Tabs";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import type { Cidade } from "@vampiro/content";
@@ -26,12 +24,15 @@ import { EntidadeTab } from "./EntidadeTab";
  *
  * Toda gravação recarrega o cânone. Sem isso o Narrador salva um personagem e o
  * resto do site continua sem enxergá-lo até a próxima recarga de página.
+ *
+ * Não tem abas próprias: a fileira de seções do painel É a navegação. Ter as
+ * duas criava um terceiro nível, e quem chegava para escrever um bairro
+ * precisava acertar três cliques antes de ver um campo de texto.
  */
-export function AdminEstudio({ adminToken }: { adminToken: string }) {
+export function AdminEstudio({ adminToken, secao }: { adminToken: string; secao: string }) {
   const api = useApi();
   const recarregarCanon = useRecarregarCanon();
   const [mundo, setMundo] = useState<EstudioCompleto | null>(null);
-  const [aba, setAba] = useState<string>("cidade");
   const [erro, setErro] = useState<string | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
@@ -78,25 +79,14 @@ export function AdminEstudio({ adminToken }: { adminToken: string }) {
     return erro ? <Alert severity="error">{erro}</Alert> : <LoadingState />;
   }
 
-  const def = ENTIDADES.find((e) => e.colecao === aba);
+  const def = ENTIDADES.find((e) => e.colecao === secao);
 
   return (
     <Stack spacing={3}>
-      <Tabs value={aba} onChange={(_e, v) => setAba(v)} variant="scrollable" scrollButtons="auto">
-        <Tab value="cidade" label="Cidade" />
-        {ENTIDADES.map((e) => (
-          <Tab
-            key={e.colecao}
-            value={e.colecao}
-            label={`${e.rotulo}${mundo[e.colecao].length ? ` (${mundo[e.colecao].length})` : ""}`}
-          />
-        ))}
-      </Tabs>
-
       {erro && <Alert severity="error" onClose={() => setErro(null)}>{erro}</Alert>}
       {aviso && <Alert severity="success" onClose={() => setAviso(null)}>{aviso}</Alert>}
 
-      {aba === "cidade" && (
+      {secao === "cidade" && (
         <AbaCidade
           cidade={mundo.cidade}
           ocupado={ocupado}

@@ -3,14 +3,13 @@
  *
  * Antes eram doze abas numa fileira só, que rolava horizontalmente: o Mestre
  * tinha de lembrar qual caixa guardava o quê antes de conseguir procurar. Agora
- * o primeiro nível responde "o que eu estou fazendo agora" — rodando o turno,
- * mexendo nas Casas, construindo mundo, mexendo no sistema — e só depois disso
- * aparece a segunda fileira.
+ * o primeiro nível responde "o que eu estou fazendo agora" — escrevendo o
+ * mundo, rodando a noite, cuidando dos jogadores, gerando imagem, mexendo no
+ * sistema — e só depois disso aparece a segunda fileira.
  *
- * O grupo "Turno" não tem seções de propósito: ler as cartas, despachar as
- * aprovações e escrever o resultado é uma sequência, e sub-abas obrigariam a
- * pular de um lado para o outro no meio do trabalho. Lá as partes ficam
- * empilhadas na ordem em que se usa.
+ * São duas fileiras, nunca três. É a regra que esta estrutura existe para
+ * manter: quem abre o painel para escrever um bairro chega ao campo de texto em
+ * dois cliques.
  */
 export interface AdminSection {
   value: string;
@@ -20,49 +19,88 @@ export interface AdminSection {
 export interface AdminGroup {
   value: string;
   label: string;
-  /** Vazio quando o grupo é uma página empilhada, sem segunda fileira. */
+  /** A segunda fileira. Sempre ao menos uma; a primeira é onde o grupo abre. */
   sections: AdminSection[];
 }
 
+/**
+ * Cinco destinos, e uma fileira de abas dentro de cada um.
+ *
+ * Antes eram três níveis: grupo, seção, e a Cosmologia com abas próprias por
+ * dentro. Quem chegava para escrever um bairro tinha de acertar três cliques
+ * numa gaveta de dez itens onde "Canônico", "Acervo" e "Escriba" não dizem o
+ * que fazem. O Mundo agora é o que a palavra promete: as sete fichas, lado a
+ * lado, sem nada por baixo.
+ *
+ * As ferramentas antigas não sumiram — foram para Sistema, marcadas como
+ * antigas, porque ainda guardam conteúdo que o Estúdio não absorveu. Quem entra
+ * para escrever a Cidade não passa por elas.
+ */
 export const ADMIN_GROUPS: AdminGroup[] = [
-  { value: "turno", label: "Noite", sections: [] },
-  {
-    value: "clas",
-    label: "Personagens",
-    sections: [
-      { value: "clas", label: "Jogadores" },
-      { value: "relacoes", label: "Relações" },
-      { value: "vivos", label: "Vivos" },
-    ],
-  },
-  // O Estúdio é o painel editorial: as entidades primeiro, as ferramentas de
-  // imagem depois. O gerador que ocupava este nome virou "Imagens", que é o
-  // que ele sempre foi.
   {
     value: "mundo",
-    label: "Estúdio",
+    label: "Mundo",
     sections: [
-      { value: "estudio", label: "Cosmologia" },
-      // Primeiro o que existe, depois o que se escreve sobre isso: sem clã
-      // cadastrado, verbete e imagem não têm a quem pertencer.
+      { value: "cidade", label: "Cidade" },
+      { value: "bairros", label: "Bairros" },
+      // O clã vem antes do personagem: é a ele que o personagem se prende.
       { value: "clas", label: "Clãs" },
-      { value: "biblia", label: "Bíblia" },
-      // O registro fica em Mundo e não em Turno: ele NASCE no turno, mas é
-      // consultado e podado fora dele, quando algo numa carta soou errado.
-      { value: "registro", label: "Registro" },
-      { value: "canonico", label: "Canônico" },
-      { value: "prompts", label: "Prompts" },
-      { value: "acervo", label: "Acervo" },
-      { value: "entidades", label: "Entidades" },
-      // Escrever vem antes de ilustrar: o Escriba fica à esquerda do Estúdio.
-      { value: "escriba", label: "Escriba" },
-      { value: "imagens", label: "Imagens" },
+      { value: "personagens", label: "Personagens" },
+      { value: "locais", label: "Locais" },
+      { value: "tramas", label: "Tramas" },
+      { value: "contos", label: "Contos" },
     ],
   },
-  { value: "sistema", label: "Sistema", sections: [] },
+  {
+    value: "turno",
+    label: "Noite",
+    sections: [
+      { value: "resolver", label: "Resolver" },
+      // O registro nasce no turno; consultá-lo é conferir o que a noite gerou.
+      { value: "registro", label: "Registro" },
+    ],
+  },
+  {
+    value: "jogadores",
+    label: "Jogadores",
+    sections: [
+      { value: "fichas", label: "Fichas" },
+      { value: "relacoes", label: "Relações" },
+      { value: "vivos", label: "Estado vivo" },
+    ],
+  },
+  {
+    value: "imagens",
+    label: "Imagens",
+    sections: [
+      { value: "gerador", label: "Gerador" },
+      { value: "entidades", label: "Entidades" },
+      { value: "acervo", label: "Acervo" },
+      { value: "prompts", label: "Estilo" },
+    ],
+  },
+  {
+    value: "sistema",
+    label: "Sistema",
+    sections: [
+      { value: "campanha", label: "Campanha" },
+      // Guardam conteúdo que o Estúdio ainda não absorveu. Ficam aqui para não
+      // se perderem, e fora do caminho de quem chega para escrever.
+      { value: "biblia", label: "Bíblia (antiga)" },
+      { value: "canonico", label: "Enciclopédia (antiga)" },
+      { value: "escriba", label: "Escriba (antigo)" },
+    ],
+  },
 ];
 
-export const DEFAULT_GROUP = "turno";
+/**
+ * O painel abre no Mundo.
+ *
+ * Abria na Noite, que é o trabalho recorrente de quem já tem crônica em
+ * andamento — mas uma noite não tem o que resolver antes de a Cidade existir.
+ * Quem chega a este painel pela primeira vez chega para escrever.
+ */
+export const DEFAULT_GROUP = "mundo";
 
 /**
  * Onde cada aba antiga foi parar.
@@ -73,16 +111,28 @@ export const DEFAULT_GROUP = "turno";
  * caem no turno, como qualquer valor desconhecido.
  */
 const LEGACY: Record<string, { group: string; section?: string }> = {
-  turnos: { group: "turno" },
-  projetos: { group: "turno" },
-  correspondencia: { group: "turno" },
-  casas: { group: "clas", section: "clas" },
-  relacoes: { group: "clas", section: "relacoes" },
-  vivos: { group: "clas", section: "vivos" },
-  historia: { group: "mundo", section: "biblia" },
-  canonico: { group: "mundo", section: "canonico" },
-  prompts: { group: "mundo", section: "prompts" },
-  sistema: { group: "sistema" },
+  turnos: { group: "turno", section: "resolver" },
+  projetos: { group: "turno", section: "resolver" },
+  correspondencia: { group: "turno", section: "resolver" },
+  // "clas" era o grupo dos jogadores e virou o das fichas; o clã do MUNDO é
+  // outra coisa, e um link antigo apontando para lá levaria a pessoa ao lugar
+  // errado sem erro nenhum.
+  clas: { group: "jogadores", section: "fichas" },
+  casas: { group: "jogadores", section: "fichas" },
+  relacoes: { group: "jogadores", section: "relacoes" },
+  vivos: { group: "jogadores", section: "vivos" },
+  historia: { group: "sistema", section: "biblia" },
+  canonico: { group: "sistema", section: "canonico" },
+  escriba: { group: "sistema", section: "escriba" },
+  prompts: { group: "imagens", section: "prompts" },
+  acervo: { group: "imagens", section: "acervo" },
+  entidades: { group: "imagens", section: "entidades" },
+  // O grupo antigo "mundo" apontava para a gaveta de dez itens. O nome ficou,
+  // mas agora leva às fichas — que é o que quem clicava em "Mundo" queria.
+  estudio: { group: "mundo", section: "cidade" },
+  biblia: { group: "sistema", section: "biblia" },
+  registro: { group: "turno", section: "registro" },
+  sistema: { group: "sistema", section: "campanha" },
 };
 
 export function groupOf(value: string | null): AdminGroup {
