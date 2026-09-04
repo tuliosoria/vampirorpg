@@ -23,7 +23,7 @@ export function AdminPromptsTab({ busy, runAction, worldLore, worldVisualDirecti
     <Card component="section">
       <CardContent>
         <Stack spacing={2}>
-          <Typography variant="h2">Prompts de imagem</Typography>
+          <Typography variant="h2">Estilo das imagens</Typography>
           <Typography variant="body2" color="text.secondary">
             Prompt de estilo e continuidade aplicado automaticamente a toda imagem gerada nos turnos. Não aparece na zona de turno.
           </Typography>

@@ -28,7 +28,7 @@ export function AdminLoreTab({ token, busy, runAction, worldLore, setWorldLore, 
           <Stack spacing={2}>
             <Typography variant="h2">Bíblia do Mundo</Typography>
             <Typography variant="body2" color="text.secondary">
-              Contexto do mundo usado pela IA. Não é mostrado aos jogadores. A crônica dos turnos resolvidos é adicionada automaticamente.
+              A crônica dos turnos já resolvidos é acrescentada a este texto automaticamente.
             </Typography>
             <TextField
               label="Lore do Mundo"

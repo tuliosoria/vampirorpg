@@ -486,13 +486,13 @@ describe("AdminPage", () => {
 
     await goToTab(/^imagens$/i);
     await goToTab(/^estilo$/i);
-    expect(screen.getByRole("heading", { name: /prompts de imagem/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /estilo das imagens/i })).toBeInTheDocument();
     expect(screen.queryByLabelText(/nome da cidade/i)).not.toBeInTheDocument();
 
     await goToTab(/^sistema$/i);
-    await goToTab(/bíblia \(antiga\)/i);
+    await goToTab(/^bíblia$/i);
     expect(screen.getByRole("heading", { name: /bíblia do mundo/i })).toBeInTheDocument();
-    expect(screen.queryByRole("heading", { name: /prompts de imagem/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: /estilo das imagens/i })).not.toBeInTheDocument();
   });
 
   it("não carrega mais as abas mortas de Galeria e Senhas", async () => {

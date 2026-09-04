@@ -52,13 +52,31 @@ describe("ADMIN_GROUPS", () => {
     expect(new Set(todas).size).toBe(todas.length);
   });
 
-  // Guardam conteúdo que o Estúdio ainda não absorveu. Ficam alcançáveis, e
-  // marcadas, para não se perderem nem confundirem quem chega.
-  it("o que ficou para trás está em Sistema e diz que é antigo", () => {
-    const rotulos = groupOf("sistema").sections.map((s) => s.label);
-    expect(rotulos).toContain("Bíblia (antiga)");
-    expect(rotulos).toContain("Enciclopédia (antiga)");
-    expect(rotulos).toContain("Escriba (antigo)");
+  /**
+   * "(antiga)" dizia que a ferramenta era obsoleta, e nenhuma é: as três estão
+   * ligadas e fazem coisas que as fichas do Mundo não fazem. O rótulo respondia
+   * "isto ainda vale?" quando a pergunta de quem chega é "então o que é isto?".
+   */
+  it("nenhuma seção se chama de antiga", () => {
+    for (const g of ADMIN_GROUPS) {
+      for (const s of g.sections) {
+        expect(s.label.toLowerCase(), `${g.value}/${s.value}`).not.toMatch(/antig[ao]/);
+      }
+    }
+  });
+
+  it("o que fica em Sistema é nomeado pelo que faz", () => {
+    expect(groupOf("sistema").sections.map((s) => s.label)).toEqual(
+      ["Campanha", "Bíblia", "Enciclopédia", "Escriba"],
+    );
+  });
+
+  // A distinção que a fileira sozinha não dá: as três não são fichas, e a
+  // pessoa acabou de escrever a Cidade no Mundo.
+  it("Sistema explica em que difere do Mundo", () => {
+    const porValor = Object.fromEntries(groupOf("sistema").sections.map((s) => [s.value, s.descricao]));
+    expect(porValor.biblia).toMatch(/não cabe numa ficha/i);
+    expect(porValor.canonico).toMatch(/difere do mundo/i);
   });
 });
 

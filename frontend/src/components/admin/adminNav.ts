@@ -41,9 +41,11 @@ export interface AdminGroup {
  * que fazem. O Mundo agora é o que a palavra promete: as sete fichas, lado a
  * lado, sem nada por baixo.
  *
- * As ferramentas antigas não sumiram — foram para Sistema, marcadas como
- * antigas, porque ainda guardam conteúdo que o Estúdio não absorveu. Quem entra
- * para escrever a Cidade não passa por elas.
+ * O que não é ficha do Mundo, noite, jogador nem imagem fica em Sistema: o
+ * contexto solto que a IA lê, a enciclopédia pública e os ajustes da campanha.
+ * Nada ali é obsoleto — cada um faz uma coisa que as fichas não fazem, e a
+ * frase de cada seção diz qual, porque a pergunta real de quem chega não é
+ * "isto ainda vale?" e sim "escrevi a Cidade no Mundo; então o que é isto?".
  */
 export const ADMIN_GROUPS: AdminGroup[] = [
   {
@@ -144,19 +146,19 @@ export const ADMIN_GROUPS: AdminGroup[] = [
         descricao:
           "Abrir e reiniciar a campanha, e conferir se a chave da IA está respondendo.",
       },
-      // Guardam conteúdo que o Estúdio ainda não absorveu. Ficam aqui para não
-      // se perderem, e fora do caminho de quem chega para escrever.
-      { value: "biblia", label: "Bíblia (antiga)",
+      // Não são fichas: são texto solto para a IA e texto publicado para o
+      // leitor. A frase de cada uma diz em que difere do Mundo.
+      { value: "biblia", label: "Bíblia",
         descricao:
-          "O texto longo de mundo que a IA lê antes de escrever qualquer coisa. Antecede o Estúdio e ainda alimenta a geração — o que estiver aqui continua valendo.",
+          "Texto solto que a IA lê antes de escrever, junto com tudo que você escreveu no Mundo. É para o que não cabe numa ficha: o tom da crônica, as regras da mesa, o que nunca deve acontecer. Nada aqui aparece para os jogadores.",
       },
-      { value: "canonico", label: "Enciclopédia (antiga)",
+      { value: "canonico", label: "Enciclopédia",
         descricao:
-          "Os verbetes que a IA propôs a partir dos turnos e que esperam sua aprovação. O que você publica aqui aparece na enciclopédia pública da Cidade.",
+          "Os verbetes que o site publica na página pública da Cidade, e as propostas que a IA tirou dos turnos esperando sua aprovação. Difere do Mundo: lá é a ficha que o jogo usa, aqui é o artigo que o leitor lê.",
       },
-      { value: "escriba", label: "Escriba (antigo)",
+      { value: "escriba", label: "Escriba",
         descricao:
-          "Pergunta ao Escriba e transforma a resposta em verbete da enciclopédia. Anterior ao Estúdio, e mantido enquanto a enciclopédia pública vier daqui.",
+          "Pergunta sobre o mundo a quem já leu tudo que você escreveu, e transforma a resposta num verbete da Enciclopédia. É o atalho para não redigir cada verbete à mão.",
       },
     ],
   },
