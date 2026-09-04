@@ -5,17 +5,15 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
-import Badge from "@mui/material/Badge";
-import Tab from "@mui/material/Tab";
-import Tabs from "@mui/material/Tabs";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { DEFAULT_IMAGE_DIRECTIVES, type Attributes, type TurnResult, pendenteNoGrupo, pendenteNaSecao } from "@vampiro/content";
+import { DEFAULT_IMAGE_DIRECTIVES, type Attributes, type TurnResult } from "@vampiro/content";
 import { useApi } from "../api/ApiProvider";
 import { clearAdminToken, loadAdminToken, saveAdminToken } from "../auth/adminSession";
 import { LoadingState } from "../components/LoadingState";
 import { Layout } from "../components/Layout";
 import { AdminEstudio } from "../components/admin/estudio/AdminEstudio";
+import { AdminNavLateral } from "../components/admin/AdminNavLateral";
 import { CabecalhoDeSecao } from "../components/admin/CabecalhoDeSecao";
 import { AdminClaFichasTab } from "../components/admin/AdminClaFichasTab";
 import { AdminRegistroTab } from "../components/admin/AdminRegistroTab";
@@ -33,7 +31,7 @@ import { AcervoTab } from "./enciclopedia/AcervoTab";
 import { EntidadesTab } from "./enciclopedia/EntidadesTab";
 import { EscribaTab } from "./enciclopedia/EscribaTab";
 import { EstudioTab } from "./enciclopedia/EstudioTab";
-import { ADMIN_GROUPS, groupOf, sectionOf } from "../components/admin/adminNav";
+import { groupOf, sectionOf } from "../components/admin/adminNav";
 import { ApiError, type AdminDashboard } from "../types/api";
 
 const emptyAttributes: Attributes = { riqueza: 0, recursos: 0, soldados: 0, controle: 0 };
@@ -70,26 +68,17 @@ export function AdminPage() {
   const section = sectionOf(searchParams.get("tab"), searchParams.get("sec"));
   const secaoAberta = group.sections.find((s) => s.value === section);
 
-  function selectGroup(next: string) {
-    const params = new URLSearchParams(searchParams);
-    params.set("tab", next);
-    params.delete("sec");
-    setSearchParams(params, { replace: true });
-  }
-
-  /** Leva a faixa dourada direto ao lugar da pendência. */
+  /**
+   * O único caminho para trocar de seção: a lateral, a faixa de pendências e o
+   * roteiro do Mundo passam todos por aqui. Antes eram três funções quase
+   * iguais, e a do grupo apagava `sec` — o que na lateral significaria clicar
+   * em "Contos" e chegar em "Cidade".
+   */
   function irPara(tab: string, sec?: string) {
     const params = new URLSearchParams(searchParams);
     params.set("tab", tab);
     if (sec) params.set("sec", sec);
     else params.delete("sec");
-    setSearchParams(params, { replace: true });
-  }
-
-  function selectSection(next: string) {
-    const params = new URLSearchParams(searchParams);
-    params.set("tab", group.value);
-    params.set("sec", next);
     setSearchParams(params, { replace: true });
   }
 
@@ -230,133 +219,99 @@ export function AdminPage() {
 
         <PainelDePendencias pendencias={dashboard.pendencias} onIr={irPara} />
 
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Tabs value={group.value} onChange={(_e, next) => selectGroup(next)} variant="scrollable" scrollButtons="auto" allowScrollButtonsMobile>
-            {ADMIN_GROUPS.map((g) => (
-              <Tab
-                key={g.value}
-                value={g.value}
-                label={
-                  // Dourado, e não `secondary` — que é a cor do texto normal e
-                  // desaparecia no meio da barra. E em todo grupo que tem
-                  // trabalho parado, não só no Turno.
-                  pendenteNoGrupo(dashboard.pendencias, g.value) > 0 ? (
-                    <Badge badgeContent={pendenteNoGrupo(dashboard.pendencias, g.value)} color="warning" sx={{ pr: 1.5 }}>
-                      {g.label}
-                    </Badge>
-                  ) : (
-                    g.label
-                  )
-                }
+        <Stack direction={{ xs: "column", md: "row" }} spacing={{ xs: 0, md: 4 }} alignItems="flex-start">
+          <AdminNavLateral
+            grupoAberto={group.value}
+            secaoAberta={section}
+            pendencias={dashboard.pendencias}
+            onIr={irPara}
+          />
+
+          {/* `minWidth: 0` porque um filho de flex nasce com largura mínima igual
+              ao seu conteúdo: sem isto uma tabela larga empurra a lateral para
+              fora da tela em vez de rolar por dentro. */}
+          <Stack spacing={3} sx={{ flex: 1, minWidth: 0, width: "100%" }}>
+
+            {error && <Alert severity="error">{error}</Alert>}
+            {notice && <Alert severity="info">{notice}</Alert>}
+
+            {/* Um cabeçalho só, para as vinte seções. Antes cinco delas traziam a
+                própria explicação no corpo e catorze não traziam nenhuma, e o
+                resultado era uma fileira de substantivos que só se entendia
+                clicando em todos. */}
+            {secaoAberta && <CabecalhoDeSecao titulo={secaoAberta.label} descricao={secaoAberta.descricao} />}
+
+            {group.value === "turno" && section === "resolver" && (
+              <AdminTurnoTab
+                dashboard={dashboard}
+                adminToken={token ?? ""}
+                busy={busy}
+                runAction={runAction}
+                publicEvent={publicEvent}
+                setPublicEvent={setPublicEvent}
+                privateInfo={privateInfo}
+                setPrivateInfo={setPrivateInfo}
+                resolution={resolution}
+                setResolution={setResolution}
+                updateResolution={updateResolution}
+                discoveriesText={discoveriesText}
+                setDiscoveriesText={setDiscoveriesText}
+                setTurnImageUrl={setTurnImageUrl}
+                onDraftPublished={() => { if (token) void refresh(token); }}
+                onError={setError}
+                pendingProjects={dashboard.pendencias.projetos}
               />
-            ))}
-          </Tabs>
-        </Box>
+            )}
 
-        {/* A segunda fileira: a ferramenta dentro do grupo. Nunca há uma
-            terceira — quem abre o painel para escrever um bairro chega ao campo
-            de texto em dois cliques. */}
-        {group.sections.length > 0 && (
-          <Tabs value={section} onChange={(_e, next) => selectSection(next)} variant="scrollable" scrollButtons="auto" allowScrollButtonsMobile>
-            {group.sections.map((s) => {
-              const parado = pendenteNaSecao(dashboard.pendencias, group.value, s.value);
-              return (
-                <Tab
-                  key={s.value}
-                  value={s.value}
-                  label={
-                    parado > 0 ? (
-                      <Badge badgeContent={parado} color="warning" sx={{ pr: 1.5 }}>
-                        {s.label}
-                      </Badge>
-                    ) : (
-                      s.label
-                    )
-                  }
-                />
-              );
-            })}
-          </Tabs>
-        )}
+            {/* Mundo: as sete fichas, cada uma numa aba da mesma fileira. O clã tem
+                formulário próprio porque carrega coordenada e escassez, que não
+                cabem no formulário genérico. */}
+            {group.value === "mundo" && section === "clas" && token && <AdminClaFichasTab adminToken={token} />}
+            {group.value === "mundo" && section !== "clas" && token && (
+              <AdminEstudio adminToken={token} secao={section} irPara={(sec) => irPara("mundo", sec)} />
+            )}
 
-        {error && <Alert severity="error">{error}</Alert>}
-        {notice && <Alert severity="info">{notice}</Alert>}
+            {group.value === "turno" && section === "registro" && token && <AdminRegistroTab adminToken={token} />}
 
-        {/* Um cabeçalho só, para as vinte seções. Antes cinco delas traziam a
-            própria explicação no corpo e catorze não traziam nenhuma, e o
-            resultado era uma fileira de substantivos que só se entendia
-            clicando em todos. */}
-        {secaoAberta && <CabecalhoDeSecao titulo={secaoAberta.label} descricao={secaoAberta.descricao} />}
+            {group.value === "jogadores" && section === "fichas" && (
+              <AdminHousesTab dashboard={dashboard} busy={busy} runAction={runAction} />
+            )}
+            {group.value === "jogadores" && section === "relacoes" && token && <AdminRelationsTab adminToken={token} />}
+            {group.value === "jogadores" && section === "vivos" && token && <AdminLivingTab adminToken={token} busy={busy} />}
 
-        {group.value === "turno" && (
-          <AdminTurnoTab
-            dashboard={dashboard}
-            adminToken={token ?? ""}
-            busy={busy}
-            runAction={runAction}
-            publicEvent={publicEvent}
-            setPublicEvent={setPublicEvent}
-            privateInfo={privateInfo}
-            setPrivateInfo={setPrivateInfo}
-            resolution={resolution}
-            setResolution={setResolution}
-            updateResolution={updateResolution}
-            discoveriesText={discoveriesText}
-            setDiscoveriesText={setDiscoveriesText}
-            setTurnImageUrl={setTurnImageUrl}
-            onDraftPublished={() => { if (token) void refresh(token); }}
-            onError={setError}
-            pendingProjects={dashboard.pendencias.projetos}
-          />
-        )}
+            {group.value === "imagens" && section === "gerador" && <EstudioTab isAdmin />}
+            {group.value === "imagens" && section === "entidades" && <EntidadesTab />}
+            {group.value === "imagens" && section === "acervo" && <AcervoTab isAdmin />}
+            {group.value === "imagens" && section === "prompts" && (
+              <AdminPromptsTab
+                busy={busy}
+                runAction={runAction}
+                worldLore={worldLore}
+                worldVisualDirectives={worldVisualDirectives}
+                setWorldVisualDirectives={setWorldVisualDirectives}
+              />
+            )}
 
-        {/* Mundo: as sete fichas, cada uma numa aba da mesma fileira. O clã tem
-            formulário próprio porque carrega coordenada e escassez, que não
-            cabem no formulário genérico. */}
-        {group.value === "mundo" && section === "clas" && token && <AdminClaFichasTab adminToken={token} />}
-        {group.value === "mundo" && section !== "clas" && token && (
-          <AdminEstudio adminToken={token} secao={section} irPara={(sec) => irPara("mundo", sec)} />
-        )}
+            {group.value === "sistema" && section === "biblia" && (
+              <AdminLoreTab
+                token={token}
+                busy={busy}
+                runAction={runAction}
+                worldLore={worldLore}
+                setWorldLore={setWorldLore}
+                worldVisualDirectives={worldVisualDirectives}
+              />
+            )}
+            {group.value === "sistema" && section === "canonico" && token && (
+              <AdminCanonTab adminToken={token} busy={busy} onError={setError} onChanged={() => { if (token) void refresh(token); }} />
+            )}
+            {group.value === "sistema" && section === "escriba" && (
+              <EscribaTab casas={dashboard?.houses ?? []} />
+            )}
 
-        {group.value === "turno" && section === "registro" && token && <AdminRegistroTab adminToken={token} />}
-
-        {group.value === "jogadores" && section === "fichas" && (
-          <AdminHousesTab dashboard={dashboard} busy={busy} runAction={runAction} />
-        )}
-        {group.value === "jogadores" && section === "relacoes" && token && <AdminRelationsTab adminToken={token} />}
-        {group.value === "jogadores" && section === "vivos" && token && <AdminLivingTab adminToken={token} busy={busy} />}
-
-        {group.value === "imagens" && section === "gerador" && <EstudioTab isAdmin />}
-        {group.value === "imagens" && section === "entidades" && <EntidadesTab />}
-        {group.value === "imagens" && section === "acervo" && <AcervoTab isAdmin />}
-        {group.value === "imagens" && section === "prompts" && (
-          <AdminPromptsTab
-            busy={busy}
-            runAction={runAction}
-            worldLore={worldLore}
-            worldVisualDirectives={worldVisualDirectives}
-            setWorldVisualDirectives={setWorldVisualDirectives}
-          />
-        )}
-
-        {group.value === "sistema" && section === "biblia" && (
-          <AdminLoreTab
-            token={token}
-            busy={busy}
-            runAction={runAction}
-            worldLore={worldLore}
-            setWorldLore={setWorldLore}
-            worldVisualDirectives={worldVisualDirectives}
-          />
-        )}
-        {group.value === "sistema" && section === "canonico" && token && (
-          <AdminCanonTab adminToken={token} busy={busy} onError={setError} onChanged={() => { if (token) void refresh(token); }} />
-        )}
-        {group.value === "sistema" && section === "escriba" && (
-          <EscribaTab casas={dashboard?.houses ?? []} />
-        )}
-
-        {group.value === "sistema" && section === "campanha" && <AdminSystemTab busy={busy} runAction={runAction} adminToken={token ?? ""} />}
+            {group.value === "sistema" && section === "campanha" && <AdminSystemTab busy={busy} runAction={runAction} adminToken={token ?? ""} />}
+          </Stack>
+        </Stack>
       </Stack>
     </Layout>
   );

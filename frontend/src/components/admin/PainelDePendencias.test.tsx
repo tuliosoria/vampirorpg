@@ -18,7 +18,7 @@ describe("a faixa do que está esperando", () => {
     const onIr = vi.fn();
     render(<PainelDePendencias pendencias={{ ...PENDENCIAS_VAZIAS, canonico: 1 }} onIr={onIr} />);
     await userEvent.click(screen.getByRole("button", { name: /verbete no cânone/i }));
-    expect(onIr).toHaveBeenCalledWith("mundo", "canonico");
+    expect(onIr).toHaveBeenCalledWith("sistema", "canonico");
   });
 
   // Uma faixa permanentemente presente dizendo "0" ensina o olho a pular a

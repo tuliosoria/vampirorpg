@@ -27,14 +27,28 @@ export const PENDENCIAS_VAZIAS: Pendencias = {
   projetos: 0, canonico: 0, espioes: 0, rascunho: 0, porto: 0, resolucao: 0,
 };
 
-/** Onde cada pendência mora no painel, para o atalho levar ao lugar certo. */
-export const PENDENCIA_DESTINO: Record<keyof Pendencias, { tab: string; sec?: string; label: (n: number) => string }> = {
-  resolucao: { tab: "turno", label: (n) => `${n} ordem${n > 1 ? "ns" : ""} para resolver` },
-  rascunho: { tab: "turno", label: () => "rascunho de turno por aplicar" },
-  porto: { tab: "turno", label: (n) => `${n} briefing${n > 1 ? "s" : ""} do Porto por escrever` },
-  projetos: { tab: "casas", sec: "casas", label: (n) => `${n} projeto${n > 1 ? "s" : ""} esperando despacho` },
-  canonico: { tab: "mundo", sec: "canonico", label: (n) => `${n} verbete${n > 1 ? "s" : ""} no cânone` },
-  espioes: { tab: "casas", sec: "casas", label: (n) => `${n} operação${n > 1 ? "ões" : ""} de espionagem sem desfecho` },
+/**
+ * Onde cada pendência mora no painel, para o atalho levar ao lugar certo.
+ *
+ * Toda entrada tem `sec`, e isso não é estilo: o contador de uma seção soma as
+ * pendências cujo destino bate em grupo E seção. As três do turno vinham sem
+ * `sec` de quando a Noite era uma página empilhada — e quando ela ganhou
+ * Resolver e Registro, elas pararam de bater com qualquer seção e o número
+ * sumiu do painel sem que nada quebrasse.
+ *
+ * Projetos e espionagem apontavam para "casas/casas", um grupo que deixou de
+ * existir; verbetes, para "mundo/canonico", e o Canônico mudou-se para Sistema.
+ * Um destino inválido não dá erro: o atalho leva a pessoa para a primeira seção
+ * do grupo e parece ter funcionado.
+ */
+export const PENDENCIA_DESTINO: Record<keyof Pendencias, { tab: string; sec: string; label: (n: number) => string }> = {
+  resolucao: { tab: "turno", sec: "resolver", label: (n) => `${n} ordem${n > 1 ? "ns" : ""} para resolver` },
+  rascunho: { tab: "turno", sec: "resolver", label: () => "rascunho de turno por aplicar" },
+  porto: { tab: "turno", sec: "resolver", label: (n) => `${n} briefing${n > 1 ? "s" : ""} do Porto por escrever` },
+  // Projetos e espionagem são despachados dentro da própria tela de resolver.
+  projetos: { tab: "turno", sec: "resolver", label: (n) => `${n} projeto${n > 1 ? "s" : ""} esperando despacho` },
+  espioes: { tab: "turno", sec: "resolver", label: (n) => `${n} operação${n > 1 ? "ões" : ""} de espionagem sem desfecho` },
+  canonico: { tab: "sistema", sec: "canonico", label: (n) => `${n} verbete${n > 1 ? "s" : ""} no cânone` },
 };
 
 export function totalPendente(p: Pendencias): number {

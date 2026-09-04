@@ -17,19 +17,31 @@ describe("o que está esperando o Mestre", () => {
     expect(totalPendente(PENDENCIAS_VAZIAS)).toBe(0);
   });
 
-  it("agrupa o que pertence a cada grupo de abas", () => {
-    // Turno: resolução, rascunho e Porto.
-    expect(pendenteNoGrupo(cheio, "turno")).toBe(4 + 1 + 1);
-    // Casas: projetos e espiões.
-    expect(pendenteNoGrupo(cheio, "casas")).toBe(2 + 3);
-    expect(pendenteNoGrupo(cheio, "mundo")).toBe(1);
-    expect(pendenteNoGrupo(cheio, "sistema")).toBe(0);
+  it("agrupa o que pertence a cada grupo do painel", () => {
+    // A Noite acumula tudo que se despacha durante o turno: ordens, rascunho,
+    // Porto, projetos e espionagem.
+    expect(pendenteNoGrupo(cheio, "turno")).toBe(4 + 1 + 1 + 2 + 3);
+    expect(pendenteNoGrupo(cheio, "sistema")).toBe(1);
+    expect(pendenteNoGrupo(cheio, "mundo")).toBe(0);
+    expect(pendenteNoGrupo(cheio, "jogadores")).toBe(0);
   });
 
-  it("desce até a seção, para a segunda fileira também avisar", () => {
-    expect(pendenteNaSecao(cheio, "mundo", "canonico")).toBe(1);
-    expect(pendenteNaSecao(cheio, "mundo", "biblia")).toBe(0);
-    expect(pendenteNaSecao(cheio, "casas", "casas")).toBe(2 + 3);
+  /**
+   * O contador da seção casa grupo E seção. As três do turno vinham sem `sec`
+   * de quando a Noite era uma página empilhada, e ao ganhar Resolver e Registro
+   * deixaram de bater com qualquer seção: o número sumiu sem nada quebrar.
+   */
+  it("desce até a seção, para a coluna também avisar", () => {
+    expect(pendenteNaSecao(cheio, "turno", "resolver")).toBe(4 + 1 + 1 + 2 + 3);
+    expect(pendenteNaSecao(cheio, "turno", "registro")).toBe(0);
+    expect(pendenteNaSecao(cheio, "sistema", "canonico")).toBe(1);
+    expect(pendenteNaSecao(cheio, "sistema", "biblia")).toBe(0);
+  });
+
+  it("nenhum destino fica sem seção", () => {
+    for (const chave of Object.keys(PENDENCIAS_VAZIAS) as (keyof Pendencias)[]) {
+      expect(PENDENCIA_DESTINO[chave].sec, chave).toBeTruthy();
+    }
   });
 
   it("todo tipo de pendência sabe para onde levar o Mestre", () => {

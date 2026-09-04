@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import { PENDENCIAS_VAZIAS, PENDENCIA_DESTINO, type Pendencias } from "@vampiro/content";
 import { ADMIN_GROUPS, groupOf, sectionOf } from "./adminNav";
 
 describe("ADMIN_GROUPS", () => {
@@ -131,5 +132,39 @@ describe("seções", () => {
   it("cai na primeira quando a pedida não existe naquele grupo", () => {
     expect(sectionOf("mundo", "acervo")).toBe("cidade");
     expect(sectionOf("imagens", "tramas")).toBe("gerador");
+  });
+});
+
+/**
+ * O elo que faltava, e por isso quebrou calado.
+ *
+ * A faixa dourada leva ao destino gravado em `PENDENCIA_DESTINO`, e o painel
+ * conta as pendências de uma seção casando grupo e seção com o mesmo registro.
+ * Os dois lados moram em pacotes diferentes — o destino no `shared`, a
+ * navegação aqui — e reestruturar o painel não dá erro nenhum do outro lado:
+ * um destino inválido só faz o atalho cair na primeira seção do grupo e o
+ * contador zerar, as duas coisas parecendo funcionar.
+ */
+describe("os atalhos das pendências", () => {
+  it("todo destino existe no painel", () => {
+    for (const chave of Object.keys(PENDENCIAS_VAZIAS) as (keyof Pendencias)[]) {
+      const { tab, sec } = PENDENCIA_DESTINO[chave];
+      const grupo = ADMIN_GROUPS.find((g) => g.value === tab);
+      expect(grupo, `${chave} aponta para o grupo "${tab}"`).toBeDefined();
+      expect(
+        grupo?.sections.some((s) => s.value === sec),
+        `${chave} aponta para "${tab}/${sec}"`,
+      ).toBe(true);
+    }
+  });
+
+  // Não basta existir: tem de ser onde o atalho realmente para. `groupOf` e
+  // `sectionOf` são quem decide isso, e é por elas que o clique passa.
+  it("o atalho para exatamente onde o destino diz", () => {
+    for (const chave of Object.keys(PENDENCIAS_VAZIAS) as (keyof Pendencias)[]) {
+      const { tab, sec } = PENDENCIA_DESTINO[chave];
+      expect(groupOf(tab).value, chave).toBe(tab);
+      expect(sectionOf(tab, sec), chave).toBe(sec);
+    }
   });
 });

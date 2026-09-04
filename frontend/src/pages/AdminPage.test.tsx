@@ -179,8 +179,13 @@ describe("AdminPage", () => {
   // deixaria um teste logado vazar para o seguinte.
   beforeEach(() => clearAdminToken());
 
-  async function goToTab(name: RegExp) {
-    await userEvent.click(screen.getByRole("tab", { name }));
+  /** A navegação é a coluna da esquerda: um clique, de qualquer lugar. */
+  function lateral() {
+    return within(screen.getByRole("navigation", { name: "Seções do painel" }));
+  }
+
+  async function irPara(name: RegExp) {
+    await userEvent.click(lateral().getByRole("button", { name }));
   }
 
   it("logs in and shows draft compose controls", async () => {
@@ -379,7 +384,7 @@ describe("AdminPage", () => {
     );
 
     await screen.findByRole("heading", { name: /painel do turno 2/i });
-    await goToTab(/sistema/i);
+    await irPara(/^campanha$/i);
     await userEvent.click(screen.getByRole("button", { name: /reiniciar campanha/i }));
 
     const confirm = await screen.findByRole("button", { name: /sim, apagar tudo/i });
@@ -400,7 +405,7 @@ describe("AdminPage", () => {
     );
 
     await screen.findByRole("heading", { name: /painel do turno 2/i });
-    await goToTab(/^jogadores$/i);
+    await irPara(/^fichas$/i);
     await screen.findByRole("heading", { name: /gerenciar personagens/i });
     await userEvent.click(screen.getByRole("button", { name: /adicionar personagem/i }));
 
@@ -429,7 +434,7 @@ describe("AdminPage", () => {
     );
 
     await screen.findByRole("heading", { name: /painel do turno 2/i });
-    await goToTab(/^jogadores$/i);
+    await irPara(/^fichas$/i);
     await screen.findByRole("heading", { name: /gerenciar personagens/i });
     await userEvent.click(screen.getByRole("button", { name: /^editar$/i }));
     await userEvent.click(screen.getByRole("button", { name: /salvar alterações/i }));
@@ -454,7 +459,7 @@ describe("AdminPage", () => {
     );
 
     await screen.findByRole("heading", { name: /painel do turno 2/i });
-    await goToTab(/^jogadores$/i);
+    await irPara(/^fichas$/i);
     await screen.findByRole("heading", { name: /gerenciar personagens/i });
     await userEvent.click(screen.getByRole("button", { name: /^deletar$/i }));
 
@@ -464,7 +469,7 @@ describe("AdminPage", () => {
     await waitFor(() => expect(client.adminDeleteHouse).toHaveBeenCalledWith("admin-token", "house-1"));
   });
 
-  it("switches between tabs and hides other panels", async () => {
+  it("troca de seção e esconde as outras", async () => {
     const client = makeClient();
     sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
@@ -480,22 +485,20 @@ describe("AdminPage", () => {
 
     // Duas fileiras, e só duas: o grupo diz onde estou, a seção diz qual
     // ferramenta. O Mundo abre na Cidade, que é onde uma crônica vazia começa.
-    await goToTab(/^mundo$/i);
+    await irPara(/^cidade$/i);
     expect(screen.queryByRole("heading", { name: /compor turno/i })).not.toBeInTheDocument();
     expect(screen.getByLabelText(/nome da cidade/i)).toBeInTheDocument();
 
-    await goToTab(/^imagens$/i);
-    await goToTab(/^estilo$/i);
+    await irPara(/^estilo$/i);
     expect(screen.getByRole("heading", { name: /estilo das imagens/i })).toBeInTheDocument();
     expect(screen.queryByLabelText(/nome da cidade/i)).not.toBeInTheDocument();
 
-    await goToTab(/^sistema$/i);
-    await goToTab(/^bíblia$/i);
+    await irPara(/^bíblia$/i);
     expect(screen.getByRole("heading", { name: /bíblia do mundo/i })).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: /estilo das imagens/i })).not.toBeInTheDocument();
   });
 
-  it("não carrega mais as abas mortas de Galeria e Senhas", async () => {
+  it("não carrega mais as seções mortas de Galeria e Senhas", async () => {
     const client = makeClient();
     sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
@@ -507,13 +510,18 @@ describe("AdminPage", () => {
     );
 
     await screen.findByRole("heading", { name: /painel do turno 2/i });
-    expect(screen.queryByRole("tab", { name: /em breve/i })).not.toBeInTheDocument();
-    // Cinco grupos no primeiro nível, no lugar das doze abas em fila.
-    // A primeira fileira, só. A segunda é das seções do grupo aberto.
-    const grupos = screen.getAllByRole("tablist")[0];
-    expect(within(grupos).getAllByRole("tab").map((t) => t.textContent)).toEqual(
-      ["Mundo", "Noite", "Jogadores", "Imagens", "Sistema"],
-    );
+    expect(screen.queryByRole("button", { name: /em breve/i })).not.toBeInTheDocument();
+
+    /**
+     * A regra que esta mudança existe para criar: nenhuma aba no painel.
+     * Eram duas fileiras, uma dentro da outra, e dezesseis dos vinte destinos
+     * ficavam escondidos atrás do clique no grupo certo.
+     */
+    expect(screen.queryAllByRole("tab")).toHaveLength(0);
+    expect(screen.queryAllByRole("tablist")).toHaveLength(0);
+
+    // Os vinte, todos na coluna, todos alcançáveis de onde quer que se esteja.
+    expect(lateral().getAllByRole("button")).toHaveLength(20);
   });
 
   /**
@@ -537,9 +545,76 @@ describe("AdminPage", () => {
     expect(screen.getByText(/a noite em andamento/i)).toBeInTheDocument();
 
     // Uma seção que nunca teve explicação nenhuma no corpo.
-    await goToTab(/^imagens$/i);
-    await goToTab(/^acervo$/i);
+    await irPara(/^acervo$/i);
     expect(screen.getByText(/tudo que já foi gerado/i)).toBeInTheDocument();
+  });
+
+  /**
+   * A coluna substituiu duas fileiras de abas, uma dentro da outra. O que ela
+   * precisa provar é o que as abas não davam: que todo destino está alcançável
+   * de onde quer que se esteja, e que dá para saber em qual deles se está.
+   */
+  describe("a coluna da esquerda", () => {
+    async function painelAberto(tab = "sistema&sec=escriba", dashboard = draftDashboard) {
+      const client = makeClient(dashboard);
+      sessionStorage.setItem("vampirorpg.admin", "admin-token");
+      render(
+        <ApiProvider client={client}>
+          <MemoryRouter initialEntries={[`/admin?tab=${tab}`]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <AdminPage />
+          </MemoryRouter>
+        </ApiProvider>,
+      );
+      await screen.findByRole("heading", { name: /painel do turno 2/i });
+    }
+
+    // Do canto mais escondido do painel até a primeira ficha do Mundo, num
+    // clique. Com as abas eram dois, e o primeiro era adivinhar a família.
+    it("leva de qualquer seção a qualquer outra num clique", async () => {
+      await painelAberto();
+      // Pela frase da seção, e não pelo título: "Escriba" nomeia tanto a seção
+      // quanto a ferramenta dentro dela, e a frase é única por construção.
+      expect(screen.getByText(/pergunta sobre o mundo/i)).toBeInTheDocument();
+
+      await userEvent.click(lateral().getByRole("button", { name: /^contos$/i }));
+
+      expect(screen.getByText(/o que a cidade conta sobre si/i)).toBeInTheDocument();
+      expect(screen.queryByText(/pergunta sobre o mundo/i)).not.toBeInTheDocument();
+    });
+
+    it("marca a seção aberta, e só ela", async () => {
+      await painelAberto("mundo&sec=tramas");
+      const marcados = lateral()
+        .getAllByRole("button")
+        .filter((b) => b.getAttribute("aria-current") === "page");
+      expect(marcados).toHaveLength(1);
+      expect(marcados[0]).toHaveTextContent("Tramas");
+    });
+
+    // O badge de trabalho parado vivia na aba do grupo e sumia quando o grupo
+    // não era o aberto. Na coluna ele fica à vista o tempo todo.
+    it("mostra o trabalho parado mesmo estando em outro grupo", async () => {
+      await painelAberto("mundo&sec=cidade", {
+        ...draftDashboard,
+        pendencias: { ...draftDashboard.pendencias, rascunho: 1, resolucao: 1 },
+      });
+      expect(lateral().getByRole("button", { name: /resolver/i })).toHaveTextContent("2");
+    });
+
+    it("no celular a coluna vira gaveta, e a gaveta navega", async () => {
+      await painelAberto("mundo&sec=cidade");
+
+      await userEvent.click(screen.getByRole("button", { name: /Mundo › Cidade/i }));
+      const gaveta = within(await screen.findByRole("navigation", { name: /gaveta/i }));
+      await userEvent.click(gaveta.getByRole("button", { name: /^locais$/i }));
+
+      expect(screen.getByRole("heading", { name: /^locais$/i })).toBeInTheDocument();
+      // Fecha ao navegar: numa tela estreita ela cobre o formulário para onde
+      // a pessoa acabou de pedir para ir.
+      await waitFor(() =>
+        expect(screen.queryByRole("navigation", { name: /gaveta/i })).not.toBeInTheDocument(),
+      );
+    });
   });
 
   it("opens the tab from the ?tab= query param", async () => {
