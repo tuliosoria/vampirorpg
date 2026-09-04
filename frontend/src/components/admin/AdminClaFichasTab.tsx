@@ -95,14 +95,6 @@ export function AdminClaFichasTab({ adminToken }: { adminToken: string }) {
 
   return (
     <Stack spacing={3}>
-      <Box>
-        <Typography variant="body2" color="text.secondary">
-          Cada clã aqui vira um ponto no mapa e uma página pública, e é desta lista que saem as
-          distâncias e o orçamento de correspondência. Quem <em>responde</em> pelo clã é um personagem:
-          cadastre-o na aba Personagens e marque-o como quem fala por ele.
-        </Typography>
-      </Box>
-
       {erro && <Alert severity="error" onClose={() => setErro(null)}>{erro}</Alert>}
       {aviso && <Alert severity="success" onClose={() => setAviso(null)}>{aviso}</Alert>}
 

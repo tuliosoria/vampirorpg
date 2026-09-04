@@ -3,7 +3,9 @@ import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
+import Chip from "@mui/material/Chip";
 import CardContent from "@mui/material/CardContent";
+import Divider from "@mui/material/Divider";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
@@ -29,7 +31,9 @@ import { EntidadeTab } from "./EntidadeTab";
  * duas criava um terceiro nível, e quem chegava para escrever um bairro
  * precisava acertar três cliques antes de ver um campo de texto.
  */
-export function AdminEstudio({ adminToken, secao }: { adminToken: string; secao: string }) {
+export function AdminEstudio({
+  adminToken, secao, irPara,
+}: { adminToken: string; secao: string; irPara: (secao: string) => void }) {
   const api = useApi();
   const recarregarCanon = useRecarregarCanon();
   const [mundo, setMundo] = useState<EstudioCompleto | null>(null);
@@ -102,6 +106,8 @@ export function AdminEstudio({ adminToken, secao }: { adminToken: string; secao:
         />
       )}
 
+      {secao === "cidade" && <Roteiro mundo={mundo} irPara={irPara} />}
+
       {def && (
         <EntidadeTab
           def={def}
@@ -130,9 +136,6 @@ function AbaCidade({
     <Card>
       <CardContent>
         <Stack spacing={2}>
-          <Typography variant="body2" color="text.secondary">
-            A cidade onde a crônica acontece. É o pano de fundo que a IA assume em tudo que escreve.
-          </Typography>
           <TextField
             size="small" label="Nome da Cidade" value={draft.nome}
             onChange={(e) => setDraft({ ...draft, nome: e.target.value })}
@@ -152,6 +155,73 @@ function AbaCidade({
               {ocupado ? "Salvando…" : "Salvar cidade"}
             </Button>
           </Box>
+        </Stack>
+      </CardContent>
+    </Card>
+  );
+}
+
+/** Os sete passos, na ordem em que um abre o seguinte. */
+const PASSOS: { secao: string; label: string; conta: (m: EstudioCompleto) => number }[] = [
+  { secao: "cidade", label: "Cidade", conta: (m) => (m.cidade.nome.trim() ? 1 : 0) },
+  { secao: "bairros", label: "Bairros", conta: (m) => m.bairros.length },
+  { secao: "clas", label: "Clãs", conta: (m) => m.clas.length },
+  { secao: "personagens", label: "Personagens", conta: (m) => m.personagens.length },
+  { secao: "locais", label: "Locais", conta: (m) => m.locais.length },
+  { secao: "tramas", label: "Tramas", conta: (m) => m.tramas.length },
+  { secao: "contos", label: "Contos", conta: (m) => m.contos.length },
+];
+
+/**
+ * O mapa de por onde seguir, na tela onde se chega.
+ *
+ * As sete abas do Mundo aparecem lado a lado e com o mesmo peso, mas não são
+ * intercambiáveis: um local pede um bairro e um personagem pede um clã, e quem
+ * começasse pelas Tramas abriria o formulário com todos os menus vazios e sem
+ * dizer por quê. A ordem está aqui, com o que já existe em cada passo, para que
+ * a primeira noite de escrita não comece por tentativa e erro.
+ */
+function Roteiro({ mundo, irPara }: { mundo: EstudioCompleto; irPara: (secao: string) => void }) {
+  const feitos = PASSOS.map((p) => p.conta(mundo));
+  const proximo = feitos.findIndex((n) => n === 0);
+
+  return (
+    <Card variant="outlined">
+      <CardContent>
+        <Stack spacing={1.5}>
+          <Box>
+            <Typography variant="h6">Por onde seguir</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Nesta ordem, porque cada passo abre o seguinte: um local precisa de um bairro, e um
+              personagem precisa de um clã. Nada aqui é obrigatório — a ordem só evita abrir um
+              formulário com todos os menus vazios.
+            </Typography>
+          </Box>
+          <Divider />
+          <Stack spacing={0.5}>
+            {PASSOS.map((passo, i) => (
+              <Stack key={passo.secao} direction="row" alignItems="center" spacing={1.5}>
+                <Typography variant="body2" color="text.secondary" sx={{ width: "1.5rem" }}>
+                  {i + 1}.
+                </Typography>
+                <Button
+                  size="small"
+                  variant="text"
+                  onClick={() => irPara(passo.secao)}
+                  sx={{ justifyContent: "flex-start", minWidth: "8rem" }}
+                >
+                  {passo.label}
+                </Button>
+                {feitos[i] > 0 ? (
+                  <Chip size="small" label={feitos[i]} />
+                ) : (
+                  <Typography variant="body2" color="text.secondary">
+                    {i === proximo ? "comece por aqui" : "nada ainda"}
+                  </Typography>
+                )}
+              </Stack>
+            ))}
+          </Stack>
         </Stack>
       </CardContent>
     </Card>

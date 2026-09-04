@@ -14,6 +14,15 @@
 export interface AdminSection {
   value: string;
   label: string;
+  /**
+   * O que se escreve aqui, em uma frase.
+   *
+   * Não é ajuda opcional: sem ela a segunda fileira é uma lista de substantivos
+   * — "Contos", "Acervo", "Escriba" — e quem chega precisa clicar em cada uma
+   * para descobrir o que é. A frase diz o que você está adicionando e o que
+   * aquilo passa a fazer no jogo depois de salvo.
+   */
+  descricao: string;
 }
 
 export interface AdminGroup {
@@ -41,54 +50,114 @@ export const ADMIN_GROUPS: AdminGroup[] = [
     value: "mundo",
     label: "Mundo",
     sections: [
-      { value: "cidade", label: "Cidade" },
-      { value: "bairros", label: "Bairros" },
+      { value: "cidade", label: "Cidade",
+        descricao:
+          "A cidade onde a crônica acontece: como ela é, o que se conta dela, quem manda de dia e o que caça à noite. Tudo o mais que você escrever vive dentro dela.",
+      },
+      { value: "bairros", label: "Bairros",
+        descricao:
+          "Os pedaços da Cidade. Cada bairro é um endereço: locais ficam num, personagens moram num, e a atmosfera que você der a ele contamina tudo que acontecer ali.",
+      },
       // O clã vem antes do personagem: é a ele que o personagem se prende.
-      { value: "clas", label: "Clãs" },
-      { value: "personagens", label: "Personagens" },
-      { value: "locais", label: "Locais" },
-      { value: "tramas", label: "Tramas" },
-      { value: "contos", label: "Contos" },
+      { value: "clas", label: "Clãs",
+        descricao:
+          "As famílias de vampiros que disputam a Cidade. Cada clã vira um ponto no mapa, uma página pública e um lugar na mesa — é a partir deles que a distância e o número de cartas por noite são calculados. Quem fala pelo clã é um personagem: cadastre-o em Personagens e marque-o como quem responde.",
+      },
+      { value: "personagens", label: "Personagens",
+        descricao:
+          "Quem habita a Cidade: vampiros, humanos, e o que mais houver. Preso a um clã, o personagem entra no elenco dele; marcado como quem responde, vira a voz de toda carta que aquele clã escrever.",
+      },
+      { value: "locais", label: "Locais",
+        descricao:
+          "Os lugares onde a crônica acontece — bares, capelas, hotéis, porões. É onde as cenas vão se passar e onde os personagens vão se encontrar.",
+      },
+      { value: "tramas", label: "Tramas",
+        descricao:
+          "Os conflitos em curso: quem quer o quê e a quem isso custa. A trama nasce invisível — os jogadores só veem a que você marcar.",
+      },
+      { value: "contos", label: "Contos",
+        descricao:
+          "O que a Cidade conta sobre si: lendas, crimes antigos, o incêndio que ninguém explica. Não precisam virar problema de ninguém para valerem a pena.",
+      },
     ],
   },
   {
     value: "turno",
     label: "Noite",
     sections: [
-      { value: "resolver", label: "Resolver" },
+      { value: "resolver", label: "Resolver",
+        descricao:
+          "A noite em andamento: as ordens que chegaram, as cartas a despachar e o resultado que os jogadores vão ler amanhã.",
+      },
       // O registro nasce no turno; consultá-lo é conferir o que a noite gerou.
-      { value: "registro", label: "Registro" },
+      { value: "registro", label: "Registro",
+        descricao:
+          "O que já aconteceu, noite a noite, em fatos com a citação de onde saíram. É o que impede a IA de contradizer a própria crônica.",
+      },
     ],
   },
   {
     value: "jogadores",
     label: "Jogadores",
     sections: [
-      { value: "fichas", label: "Fichas" },
-      { value: "relacoes", label: "Relações" },
-      { value: "vivos", label: "Estado vivo" },
+      { value: "fichas", label: "Fichas",
+        descricao:
+          "Os clãs que têm dono na mesa: atributos, código de acesso e o estado de cada jogador.",
+      },
+      { value: "relacoes", label: "Relações",
+        descricao:
+          "Quem é aliado de quem, e a que distância. A força de cada laço muda o que a IA escreve entre eles.",
+      },
+      { value: "vivos", label: "Estado vivo",
+        descricao:
+          "O estado vivo que o motor mantém para cada personagem — humor, objetivo, lealdade — e o que ele gravou depois da última noite. É aqui que você corrige o que saiu fora de tom.",
+      },
     ],
   },
   {
     value: "imagens",
     label: "Imagens",
     sections: [
-      { value: "gerador", label: "Gerador" },
-      { value: "entidades", label: "Entidades" },
-      { value: "acervo", label: "Acervo" },
-      { value: "prompts", label: "Estilo" },
+      { value: "gerador", label: "Gerador",
+        descricao:
+          "Gera a arte de uma entidade ou de uma cena a partir do que você já escreveu sobre ela.",
+      },
+      { value: "entidades", label: "Entidades",
+        descricao:
+          "As coisas do mundo que podem ser ilustradas, e as imagens que cada uma já tem.",
+      },
+      { value: "acervo", label: "Acervo",
+        descricao:
+          "Tudo que já foi gerado. É daqui que você escolhe qual imagem cada coisa usa no site.",
+      },
+      { value: "prompts", label: "Estilo",
+        descricao:
+          "As diretrizes visuais que toda imagem gerada obedece: paleta, luz, época, o que nunca aparece. Escreva uma vez e vale para o acervo inteiro.",
+      },
     ],
   },
   {
     value: "sistema",
     label: "Sistema",
     sections: [
-      { value: "campanha", label: "Campanha" },
+      { value: "campanha", label: "Campanha",
+        descricao:
+          "Abrir e reiniciar a campanha, e conferir se a chave da IA está respondendo.",
+      },
       // Guardam conteúdo que o Estúdio ainda não absorveu. Ficam aqui para não
       // se perderem, e fora do caminho de quem chega para escrever.
-      { value: "biblia", label: "Bíblia (antiga)" },
-      { value: "canonico", label: "Enciclopédia (antiga)" },
-      { value: "escriba", label: "Escriba (antigo)" },
+      { value: "biblia", label: "Bíblia (antiga)",
+        descricao:
+          "O texto longo de mundo que a IA lê antes de escrever qualquer coisa. Antecede o Estúdio e ainda alimenta a geração — o que estiver aqui continua valendo.",
+      },
+      { value: "canonico", label: "Enciclopédia (antiga)",
+        descricao:
+          "Os verbetes que a IA propôs a partir dos turnos e que esperam sua aprovação. O que você publica aqui aparece na enciclopédia pública da Cidade.",
+      },
+      { value: "escriba", label: "Escriba (antigo)",
+        descricao:
+          "Pergunta ao Escriba e transforma a resposta em verbete da enciclopédia. Anterior ao Estúdio, e mantido enquanto a enciclopédia pública vier daqui.",
+      },
     ],
   },
 ];

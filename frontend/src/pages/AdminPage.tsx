@@ -16,6 +16,7 @@ import { clearAdminToken, loadAdminToken, saveAdminToken } from "../auth/adminSe
 import { LoadingState } from "../components/LoadingState";
 import { Layout } from "../components/Layout";
 import { AdminEstudio } from "../components/admin/estudio/AdminEstudio";
+import { CabecalhoDeSecao } from "../components/admin/CabecalhoDeSecao";
 import { AdminClaFichasTab } from "../components/admin/AdminClaFichasTab";
 import { AdminRegistroTab } from "../components/admin/AdminRegistroTab";
 import { PainelDePendencias } from "../components/admin/PainelDePendencias";
@@ -67,6 +68,7 @@ export function AdminPage() {
   // trabalha. Os doze valores antigos continuam entrando, remapeados.
   const group = groupOf(searchParams.get("tab"));
   const section = sectionOf(searchParams.get("tab"), searchParams.get("sec"));
+  const secaoAberta = group.sections.find((s) => s.value === section);
 
   function selectGroup(next: string) {
     const params = new URLSearchParams(searchParams);
@@ -251,8 +253,9 @@ export function AdminPage() {
           </Tabs>
         </Box>
 
-        {/* A segunda fileira só aparece depois que o Mestre já decidiu onde
-            está. Grupos empilhados (Turno, Sistema) não têm nenhuma. */}
+        {/* A segunda fileira: a ferramenta dentro do grupo. Nunca há uma
+            terceira — quem abre o painel para escrever um bairro chega ao campo
+            de texto em dois cliques. */}
         {group.sections.length > 0 && (
           <Tabs value={section} onChange={(_e, next) => selectSection(next)} variant="scrollable" scrollButtons="auto" allowScrollButtonsMobile>
             {group.sections.map((s) => {
@@ -278,6 +281,12 @@ export function AdminPage() {
 
         {error && <Alert severity="error">{error}</Alert>}
         {notice && <Alert severity="info">{notice}</Alert>}
+
+        {/* Um cabeçalho só, para as vinte seções. Antes cinco delas traziam a
+            própria explicação no corpo e catorze não traziam nenhuma, e o
+            resultado era uma fileira de substantivos que só se entendia
+            clicando em todos. */}
+        {secaoAberta && <CabecalhoDeSecao titulo={secaoAberta.label} descricao={secaoAberta.descricao} />}
 
         {group.value === "turno" && (
           <AdminTurnoTab
@@ -306,7 +315,7 @@ export function AdminPage() {
             cabem no formulário genérico. */}
         {group.value === "mundo" && section === "clas" && token && <AdminClaFichasTab adminToken={token} />}
         {group.value === "mundo" && section !== "clas" && token && (
-          <AdminEstudio adminToken={token} secao={section} />
+          <AdminEstudio adminToken={token} secao={section} irPara={(sec) => irPara("mundo", sec)} />
         )}
 
         {group.value === "turno" && section === "registro" && token && <AdminRegistroTab adminToken={token} />}

@@ -31,6 +31,27 @@ describe("ADMIN_GROUPS", () => {
     );
   });
 
+  /**
+   * A fileira sozinha é uma lista de substantivos, e "Acervo", "Escriba" e
+   * "Contos" não dizem o que guardam. Quem chega para escrever o mundo não deve
+   * precisar clicar em todos para descobrir onde escreve o quê.
+   */
+  it("toda seção diz o que se adiciona nela", () => {
+    for (const g of ADMIN_GROUPS) {
+      for (const s of g.sections) {
+        expect(s.descricao.trim(), `${g.value}/${s.value}`).not.toBe("");
+        // Uma frase de verdade, não o rótulo repetido com outra pontuação.
+        expect(s.descricao.length, `${g.value}/${s.value}`).toBeGreaterThan(40);
+        expect(s.descricao, `${g.value}/${s.value}`).not.toBe(s.label);
+      }
+    }
+  });
+
+  it("nenhuma descrição serve para duas seções", () => {
+    const todas = ADMIN_GROUPS.flatMap((g) => g.sections.map((s) => s.descricao));
+    expect(new Set(todas).size).toBe(todas.length);
+  });
+
   // Guardam conteúdo que o Estúdio ainda não absorveu. Ficam alcançáveis, e
   // marcadas, para não se perderem nem confundirem quem chega.
   it("o que ficou para trás está em Sistema e diz que é antigo", () => {

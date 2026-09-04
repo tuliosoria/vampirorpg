@@ -46,8 +46,6 @@ export interface DefinicaoDeEntidade {
   /** Uma linha de resumo na lista, montada dos campos que existirem. */
   resumo: string[];
   campos: Campo[];
-  /** O que o Narrador ganha ao preencher esta ficha. Aparece no topo da aba. */
-  porque: string;
 }
 
 const ROTULOS_DE_ESCOLHA: Record<string, string> = {
@@ -72,7 +70,6 @@ export const ENTIDADES: DefinicaoDeEntidade[] = [
     singular: "bairro",
     titulo: "nome",
     resumo: ["atmosfera"],
-    porque: "Os bairros dividem a Cidade. Locais pertencem a eles, e personagens moram neles.",
     campos: [
       { nome: "nome", rotulo: "Nome do bairro", tipo: "texto" },
       { nome: "atmosfera", rotulo: "Atmosfera", tipo: "texto", ajuda: "Decadente, aristocrático, industrial, boêmio. Uma palavra ou duas." },
@@ -87,9 +84,6 @@ export const ENTIDADES: DefinicaoDeEntidade[] = [
     singular: "personagem",
     titulo: "nome",
     resumo: ["tipo", "claKey"],
-    porque:
-      "Quem habita a Cidade. Um personagem vampiro que aponta para um clã entra no elenco dele; " +
-      "marcado como quem responde, passa a ser a voz das cartas daquele clã.",
     campos: [
       { nome: "nome", rotulo: "Nome", tipo: "texto" },
       { nome: "tipo", rotulo: "Tipo", tipo: "escolha", opcoes: TIPOS_DE_PERSONAGEM },
@@ -119,7 +113,6 @@ export const ENTIDADES: DefinicaoDeEntidade[] = [
     singular: "local",
     titulo: "nome",
     resumo: ["bairroId"],
-    porque: "Bares, capelas, hotéis, porões. Onde a crônica acontece.",
     campos: [
       { nome: "nome", rotulo: "Nome do local", tipo: "texto" },
       { nome: "bairroId", rotulo: "Bairro", tipo: "referencia", de: "bairros" },
@@ -134,7 +127,6 @@ export const ENTIDADES: DefinicaoDeEntidade[] = [
     singular: "trama",
     titulo: "nome",
     resumo: ["importancia", "estado"],
-    porque: "Os conflitos em curso. A trama nasce invisível: só o que você marcar chega aos jogadores.",
     campos: [
       { nome: "nome", rotulo: "Nome da trama", tipo: "texto" },
       { nome: "importancia", rotulo: "Importância", tipo: "escolha", opcoes: IMPORTANCIAS },
@@ -154,7 +146,6 @@ export const ENTIDADES: DefinicaoDeEntidade[] = [
     singular: "conto",
     titulo: "titulo",
     resumo: ["tipo", "periodo"],
-    porque: "Lendas, crimes antigos, o que a Cidade conta sobre si. Não precisam virar problema de ninguém.",
     campos: [
       { nome: "titulo", rotulo: "Título", tipo: "texto" },
       { nome: "tipo", rotulo: "Tipo", tipo: "escolha", opcoes: TIPOS_DE_CONTO },

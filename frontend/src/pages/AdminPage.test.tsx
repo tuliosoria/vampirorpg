@@ -516,6 +516,32 @@ describe("AdminPage", () => {
     );
   });
 
+  /**
+   * O defeito que o cabeçalho conserta: cinco seções traziam a própria
+   * explicação no corpo e catorze não traziam nenhuma, então a segunda fileira
+   * era uma lista de substantivos que só se entendia clicando em todos.
+   */
+  it("toda seção aberta diz o que se adiciona nela", async () => {
+    const client = makeClient();
+    sessionStorage.setItem("vampirorpg.admin", "admin-token");
+    render(
+      <ApiProvider client={client}>
+        <MemoryRouter initialEntries={["/admin?tab=turno"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <AdminPage />
+        </MemoryRouter>
+      </ApiProvider>,
+    );
+
+    await screen.findByRole("heading", { name: /painel do turno 2/i });
+    expect(screen.getByRole("heading", { name: /^resolver$/i })).toBeInTheDocument();
+    expect(screen.getByText(/a noite em andamento/i)).toBeInTheDocument();
+
+    // Uma seção que nunca teve explicação nenhuma no corpo.
+    await goToTab(/^imagens$/i);
+    await goToTab(/^acervo$/i);
+    expect(screen.getByText(/tudo que já foi gerado/i)).toBeInTheDocument();
+  });
+
   it("opens the tab from the ?tab= query param", async () => {
     const client = makeClient();
     sessionStorage.setItem("vampirorpg.admin", "admin-token");

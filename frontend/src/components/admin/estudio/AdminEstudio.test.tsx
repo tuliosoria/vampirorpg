@@ -15,15 +15,17 @@ import { AdminEstudio } from "./AdminEstudio";
 beforeEach(limparCanonAplicado);
 
 async function abrir(client: MockApiClient, secao = "cidade") {
+  const idas: string[] = [];
   await act(async () => {
     render(
       <ApiProvider client={client}>
         <CanonProvider>
-          <AdminEstudio adminToken="t" secao={secao} />
+          <AdminEstudio adminToken="t" secao={secao} irPara={(s) => idas.push(s)} />
         </CanonProvider>
       </ApiProvider>,
     );
   });
+  return idas;
 }
 
 describe("AdminEstudio", () => {
@@ -115,5 +117,47 @@ describe("AdminEstudio", () => {
     expect(publico.tramas).toHaveLength(0);
     expect(JSON.stringify(publico)).not.toContain("É o próprio Príncipe");
     expect((await client.getEstudio("t")).tramas).toHaveLength(1);
+  });
+
+  /**
+   * As sete abas do Mundo têm o mesmo peso na fileira, mas não são
+   * intercambiáveis: quem começasse pelas Tramas abriria o formulário com todos
+   * os menus vazios e sem dizer por quê. O roteiro é o que conta a ordem.
+   */
+  describe("o roteiro da Cidade", () => {
+    it("aponta o primeiro passo vazio numa crônica em branco", async () => {
+      await abrir(new MockApiClient(), "cidade");
+
+      const passo = screen.getByRole("button", { name: "Cidade" }).closest("div");
+      expect(passo).toHaveTextContent("comece por aqui");
+      // Um só. "Comece por aqui" em sete linhas não indica nada.
+      expect(screen.getAllByText("comece por aqui")).toHaveLength(1);
+    });
+
+    it("mostra o que já existe e avança o ponto de partida", async () => {
+      const client = new MockApiClient();
+      await client.saveCidade("t", { nome: "Porto Lívido", descricao: "", segredos: "", atualizadoEm: "" });
+      await client.saveEstudioItem("t", "bairros", {
+        id: "centro-velho", nome: "Centro Velho", descricao: "", atmosfera: "", segredos: "", atualizadoEm: "",
+      });
+
+      await abrir(client, "cidade");
+
+      expect(screen.getByRole("button", { name: "Bairros" }).closest("div")).toHaveTextContent("1");
+      expect(screen.getByRole("button", { name: "Clãs" }).closest("div")).toHaveTextContent("comece por aqui");
+    });
+
+    it("cada passo leva à sua seção", async () => {
+      const idas = await abrir(new MockApiClient(), "cidade");
+      await act(async () => { await userEvent.click(screen.getByRole("button", { name: "Personagens" })); });
+      expect(idas).toEqual(["personagens"]);
+    });
+
+    // Só na tela onde se chega. Repetido em toda seção viraria ruído para quem
+    // já sabe onde está.
+    it("não aparece nas outras seções", async () => {
+      await abrir(new MockApiClient(), "tramas");
+      expect(screen.queryByText(/por onde seguir/i)).not.toBeInTheDocument();
+    });
   });
 });

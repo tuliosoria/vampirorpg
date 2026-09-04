@@ -94,8 +94,6 @@ export function EntidadeTab({ def, itens, mundo, onSalvar, onRemover, ocupado }:
 
   return (
     <Stack spacing={3}>
-      <Typography variant="body2" color="text.secondary">{def.porque}</Typography>
-
       {erro && <Alert severity="error" onClose={() => setErro(null)}>{erro}</Alert>}
 
       {!draft && <Box><Button onClick={novo}>{def.genero === "f" ? "Nova" : "Novo"} {def.singular}</Button></Box>}
