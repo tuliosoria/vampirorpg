@@ -2,7 +2,7 @@ import type { HandlerRequest, HandlerResponse } from "./types/domain";
 import { HttpError } from "./types/domain";
 import { garantirCanon } from "./canon/aplicar";
 import { listCla, saveCla, removeCla } from "./routes/claRoutes";
-import { getEstudio, getEstudioPublico, salvarItem, removerItem, salvarCidade } from "./routes/estudioRoutes";
+import { getEstudio, getEstudioPublico, salvarItem, removerItem, salvarCidade, revisarItem } from "./routes/estudioRoutes";
 import { getCampaign, getHouseExample, createAccountAndHouse, login, getGallery, getWiki, getChronicle, generateHouseImage, type Deps } from "./routes/publicRoutes";
 import { getGame, submitOrder } from "./routes/playerRoutes";
 import { escribaPreview, escribaPublicar } from "./routes/escribaRoutes";
@@ -47,6 +47,9 @@ const routes: Route[] = [
   r("GET", "/api/estudio/publico", getEstudioPublico),
   r("GET", "/api/admin/estudio", getEstudio),
   r("PUT", "/api/admin/estudio/cidade", salvarCidade),
+  // Antes da rota de gravar: o roteador casa na ordem, e "/:colecao" com um
+  // segmento a mais não é a mesma coisa que "/:colecao".
+  r("POST", "/api/admin/estudio/:colecao/revisar", revisarItem),
   r("POST", "/api/admin/estudio/:colecao", salvarItem),
   r("POST", "/api/admin/estudio/:colecao/delete", removerItem),
   r("GET", "/api/house-example", getHouseExample),

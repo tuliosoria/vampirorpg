@@ -1114,6 +1114,26 @@ export class MockApiClient implements ApiClient {
     return gravado as T;
   }
 
+  /**
+   * A revisão de mentira: devolve cada campo de texto com uma marca.
+   *
+   * Basta para os testes, que verificam o fluxo — mostrar as duas versões,
+   * aceitar uma, e não gravar nada sem o Narrador mandar — e não a prosa.
+   */
+  async revisarEstudioItem(
+    _token: string,
+    _colecao: ColecaoDoEstudio | "cidade",
+    item: unknown,
+  ): Promise<Record<string, string>> {
+    const campos: Record<string, string> = {};
+    for (const [k, v] of Object.entries((item ?? {}) as Record<string, unknown>)) {
+      if (typeof v === "string" && v.trim() && !["id", "nome", "titulo", "claKey", "bairroId"].includes(k)) {
+        campos[k] = `${v} (revisado)`;
+      }
+    }
+    return campos;
+  }
+
   async deleteEstudioItem(_token: string, colecao: ColecaoDoEstudio, id: string): Promise<void> {
     const lista = this.estudio[colecao] as { id: string }[];
     const i = lista.findIndex((x) => x.id === id);

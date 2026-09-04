@@ -59,6 +59,7 @@ function makeClient(dashboard: AdminDashboard = draftDashboard): ApiClient {
       bairros: [], personagens: [], locais: [], tramas: [], contos: [], clas: [],
     }),
     saveEstudioItem: vi.fn(),
+    revisarEstudioItem: vi.fn().mockResolvedValue({}),
     deleteEstudioItem: vi.fn(),
     saveCidade: vi.fn(),
     adminSaveCla: vi.fn(),

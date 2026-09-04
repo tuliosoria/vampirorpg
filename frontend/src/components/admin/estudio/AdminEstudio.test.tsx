@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { act } from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { limparCanonAplicado } from "@vampiro/content";
 import { ApiProvider } from "../../../api/ApiProvider";
@@ -158,6 +158,91 @@ describe("AdminEstudio", () => {
     it("não aparece nas outras seções", async () => {
       await abrir(new MockApiClient(), "tramas");
       expect(screen.queryByText(/por onde seguir/i)).not.toBeInTheDocument();
+    });
+  });
+
+  /**
+   * "Revisar com IA": a IA propõe, o Narrador decide.
+   *
+   * O que estes testes protegem não é a prosa — é a fronteira. Um botão que
+   * melhorasse o texto sozinho estaria apagando a decisão de quem o escreveu
+   * daquele jeito, e um que gravasse a revisão tiraria dele a última palavra.
+   */
+  describe("revisar com IA", () => {
+    async function comBairro(client: MockApiClient) {
+      await client.saveEstudioItem("t", "bairros", {
+        id: "centro-velho", nome: "Centro Velho", descricao: "predios velhos",
+        atmosfera: "decadente", segredos: "tem tunel", atualizadoEm: "",
+      });
+      await abrir(client, "bairros");
+      await act(async () => { await userEvent.click(screen.getByRole("button", { name: /^Editar$/i })); });
+    }
+
+    it("mostra o que você escreveu ao lado do que a IA propôs", async () => {
+      await comBairro(new MockApiClient());
+      await act(async () => { await userEvent.click(screen.getByRole("button", { name: /revisar com ia/i })); });
+
+      const dialogo = within(await screen.findByRole("dialog"));
+      expect(dialogo.getByText("predios velhos")).toBeInTheDocument();
+      expect(dialogo.getByLabelText(/versão da ia — descrição/i)).toHaveValue("predios velhos (revisado)");
+    });
+
+    // O caso comum: gostar da descrição e achar que a IA errou o tom do
+    // segredo. Um botão só para as duas obrigaria a jogar fora a metade boa.
+    it("aceita campo a campo, e não a revisão inteira", async () => {
+      await comBairro(new MockApiClient());
+      await act(async () => { await userEvent.click(screen.getByRole("button", { name: /revisar com ia/i })); });
+      await screen.findByLabelText(/versão da ia — descrição/i);
+
+      const usar = screen.getAllByRole("button", { name: /usar esta versão/i });
+      await act(async () => { await userEvent.click(usar[0]); });
+      await act(async () => { await userEvent.click(screen.getByRole("button", { name: /levar o campo/i })); });
+
+      expect(screen.getByLabelText("Descrição")).toHaveValue("predios velhos (revisado)");
+      // O segredo, que ele não aceitou, ficou como estava.
+      expect(screen.getByLabelText(/🔒 Segredos/)).toHaveValue("tem tunel");
+    });
+
+    it("descartar não mexe em nada", async () => {
+      await comBairro(new MockApiClient());
+      await act(async () => { await userEvent.click(screen.getByRole("button", { name: /revisar com ia/i })); });
+      await screen.findByLabelText(/versão da ia — descrição/i);
+
+      await act(async () => { await userEvent.click(screen.getAllByRole("button", { name: /usar esta versão/i })[0]); });
+      await act(async () => { await userEvent.click(screen.getByRole("button", { name: /descartar a revisão/i })); });
+
+      expect(screen.getByLabelText("Descrição")).toHaveValue("predios velhos");
+    });
+
+    /**
+     * A regra que o painel inteiro sustenta: gravar é do botão de salvar, com o
+     * que estiver no formulário. Revisar leva o texto para a tela e para por aí.
+     */
+    it("levar para o formulário não grava", async () => {
+      const client = new MockApiClient();
+      await comBairro(client);
+      await act(async () => { await userEvent.click(screen.getByRole("button", { name: /revisar com ia/i })); });
+      await screen.findByLabelText(/versão da ia — descrição/i);
+      await act(async () => { await userEvent.click(screen.getAllByRole("button", { name: /usar esta versão/i })[0]); });
+      await act(async () => { await userEvent.click(screen.getByRole("button", { name: /levar o campo/i })); });
+      await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+
+      const gravado = (await client.getEstudio("t")).bairros[0];
+      expect(gravado.descricao).toBe("predios velhos");
+
+      await act(async () => { await userEvent.click(screen.getByRole("button", { name: /^Salvar$/i })); });
+      expect((await client.getEstudio("t")).bairros[0].descricao).toBe("predios velhos (revisado)");
+    });
+
+    it("diz quando a revisão falha, sem perder o que estava escrito", async () => {
+      const client = new MockApiClient();
+      client.revisarEstudioItem = async () => { throw new Error("A IA não está configurada."); };
+      await comBairro(client);
+      await act(async () => { await userEvent.click(screen.getByRole("button", { name: /revisar com ia/i })); });
+
+      expect(await screen.findByText(/a ia não está configurada/i)).toBeInTheDocument();
+      await act(async () => { await userEvent.click(screen.getByRole("button", { name: /descartar a revisão/i })); });
+      expect(screen.getByLabelText("Descrição")).toHaveValue("predios velhos");
     });
   });
 });

@@ -321,6 +321,15 @@ export interface ApiClient {
   /** Tudo, cru. Exige sessão de Narrador. */
   getEstudio(token: string): Promise<EstudioCompleto>;
   saveEstudioItem<T>(token: string, colecao: ColecaoDoEstudio, item: T): Promise<T>;
+  /**
+   * Uma versão melhor escrita da ficha, para o Narrador comparar. Não grava:
+   * quem grava é `saveEstudioItem`, com o que estiver no formulário.
+   */
+  revisarEstudioItem(
+    token: string,
+    colecao: ColecaoDoEstudio | "cidade",
+    item: unknown,
+  ): Promise<Record<string, string>>;
   deleteEstudioItem(token: string, colecao: ColecaoDoEstudio, id: string): Promise<void>;
   saveCidade(token: string, cidade: Cidade): Promise<Cidade>;
   adminSaveCla(token: string, ficha: Partial<ClaFicha> & { name: string }): Promise<ClaFicha>;

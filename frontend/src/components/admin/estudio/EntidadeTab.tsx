@@ -15,6 +15,7 @@ import Typography from "@mui/material/Typography";
 import DeleteIcon from "@mui/icons-material/DeleteOutline";
 import type { EstudioCompleto } from "../../../api/client";
 import { rotuloDeEscolha, type Campo, type DefinicaoDeEntidade } from "./campos";
+import { RevisaoDialog, type CampoEmRevisao } from "./RevisaoDialog";
 
 /**
  * O formulário de qualquer entidade do Estúdio.
@@ -51,12 +52,42 @@ interface Props {
   mundo: EstudioCompleto;
   onSalvar: (item: Record<string, unknown>) => Promise<void>;
   onRemover: (id: string) => Promise<void>;
+  /** Devolve os campos revisados. Não grava — quem grava é `onSalvar`. */
+  onRevisar: (item: Record<string, unknown>) => Promise<Record<string, string>>;
   ocupado: boolean;
 }
 
-export function EntidadeTab({ def, itens, mundo, onSalvar, onRemover, ocupado }: Props) {
+/**
+ * Monta a comparação a partir do que o backend devolveu, e não de uma lista
+ * própria de campos revisáveis.
+ *
+ * Duas listas divergem: alguém acrescenta um campo lá e aqui ele não aparece,
+ * ou aparece e volta vazio. Quem decide o que pode ser reescrito é o servidor,
+ * porque é ele que precisa impedir a IA de mexer num vínculo.
+ */
+export function camposEmRevisao(
+  def: DefinicaoDeEntidade,
+  original: Record<string, unknown>,
+  daIa: Record<string, string>,
+): CampoEmRevisao[] {
+  return Object.entries(daIa).map(([nome, texto]) => {
+    const conhecido = def.campos.find((c) => c.nome === nome);
+    return {
+      nome,
+      rotulo: conhecido?.rotulo ?? nome,
+      segredo: conhecido?.segredo ?? false,
+      original: String(ler(original, nome) ?? ""),
+      daIa: texto,
+    };
+  });
+}
+
+export function EntidadeTab({ def, itens, mundo, onSalvar, onRemover, onRevisar, ocupado }: Props) {
   const [draft, setDraft] = useState<Record<string, unknown> | null>(null);
   const [erro, setErro] = useState<string | null>(null);
+  const [revisao, setRevisao] = useState<CampoEmRevisao[] | null>(null);
+  const [revisando, setRevisando] = useState(false);
+  const [erroDaRevisao, setErroDaRevisao] = useState<string | null>(null);
 
   const opcoesDe = useMemo(() => {
     return (campo: Campo): { valor: string; rotulo: string }[] => {
@@ -80,6 +111,20 @@ export function EntidadeTab({ def, itens, mundo, onSalvar, onRemover, ocupado }:
       setDraft(null);
     } catch (e) {
       setErro(e instanceof Error ? e.message : "Falha ao salvar.");
+    }
+  };
+
+  const revisar = async () => {
+    if (!draft) return;
+    setRevisando(true);
+    setErroDaRevisao(null);
+    setRevisao([]);
+    try {
+      setRevisao(camposEmRevisao(def, draft, await onRevisar(draft)));
+    } catch (e) {
+      setErroDaRevisao(e instanceof Error ? e.message : "A revisão falhou.");
+    } finally {
+      setRevisando(false);
     }
   };
 
@@ -160,12 +205,29 @@ export function EntidadeTab({ def, itens, mundo, onSalvar, onRemover, ocupado }:
                 <Button onClick={() => void salvar()} disabled={ocupado || !String(ler(draft, def.titulo) ?? "").trim()}>
                   {ocupado ? "Salvando…" : "Salvar"}
                 </Button>
-                <Button variant="outlined" onClick={() => setDraft(null)} disabled={ocupado}>Cancelar</Button>
+                {/* Salvar grava o que você escreveu. Revisar não grava nada — é
+                    a diferença que os dois botões precisam deixar clara. */}
+                <Button variant="outlined" onClick={() => void revisar()} disabled={ocupado || revisando}>
+                  {revisando ? "Revisando…" : "Revisar com IA"}
+                </Button>
+                <Button variant="text" onClick={() => setDraft(null)} disabled={ocupado}>Cancelar</Button>
               </Stack>
             </Stack>
           </CardContent>
         </Card>
       )}
+
+      <RevisaoDialog
+        aberto={revisao !== null}
+        carregando={revisando}
+        erro={erroDaRevisao}
+        campos={revisao ?? []}
+        onFechar={() => setRevisao(null)}
+        onAceitar={(escolhidos) => {
+          setDraft((d) => (d ? Object.entries(escolhidos).reduce((acc, [k, v]) => escrever(acc, k, v), d) : d));
+          setRevisao(null);
+        }}
+      />
 
       <Divider />
 

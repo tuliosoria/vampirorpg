@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { getEstudio, getEstudioPublico, salvarItem, removerItem, salvarCidade } from "./estudioRoutes";
+import { getEstudio, getEstudioPublico, salvarItem, removerItem, salvarCidade, revisarItem } from "./estudioRoutes";
 import type { Deps } from "./publicRoutes";
 import * as auth from "../auth/adminAuth";
 import * as db from "../db/estudio";
@@ -194,5 +194,93 @@ describe("cidade", () => {
 
   it("recusa cidade sem nome", async () => {
     await expect(salvarCidade(deps(), req({ descricao: "d" }))).rejects.toMatchObject({ status: 400 });
+  });
+});
+
+
+/**
+ * "Revisar com IA", e a razão de ela custar duas chamadas.
+ *
+ * A revisão dos campos públicos não pode enxergar segredo — nem o da própria
+ * ficha, nem o das outras. É o mesmo critério das projeções, aplicado ao que
+ * sai daqui para o modelo em vez do que sai para o jogador, e provado do mesmo
+ * jeito: o marcador está plantado em toda ficha do cenário acima.
+ */
+describe("revisar com IA", () => {
+  /** Guarda o que foi mandado ao modelo, para varrer depois. */
+  function depsComChat(resposta: string) {
+    const chamadas: { system: string; user: string }[] = [];
+    const chat = vi.fn(async (system: string, user: string) => {
+      chamadas.push({ system, user });
+      return resposta;
+    });
+    return { d: { ...deps(), chat } as unknown as Deps, chamadas };
+  }
+
+  const RESPOSTA = JSON.stringify({
+    descricao: "Prédios dos anos trinta, tortos de umidade.",
+    segredos: "Três entradas, e uma delas dá no rio.",
+    historia: "Abraçado em 1908, numa noite de chuva.",
+    objetivos: "Quer o porto, e quer que saibam que quer.",
+  });
+
+  it("o pedido dos campos públicos não leva segredo algum", async () => {
+    const { d, chamadas } = depsComChat(RESPOSTA);
+    await revisarItem(d, req(bairro, { colecao: "bairros" }));
+
+    // Duas chamadas: os públicos e os secretos, separados de propósito.
+    expect(chamadas).toHaveLength(2);
+    const publico = chamadas.find((c) => c.user.includes("PÚBLICOS"));
+    expect(publico).toBeDefined();
+    expect(publico?.user).not.toContain(SEGREDO);
+  });
+
+  // O outro lado da mesma moeda: separar não pode significar escrever no escuro.
+  it("o pedido dos segredos vê o segredo que está revisando", async () => {
+    const { d, chamadas } = depsComChat(RESPOSTA);
+    await revisarItem(d, req(bairro, { colecao: "bairros" }));
+
+    const secreto = chamadas.find((c) => c.user.includes("SEGREDOS DO NARRADOR"));
+    expect(secreto?.user).toContain("Três entradas");
+  });
+
+  it("devolve os dois lados revisados, e não grava nada", async () => {
+    const { d } = depsComChat(RESPOSTA);
+    const res = await revisarItem(d, req(bairro, { colecao: "bairros" }));
+
+    expect(res.status).toBe(200);
+    expect((res.body as { campos: Record<string, string> }).campos).toEqual({
+      descricao: "Prédios dos anos trinta, tortos de umidade.",
+      segredos: "Três entradas, e uma delas dá no rio.",
+    });
+    // O botão de salvar é quem grava, com o que estiver no formulário.
+    expect(db.gravar).not.toHaveBeenCalled();
+  });
+
+  it("não gasta chamada com campo vazio", async () => {
+    const { d, chamadas } = depsComChat(RESPOSTA);
+    await revisarItem(d, req({ ...bairro, segredos: "" }, { colecao: "bairros" }));
+    expect(chamadas).toHaveLength(1);
+    expect(chamadas[0].user).toContain("PÚBLICOS");
+  });
+
+  it("exige sessão de Narrador", async () => {
+    vi.mocked(auth.requireAdmin).mockImplementation(() => {
+      throw new Error("sem sessão");
+    });
+    const { d } = depsComChat(RESPOSTA);
+    await expect(revisarItem(d, req(bairro, { colecao: "bairros" }))).rejects.toThrow("sem sessão");
+  });
+
+  it("recusa coleção que não existe", async () => {
+    const { d } = depsComChat(RESPOSTA);
+    await expect(revisarItem(d, req(bairro, { colecao: "inventada" }))).rejects.toMatchObject({ status: 404 });
+  });
+
+  it("avisa quando a IA não está ligada, em vez de estourar", async () => {
+    await expect(revisarItem(deps(), req(bairro, { colecao: "bairros" }))).rejects.toMatchObject({
+      status: 503,
+      code: "AI_DISABLED",
+    });
   });
 });

@@ -6,6 +6,10 @@ import {
   type Bairro, type Cidade, type Conto, type Local, type Personagem, type Trama,
 } from "@vampiro/content";
 import { HttpError, type HandlerRequest, type HandlerResponse } from "../types/domain";
+import { generateJson } from "../ai/openai";
+import {
+  CAMPOS_REVISAVEIS, contextoDoMundo, parseRevisao, pedidoDeRevisao, sistemaDeRevisao,
+} from "../ai/estudioRevisao";
 import { requireAdmin } from "../auth/adminAuth";
 import { gravar, gravarCidade, lerCidade, listar, remover } from "../db/estudio";
 import { listClaFichas } from "../db/canonFichas";
@@ -237,4 +241,79 @@ export async function salvarCidade(deps: Deps, req: HandlerRequest): Promise<Han
     atualizadoEm: "",
   };
   return { status: 200, body: await gravarCidade(deps.doc, deps.config.tableName, deps.config.campaignId, cidade) };
+}
+
+
+/**
+ * "Revisar com IA": devolve uma versão melhor escrita, sem gravar nada.
+ *
+ * Não persiste de propósito. O Narrador compara as duas e decide; quem grava
+ * continua sendo o botão de salvar, com o texto que estiver no formulário.
+ *
+ * Os campos públicos e os secretos vão em chamadas separadas, e a dos públicos
+ * não recebe segredo nenhum — nem o da própria ficha, nem os do mundo em volta.
+ * Um modelo não vaza o que nunca leu, e isso vale mais que qualquer instrução
+ * pedindo que ele não vaze.
+ */
+export async function revisarItem(deps: Deps, req: HandlerRequest): Promise<HandlerResponse> {
+  requireAdmin(deps.config, req);
+  if (!deps.chat) throw new HttpError(503, "AI_DISABLED", "A IA não está configurada.");
+  const chat = deps.chat;
+
+  const alvo = req.pathParams?.colecao ?? "";
+  const campos = CAMPOS_REVISAVEIS[alvo];
+  if (!campos) throw new HttpError(404, "NOT_FOUND", "Coleção desconhecida.");
+
+  const item = (req.body ?? {}) as Record<string, unknown>;
+  const nome = texto(item.nome) || texto(item.titulo) || "(sem nome)";
+
+  const mundo = await tudo(deps);
+  const contexto = contextoDoMundo(mundo, item);
+  // O lado que pode ver tudo vê também as tramas que ainda não vazaram.
+  const contextoDoMestre = contextoDoMundo(mundo, item, true);
+  const sistema = sistemaDeRevisao();
+
+  const valorDe = (c: { nome: string; rotulo: string }) => ({ ...c, valor: texto(item[c.nome]) });
+  const publicos = campos.filter((c) => !c.segredo).map(valorDe);
+  const secretos = campos.filter((c) => c.segredo).map(valorDe);
+
+  // Só o que tem texto: mandar um campo vazio gasta uma chamada para receber
+  // de volta o vazio que já se tinha.
+  const comTexto = (cs: { valor: string }[]) => cs.some((c) => c.valor !== "");
+
+  const [revPublicos, revSecretos] = await Promise.all([
+    comTexto(publicos)
+      ? generateJson(
+          chat,
+          sistema,
+          pedidoDeRevisao({ rotuloDaFicha: alvo, nomeDaFicha: nome, contexto, campos: publicos, secretos: false }),
+          (raw) => parseRevisao(raw, publicos.map((c) => c.nome)),
+        )
+      : Promise.resolve({}),
+    comTexto(secretos)
+      ? generateJson(
+          chat,
+          sistema,
+          pedidoDeRevisao({
+            rotuloDaFicha: alvo,
+            nomeDaFicha: nome,
+            // A chamada dos segredos vê tudo: é o único lado que pode.
+            contexto: [contextoDoMestre, blocoSecreto(item, campos)].filter(Boolean).join("\n\n"),
+            campos: secretos,
+            secretos: true,
+          }),
+          (raw) => parseRevisao(raw, secretos.map((c) => c.nome)),
+        )
+      : Promise.resolve({}),
+  ]);
+
+  return { status: 200, body: { campos: { ...revPublicos, ...revSecretos } } };
+}
+
+/** O que a ficha esconde, para a revisão dos segredos poder se apoiar nela. */
+function blocoSecreto(item: Record<string, unknown>, campos: { nome: string; rotulo: string; segredo: boolean }[]): string {
+  const linhas = campos
+    .filter((c) => !c.segredo && texto(item[c.nome]))
+    .map((c) => `${c.rotulo} (público): ${texto(item[c.nome])}`);
+  return linhas.length > 0 ? `O LADO PÚBLICO DESTA MESMA FICHA:\n${linhas.join("\n")}` : "";
 }

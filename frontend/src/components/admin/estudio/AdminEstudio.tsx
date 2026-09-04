@@ -16,6 +16,7 @@ import { LoadingState } from "../../LoadingState";
 import type { ColecaoDoEstudio, EstudioCompleto } from "../../../api/client";
 import { ENTIDADES } from "./campos";
 import { EntidadeTab } from "./EntidadeTab";
+import { RevisaoDialog, type CampoEmRevisao } from "./RevisaoDialog";
 
 /**
  * O Estúdio: onde a cosmologia da crônica é escrita.
@@ -94,6 +95,7 @@ export function AdminEstudio({
         <AbaCidade
           cidade={mundo.cidade}
           ocupado={ocupado}
+          onRevisar={(c) => api.revisarEstudioItem(adminToken, "cidade", c)}
           onSalvar={async (c) => {
             setOcupado(true);
             try {
@@ -116,6 +118,7 @@ export function AdminEstudio({
           ocupado={ocupado}
           onSalvar={(item) => salvarItem(def.colecao, item)}
           onRemover={(id) => removerItem(def.colecao, id)}
+          onRevisar={(item) => api.revisarEstudioItem(adminToken, def.colecao, item)}
         />
       )}
     </Stack>
@@ -127,10 +130,46 @@ export function AdminEstudio({
  * não há lista, não há criar nem remover — só um formulário que já existe.
  */
 function AbaCidade({
-  cidade, ocupado, onSalvar,
-}: { cidade: Cidade; ocupado: boolean; onSalvar: (c: Cidade) => Promise<void> }) {
+  cidade, ocupado, onSalvar, onRevisar,
+}: {
+  cidade: Cidade;
+  ocupado: boolean;
+  onSalvar: (c: Cidade) => Promise<void>;
+  onRevisar: (c: Cidade) => Promise<Record<string, string>>;
+}) {
   const [draft, setDraft] = useState<Cidade>(cidade);
   useEffect(() => setDraft(cidade), [cidade]);
+
+  const [revisao, setRevisao] = useState<CampoEmRevisao[] | null>(null);
+  const [revisando, setRevisando] = useState(false);
+  const [erroDaRevisao, setErroDaRevisao] = useState<string | null>(null);
+
+  const ROTULOS: Record<string, { rotulo: string; segredo: boolean }> = {
+    descricao: { rotulo: "Descrição", segredo: false },
+    segredos: { rotulo: "Segredos da Cidade", segredo: true },
+  };
+
+  const revisar = async () => {
+    setRevisando(true);
+    setErroDaRevisao(null);
+    setRevisao([]);
+    try {
+      const daIa = await onRevisar(draft);
+      setRevisao(
+        Object.entries(daIa).map(([nome, texto]) => ({
+          nome,
+          rotulo: ROTULOS[nome]?.rotulo ?? nome,
+          segredo: ROTULOS[nome]?.segredo ?? false,
+          original: String((draft as unknown as Record<string, unknown>)[nome] ?? ""),
+          daIa: texto,
+        })),
+      );
+    } catch (e) {
+      setErroDaRevisao(e instanceof Error ? e.message : "A revisão falhou.");
+    } finally {
+      setRevisando(false);
+    }
+  };
 
   return (
     <Card>
@@ -150,11 +189,26 @@ function AbaCidade({
             onChange={(e) => setDraft({ ...draft, segredos: e.target.value })}
             helperText="Nunca sai por rota de jogador. A IA lê para saber o que o cenário esconde."
           />
-          <Box>
+          <Stack direction="row" spacing={2}>
             <Button onClick={() => void onSalvar(draft)} disabled={ocupado || !draft.nome.trim()}>
               {ocupado ? "Salvando…" : "Salvar cidade"}
             </Button>
-          </Box>
+            <Button variant="outlined" onClick={() => void revisar()} disabled={ocupado || revisando}>
+              {revisando ? "Revisando…" : "Revisar com IA"}
+            </Button>
+          </Stack>
+
+          <RevisaoDialog
+            aberto={revisao !== null}
+            carregando={revisando}
+            erro={erroDaRevisao}
+            campos={revisao ?? []}
+            onFechar={() => setRevisao(null)}
+            onAceitar={(escolhidos) => {
+              setDraft((d) => ({ ...d, ...escolhidos }));
+              setRevisao(null);
+            }}
+          />
         </Stack>
       </CardContent>
     </Card>

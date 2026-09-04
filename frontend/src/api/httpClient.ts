@@ -544,6 +544,18 @@ export class HttpApiClient implements ApiClient {
     return this.request<T>(`/api/admin/estudio/${colecao}`, { method: "POST", body: item, token });
   }
 
+  async revisarEstudioItem(
+    token: string,
+    colecao: ColecaoDoEstudio | "cidade",
+    item: unknown,
+  ): Promise<Record<string, string>> {
+    const res = await this.request<{ campos: Record<string, string> }>(
+      `/api/admin/estudio/${colecao}/revisar`,
+      { method: "POST", body: item, token },
+    );
+    return res.campos;
+  }
+
   async deleteEstudioItem(token: string, colecao: ColecaoDoEstudio, id: string): Promise<void> {
     await this.request<void>(`/api/admin/estudio/${colecao}/delete`, { method: "POST", body: { id }, token });
   }
