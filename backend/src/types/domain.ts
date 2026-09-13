@@ -27,6 +27,8 @@ export interface Config {
   openAiSyncImageQuality: string;
   imagesBucket: string;
   visualWorkerFunctionName: string;
+  /** Onde vive quem escreve a resposta de uma carta, fora da requisição. */
+  replyWorkerFunctionName: string;
   /**
    * Segredo dedicado que autoriza APENAS enviar um rascunho de turno (nada
    * mais). Deixa um agente externo (Claude) propor o turno sem receber o código

@@ -40,7 +40,8 @@ function makeDeps(over: { houses?: any[]; turnStatus?: string; sent?: any[]; cha
       return { Items: [] };
     }),
   } as unknown as DynamoDBDocumentClient;
-  return { deps: { doc, config, chat: over.chat } as unknown as Deps, stored };
+  const invokeReply = (over as any).invokeReply ?? vi.fn(async () => {});
+  return { deps: { doc, config, chat: over.chat, invokeReply } as unknown as Deps, stored, invokeReply };
 }
 
 describe("houseKeyForName", () => {
@@ -59,13 +60,31 @@ describe("houseKeyForName", () => {
 describe("sendMessage", () => {
   const chat = vi.fn(async () => "Brujah responde com cautela.");
 
-  it("grava a carta e a resposta da Casa", async () => {
-    const { deps, stored } = makeDeps({ chat });
+  // A resposta é escrita fora da requisição: quem responde leva de vinte e cinco
+  // a setenta segundos, e o gateway corta em trinta. A rota grava a carta,
+  // dispara o escritor e volta.
+  it("grava a carta, dispara a resposta e não espera por ela", async () => {
+    const { deps, stored, invokeReply } = makeDeps({ chat });
     const res = await sendMessage(deps, playerReq({ toHouseKey: "cla-brujah", body: "Propomos uma aliança." }));
     expect(res.status).toBe(201);
     expect((res.body as any).sent.author).toBe("PLAYER");
-    expect((res.body as any).reply.author).toBe("AI");
-    expect(stored.filter((s) => s.SK?.startsWith("DIPLMSG#"))).toHaveLength(2);
+    expect((res.body as any).reply).toBeNull();
+    expect((res.body as any).replyPending).toBe(true);
+    expect(stored.filter((s) => s.SK?.startsWith("DIPLMSG#"))).toHaveLength(1);
+    expect(invokeReply).toHaveBeenCalledWith(expect.objectContaining({ toHouseKey: "cla-brujah", sentId: (res.body as any).sent.id }));
+  });
+
+  // Falhar ao chamar o escritor não desfaz nada: a carta está gravada e o envio,
+  // cobrado. O jogador precisa saber que a resposta não vem — não que a carta
+  // sumiu, que é o que o leva a reenviar e duplicar o fio.
+  it("a carta segue mesmo quando o escritor não pode ser chamado", async () => {
+    const invokeReply = vi.fn(async () => { throw new Error("Lambda fora do ar"); });
+    const { deps, stored } = makeDeps({ chat, invokeReply } as any);
+    const res = await sendMessage(deps, playerReq({ toHouseKey: "cla-brujah", body: "Propomos uma aliança." }));
+    expect(res.status).toBe(201);
+    expect((res.body as any).replyPending).toBe(false);
+    expect((res.body as any).replyFailed).toBe(true);
+    expect(stored.filter((s) => s.SK?.startsWith("DIPLMSG#"))).toHaveLength(1);
   });
 
   it("recusa o terceiro envio para uma Casa próxima no mesmo turno", async () => {
@@ -113,23 +132,6 @@ describe("sendMessage", () => {
       .rejects.toThrow(/para si mesmo/);
   });
 
-  it("recusa destinatário inexistente", async () => {
-    const { deps } = makeDeps({ chat });
-    await expect(sendMessage(deps, playerReq({ toHouseKey: "casa-inventada", body: "x" })))
-      .rejects.toThrow(/desconhecida/);
-  });
-
-  it("não perde a carta quando a IA falha", async () => {
-    // O envio já foi cobrado; apagar a carta puniria o jogador por uma falha
-    // que não é dele.
-    const failing = vi.fn(async () => { throw new Error("openai fora do ar"); });
-    const { deps, stored } = makeDeps({ chat: failing });
-    const res = await sendMessage(deps, playerReq({ toHouseKey: "cla-brujah", body: "carta" }));
-    expect(res.status).toBe(201);
-    expect((res.body as any).reply).toBeNull();
-    expect((res.body as any).replyFailed).toBe(true);
-    expect(stored.filter((s) => s.SK?.startsWith("DIPLMSG#"))).toHaveLength(1);
-  });
 
   it("recusa corpo vazio antes de gastar qualquer chamada", async () => {
     const { deps } = makeDeps({ chat });

@@ -2,6 +2,8 @@ import type { DiplomaticMessage, Favor } from "@vampiro/content";
 import { clampMessage, seatKeyForHouseId } from "@vampiro/content";
 import { planOutreach, type OutreachPlan } from "../ai/diplomacy/outreach";
 import { buildOutreachUser, OUTREACH_SYSTEM_PROMPT } from "../ai/diplomacy/outreachPrompt";
+import type { Dossie } from "../ai/diplomacy/dossie";
+import type { NpcDynamic } from "@vampiro/content";
 import { REVIEW_SYSTEM_PROMPT, buildReviewUser, parseRevisao } from "../ai/diplomacy/revisor";
 
 export interface OutreachDeps {
@@ -17,6 +19,10 @@ export interface OutreachDeps {
   /** Grava a proposta como favor pendente, para o jogador aceitar ou recusar. */
   putFavor?: (f: Favor) => Promise<void>;
   newId: () => string;
+  /** O fio completo com aquele par. Sem isto a carta proativa é amnésica. */
+  dossieDe?: (playerHouseId: string, seatKey: string) => Promise<Dossie>;
+  /** A memória viva de quem escreve. */
+  dynamicDe?: (seatKey: string) => Promise<NpcDynamic | null>;
   limit?: number;
   /**
    * Quanto tempo, no total, as cartas podem levar.
@@ -132,6 +138,8 @@ async function escrever(
       relation: relation as never,
       publicEvent: deps.publicEvent,
       lastOrder: deps.lastOrders[plan.toHouseId] ?? "",
+      dossie: deps.dossieDe ? await deps.dossieDe(plan.toHouseId, plan.fromSeatKey) : undefined,
+      npcDynamic: deps.dynamicDe ? await deps.dynamicDe(plan.fromSeatKey) : undefined,
     });
     // Teto 2200, e não 900. Os tokens de raciocínio saem do MESMO orçamento da
     // resposta: a 900 o modelo gastava os 900 pensando e devolvia string vazia,

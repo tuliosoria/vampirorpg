@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
@@ -83,6 +84,8 @@ export function CorrespondencePanel({ playerToken, houseName, abrirCasa }: Corre
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  // Enquanto a resposta está sendo escrita do outro lado, fora da requisição.
+  const [esperandoResposta, setEsperandoResposta] = useState(false);
   const [turnNumber, setTurnNumber] = useState(0);
   const [propostas, setPropostas] = useState<PactProposal[]>([]);
   const [respondendo, setRespondendo] = useState<string | null>(null);
@@ -189,10 +192,13 @@ export function CorrespondencePanel({ playerToken, houseName, abrirCasa }: Corre
       const res = await api.sendCorrespondence(playerToken, { toHouseKey: selected.houseKey, toCharacterId: addressee, body: draft.trim() });
       setThread((t) => [...t, res.sent, ...(res.reply ? [res.reply] : [])]);
       setDraft("");
-      if (res.replyFailed) {
-        // A carta foi entregue; só a resposta falhou. Dizer isso evita que o
-        // jogador ache que perdeu o envio.
-        setNotice("A carta seguiu, mas a resposta não chegou desta vez.");
+      if (res.replyPending) {
+        // A carta saiu; quem recebeu ainda está escrevendo. O painel busca o
+        // fio de tempos em tempos até a resposta aparecer, e o jogador não
+        // precisa recarregar nem adivinhar se deu certo.
+        setEsperandoResposta(true);
+      } else if (res.replyFailed) {
+        setNotice("A carta seguiu e está entregue. A resposta não saiu desta vez — ela pode chegar quando o Narrador resolver a noite.");
       }
       await load();
       setSelected((s) => (s ? { ...s, remaining: res.remaining } : s));
@@ -201,7 +207,42 @@ export function CorrespondencePanel({ playerToken, houseName, abrirCasa }: Corre
     } finally {
       setSending(false);
     }
-  }, [api, playerToken, selected, draft, load]);
+  }, [api, playerToken, selected, addressee, draft, load]);
+
+  /**
+   * Busca o fio até a resposta chegar.
+   *
+   * Para sozinho depois de dois minutos. Quem escreve leva de vinte e cinco a
+   * setenta segundos; passar disso é falha, e bater no servidor para sempre não
+   * conserta falha nenhuma — só esconde que ela existe.
+   */
+  useEffect(() => {
+    if (!esperandoResposta || !selected) return;
+    const casa = selected.houseKey;
+    let vivo = true;
+    let tentativas = 0;
+    const id = setInterval(() => {
+      void (async () => {
+        tentativas += 1;
+        try {
+          const fio = await api.getCorrespondenceThread(playerToken, casa);
+          if (!vivo) return;
+          if (fio.some((m) => m.author === "AI" && !thread.some((t) => t.id === m.id))) {
+            setThread(fio);
+            setEsperandoResposta(false);
+            return;
+          }
+        } catch {
+          // Uma busca que falha não é a resposta falhando. Tenta de novo.
+        }
+        if (vivo && tentativas >= 24) {
+          setEsperandoResposta(false);
+          setNotice("Sua carta está entregue, mas a resposta demorou mais que o normal. Ela pode chegar sozinha — recarregue a página daqui a pouco.");
+        }
+      })();
+    }, 5000);
+    return () => { vivo = false; clearInterval(id); };
+  }, [esperandoResposta, selected, api, playerToken, thread]);
 
   if (error && !recipients) {
     return <Alert severity="error" action={<Button onClick={() => void load()}>Tentar novamente</Button>}>{error}</Alert>;
@@ -378,6 +419,12 @@ export function CorrespondencePanel({ playerToken, houseName, abrirCasa }: Corre
                 )}
               </Stack>
 
+              {esperandoResposta && (
+                <Alert severity="info" icon={<CircularProgress size={16} />}>
+                  Sua carta seguiu. A resposta está sendo escrita — ela aparece aqui em alguns segundos,
+                  sem precisar recarregar.
+                </Alert>
+              )}
               {notice && <Alert severity="warning">{notice}</Alert>}
               {error && <Alert severity="error">{error}</Alert>}
 

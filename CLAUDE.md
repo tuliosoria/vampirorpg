@@ -71,18 +71,23 @@ Use a skill `mexer-em-prompt-de-carta`: ela obriga medir antes e depois.
   contatar a IA", que parece rede e é relógio.
 - **Nada de IA na requisição do gateway: são 30s.** Use worker, como o visual já faz.
 
-## O que falta, e por quê
+## O que o porte trouxe, e por que nesta ordem
 
-Estas peças vieram do projeto irmão mas **ainda não estão ligadas**. Cada uma
-depende de um passo anterior:
+A resposta a carta era gerada **dentro da requisição**, com Lambda de 30s. Isso
+travava tudo o mais: sem worker, não cabia revisor (duas chamadas de até setenta
+segundos), e sem revisor não valia a pena o resto.
 
-1. **A resposta a carta ainda é gerada dentro da requisição**, com Lambda de 30s.
-   Enquanto for assim, ela não pode ter revisor — seriam duas chamadas de até 70s
-   cada. O conserto é o mesmo do visual: extrair para um worker de 900s e disparar
-   com `InvocationType: "Event"`.
-2. **`dossie.ts` está portado e não é usado.** Ele monta o fio completo entre as
-   duas partes. Sem ele, a carta proativa escreve para quem já conhece há turnos
-   sem ver uma linha da conversa.
-3. **`estado.ts` está portado e não é usado.** Traz humor, medo, o que a pessoa
-   recusa e quantas cartas mandou sem resposta. É o que separa uma carta de
-   pessoa de uma carta de chancelaria.
+1. **`gerarResposta.ts` + `replyWorkerHandler.ts`** — a resposta saiu para um
+   worker de 900s, disparado com `InvocationType: "Event"`. A rota grava a carta
+   e volta na hora com `replyPending`; o painel avisa e busca o fio até a
+   resposta aparecer, com teto de dois minutos.
+2. **O revisor entrou na resposta**, que é onde ele mais rende — é ali que o
+   jogador escreve e espera.
+3. **`dossie.ts`** — o fio completo entre as duas partes, montado em código. A
+   carta proativa escrevia para quem conhece há noites sem ver uma linha.
+4. **`estado.ts`** — humor, o que a pessoa teme, o que recusa, quantas cartas
+   mandou sem resposta. É o que separa uma carta de pessoa de uma de chancelaria.
+
+Uma diferença deliberada em relação ao projeto irmão: aqui as mágoas entre clãs
+saem da **Bíblia do Mundo que o Narrador escreve**, e não de um documento
+embutido no código. É o que permite o site nascer sem mundo.

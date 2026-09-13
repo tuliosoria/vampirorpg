@@ -31,6 +31,8 @@ import {
   factExtractionSystemPrompt, buildFactExtractionUser, parseFacts, turnBlocks,
 } from "../ai/campaign/factExtraction";
 import { listHouseRelations } from "../db/houseRelations";
+import { personaFor, characterId } from "@vampiro/content";
+import { montarDossie } from "../ai/diplomacy/dossie";
 import { sendOutreach } from "../diplomacy/sendOutreach";
 import { resetCampaign as dbResetCampaign } from "../db/campaignReset";
 import { getWorldBible as dbGetWorldBible, putWorldBible as dbPutWorldBible } from "../db/worldBible";
@@ -278,6 +280,14 @@ async function enviarCartasDoMundo(deps: Deps, turnId: number, publicEvent: stri
     ),
     turnNumber: turnId,
     campaignId,
+    dossieDe: (playerHouseId, seatKey) => montarDossie(deps.doc, tableName, campaignId, playerHouseId, seatKey),
+    dynamicDe: async (seatKey) => {
+
+      const p = personaFor(seatKey);
+
+      return p ? getNpcDynamic(deps.doc, tableName, campaignId, seatKey, characterId(p.leaderName)) : null;
+
+    },
     putMessage: (m) => putMessage(deps.doc, tableName, campaignId, m),
     putFavor: (f) => putFavor(deps.doc, tableName, campaignId, f),
     newId: () => `out-${turnId}-${Math.random().toString(36).slice(2, 10)}`,

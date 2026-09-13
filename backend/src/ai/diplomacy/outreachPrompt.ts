@@ -1,7 +1,9 @@
-import { houseProfileFor, type HouseRelation } from "@vampiro/content";
+import { houseProfileFor, type HouseRelation, personaFor, type NpcDynamic } from "@vampiro/content";
 import { faltas, outreachTone, sobras, type OutreachPlan } from "./outreach";
 import { VOICE_RULES } from "./voice";
 import { STAGE_RULES } from "./estagio";
+import { estadoInterior, historicoDaRelacao } from "./estado";
+import { descreverCompromissos, descreverFio, type Dossie } from "./dossie";
 import { READABILITY_RULES } from "./leitura";
 import { TRADE_SCALE_RULES } from "./escala";
 
@@ -41,6 +43,15 @@ export interface OutreachContext {
   publicEvent: string;
   /** A ordem que o jogador escreveu no turno anterior, quando o motivo é essa. */
   lastOrder: string;
+  /**
+   * Tudo que os dois já se escreveram, e o que já combinaram.
+   *
+   * Sem isto a carta proativa escreve para quem conhece há noites sem ver uma
+   * linha da conversa, e reabre acordos que ela mesma fechou.
+   */
+  dossie?: Dossie;
+  /** A memória viva de quem escreve: humor, o que teme, o que quer. */
+  npcDynamic?: NpcDynamic | null;
 }
 
 /**
@@ -71,6 +82,20 @@ export function buildOutreachUser(ctx: OutreachContext): string {
         `O que lhes sobra: ${sobras(dele).join(", ") || "pouco"}. O que lhes falta: ${faltas(dele).join(", ") || "nada declarado"}.\n\n` +
         `Peça o que lhes sobra. Ofereça o que lhe sobra. Não peça o que falta aos dois.`,
     );
+  }
+
+  if (ctx.dossie) {
+    const fio = descreverFio(ctx.dossie, plan.toHouseName, plan.fromSeatName);
+    if (fio) parts.push(fio);
+    const comp = descreverCompromissos(ctx.dossie);
+    if (comp) parts.push(comp);
+  }
+
+  const dentro = estadoInterior(personaFor(plan.fromSeatKey), ctx.npcDynamic ?? null);
+  if (dentro) parts.push(dentro);
+  if (ctx.dossie) {
+    const rel = historicoDaRelacao(ctx.dossie.fio, ctx.npcDynamic ?? null, plan.toHouseId, plan.toHouseName);
+    if (rel) parts.push(rel);
   }
 
   parts.push(outreachTone(ctx.relation));

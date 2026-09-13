@@ -5,6 +5,7 @@ import { buildGeographyBlock } from "./geographyBlock";
 import { extractCanonFacts, fold, significantTokens } from "../visual/canonLookup";
 import { VOICE_RULES } from "./voice";
 import { STAGE_RULES } from "./estagio";
+import { estadoInterior, historicoDaRelacao } from "./estado";
 import { READABILITY_RULES } from "./leitura";
 import { TRADE_SCALE_RULES } from "./escala";
 
@@ -248,6 +249,17 @@ export function buildHouseReplyUser(ctx: HouseReplyContext): string {
   // O que instrui de fato — quem você é, o que responder — segue no fim, que é
   // a posição forte para o modelo.
   const parts: string[] = [];
+
+  // Quem escreve, por dentro, e o que a relação virou. Sem isto toda casa é um
+  // negociador perfeitamente informado e disponível, e é isso que soa a robô.
+  const dentro = estadoInterior(ctx.persona, ctx.npcDynamic);
+  if (dentro) parts.push(dentro);
+  const relacao = historicoDaRelacao(
+    [...ctx.priorLetters, ...ctx.thread.map((m) => ({ turnNumber: 0, author: m.author }))],
+    ctx.npcDynamic, ctx.fromHouseKey ?? "", ctx.fromHouseName,
+  );
+  if (relacao) parts.push(relacao);
+
   if (ctx.chronicle.trim()) {
     parts.push(`O que aconteceu no reino até agora — você viveu isto:\n${ctx.chronicle.trim()}`);
   }
