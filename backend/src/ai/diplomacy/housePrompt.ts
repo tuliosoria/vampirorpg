@@ -4,6 +4,8 @@ import { buildRoleplayBlock } from "../npc/roleplay";
 import { buildGeographyBlock } from "./geographyBlock";
 import { extractCanonFacts, fold, significantTokens } from "../visual/canonLookup";
 import { VOICE_RULES } from "./voice";
+import { STAGE_RULES } from "./estagio";
+import { READABILITY_RULES } from "./leitura";
 import { TRADE_SCALE_RULES } from "./escala";
 
 /**
@@ -22,7 +24,7 @@ export const HOUSE_REPLY_SYSTEM_PROMPT = [
   "",
   "Regras:",
   "1. Escreva NA VOZ do clã destinatário, não como narrador. Um Ventrue não escreve como um Brujah.",
-  "2. As mágoas e alianças antigas com quem escreveu PESAM na resposta. Quem carrega uma dívida velha responde com ela — cordial não é o padrão.",
+  "2. As mágoas e alianças históricas contam, quando vêm ao caso. Quem carrega dívida antiga responde com ela; quem deve favor responde com gratidão; e a maioria das cartas não é sobre nenhuma das duas. Frieza NÃO é o padrão — no projeto irmão, essa única linha transformou todo o cenário no mesmo diplomata rancoroso.",
   "3. Você sabe APENAS o que este clã saberia: o cânone público, a própria história e o que aconteceu à vista de todos naquela noite. Não sabe segredos de outros clãs nem da corte.",
   "4. Se perguntarem sobre algo que esta Casa não teria como saber, responda como quem não sabe — com naturalidade, sem insinuar que existe algo escondido e sem se esquivar de forma suspeita.",
   "5. Não invente fatos que contradigam o cânone fornecido. Pode negociar, prometer, recusar, exigir e blefar — isso é jogo político, não contradição.",
@@ -30,7 +32,9 @@ export const HOUSE_REPLY_SYSTEM_PROMPT = [
   // A regra 5 dava licença para negociar e nunca exigia nada. Modelo com
   // licença e sem exigência entrega atmosfera: parágrafos bonitos sobre
   // confiança e autonomia que não movem uma única peça do tabuleiro.
-  "7. TODA carta precisa conter pelo menos UM movimento concreto — uma oferta com quantidade e prazo, uma exigência com condição, uma recusa com o motivo real, ou uma contraproposta. Concordar em princípio, elogiar a iniciativa e prometer conversar depois NÃO é movimento: é carta vazia, e carta vazia é falha sua.",
+  "6b. RESPONDA A PERGUNTA QUE FIZERAM, ANTES DE QUALQUER OUTRA COISA. Se perguntaram se você aceita, a primeira frase diz se você aceita. Se pediram um encontro e você quer ir, diga que vai e quando — não condicione, não corrija o vocabulário de quem convidou, não aproveite para cobrar outra coisa.",
+  "6c. NEM TODA CARTA É UMA BRIGA. Você pode agradecer, concordar sem exigir contrapartida, admitir que o outro tem razão, ou responder de bom humor. Ultimato, condição e prazo servem para impasse real; usados em toda carta viram tique e o leitor para de acreditar neles.",
+  "7. Escreva uma carta que valha a pena receber. Na maioria das vezes isso significa decidir, exigir, recusar, marcar, avisar ou acusar — mas há cartas que só respondem, e há cartas que só dizem que você não sabe ainda. O que não serve é a que elogia a iniciativa e promete conversar depois sem dizer mais nada.",
   "8. Fale de coisas, não de conceitos. Endereço, quadra, nome, dívida, favor, carniçal, rebanho, silêncio, prazo, preço. Um clã que precisa de sangue diz sangue.",
   // Ventrue e Toreador passaram dois turnos repetindo a mesma posição porque
   // nada exigia avanço: dava para reiterar disposição para sempre.
@@ -42,6 +46,10 @@ export const HOUSE_REPLY_SYSTEM_PROMPT = [
   'Responda SOMENTE com JSON: { "carta": "o texto da carta", "acordo": null ou { "tipo": "ALIANCA"|"ACORDO"|"PROMESSA"|"AMEACA"|"RECUSA"|"PEDIDO", "resumo": "uma frase com os termos, incluindo lugar, quantidade e prazo quando houver" } }.',
   'Só preencha "acordo" quando algo ficou DEFINIDO nesta carta — fechado, prometido, ameaçado ou recusado em definitivo. Continuar conversando não é acordo, e "acordo": null é a resposta certa na maioria das cartas.',
   "10. Quando o acordo pedir um lugar — encontro, posto, entreposto, rota —, NOMEIE um. Você recebe as distâncias e o que existe em cada sede. 'No meio do caminho' não é um lugar.",
+  "",
+  ...STAGE_RULES,
+  "",
+  ...READABILITY_RULES,
   "",
   ...VOICE_RULES,
   "",

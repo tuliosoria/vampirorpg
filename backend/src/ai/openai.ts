@@ -52,7 +52,10 @@ export function chatParamsFor(model: string, maxTokens: number | undefined, temp
  * transforma um modelo melhor num modelo que nunca responde.
  */
 export function timeoutFor(model: string): number {
-  return /^(gpt-5|o[1-9])/i.test(model) ? 60000 : 12000;
+  // 60s cortava as cartas mais pensadas, e o erro chegava como "Falha ao
+  // contatar a IA" — que parece rede e é relógio. Medido no projeto irmão: uma
+  // carta leva de 25 a 70 segundos. Workers têm 900s de folga.
+  return /^(gpt-5|o[1-9])/i.test(model) ? 180_000 : 12_000;
 }
 
 export function makeChatFn(apiKey: string, model: string): ChatFn {

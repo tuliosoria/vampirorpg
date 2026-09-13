@@ -2,6 +2,7 @@ import type { DiplomaticMessage, Favor } from "@vampiro/content";
 import { clampMessage, seatKeyForHouseId } from "@vampiro/content";
 import { planOutreach, type OutreachPlan } from "../ai/diplomacy/outreach";
 import { buildOutreachUser, OUTREACH_SYSTEM_PROMPT } from "../ai/diplomacy/outreachPrompt";
+import { REVIEW_SYSTEM_PROMPT, buildReviewUser, parseRevisao } from "../ai/diplomacy/revisor";
 
 export interface OutreachDeps {
   chat?: (system: string, user: string, json: boolean, maxTokens: number) => Promise<string>;
@@ -70,7 +71,7 @@ export async function sendOutreach(deps: OutreachDeps): Promise<DiplomaticMessag
   );
   const cartas = await Promise.race([
     escrita,
-    new Promise<null>((r) => setTimeout(() => r(null), deps.deadlineMs ?? 20000)),
+    new Promise<null>((r) => setTimeout(() => r(null), deps.deadlineMs ?? 45000)),
   ]);
   if (!cartas) return [];
 
@@ -132,14 +133,41 @@ async function escrever(
       publicEvent: deps.publicEvent,
       lastOrder: deps.lastOrders[plan.toHouseId] ?? "",
     });
-    const raw = await deps.chat!(OUTREACH_SYSTEM_PROMPT, user, true, 900);
+    // Teto 2200, e não 900. Os tokens de raciocínio saem do MESMO orçamento da
+    // resposta: a 900 o modelo gastava os 900 pensando e devolvia string vazia,
+    // sem erro nenhum. Medido no projeto irmão: 3 de 3 chamadas vazias.
+    // A repetição existe porque o vazio é aleatório, não determinístico.
+    let raw = await deps.chat!(OUTREACH_SYSTEM_PROMPT, user, true, 2200);
+    if (!raw.trim()) raw = await deps.chat!(OUTREACH_SYSTEM_PROMPT, user, true, 2200);
+    if (!raw.trim()) {
+      console.warn("Carta do mundo vazia após duas tentativas:", plan.fromSeatKey);
+      return null;
+    }
     const o = JSON.parse(raw) as Record<string, unknown>;
+    const t = (o.troca ?? o) as Record<string, unknown>;
     const texto = typeof o.carta === "string" ? o.carta.trim() : "";
     if (texto.length <= 40) return null;
+    // Segunda leitura antes de a carta sair. Quem escreve não vê o que errou
+    // nela — é a razão pela qual um escritor precisa de editor. Falha para o
+    // lado seguro em toda porta: qualquer problema e vale o rascunho.
+    let final = texto;
+    try {
+      const rev = await deps.chat!(REVIEW_SYSTEM_PROMPT, buildReviewUser({ materialDoEscritor: user, rascunho: texto }), true, 2200);
+      const r = parseRevisao(rev, texto);
+      if (r) {
+        final = r.carta;
+        if (r.motivos.length) console.info("Carta revisada:", plan.fromSeatKey, "|", r.motivos.join(" | "));
+      }
+    } catch (e) {
+      console.warn("Revisão falhou, segue o rascunho:", (e as Error)?.message);
+    }
+
     return {
-      texto,
-      oferta: typeof o.oferta === "string" ? o.oferta.trim().slice(0, 120) : "",
-      pedido: typeof o.pedido === "string" ? o.pedido.trim().slice(0, 120) : "",
+      texto: final,
+      // "troca" é opcional agora; aceita o formato antigo para não quebrar o
+      // que estiver em voo quando isto subir.
+      oferta: typeof t.oferta === "string" ? t.oferta.trim().slice(0, 120) : "",
+      pedido: typeof t.pedido === "string" ? t.pedido.trim().slice(0, 120) : "",
     };
   } catch {
     // Modelo fora do ar ou JSON quebrado: esta carta não sai, as outras saem.

@@ -1,6 +1,8 @@
 import { houseProfileFor, type HouseRelation } from "@vampiro/content";
 import { faltas, outreachTone, sobras, type OutreachPlan } from "./outreach";
 import { VOICE_RULES } from "./voice";
+import { STAGE_RULES } from "./estagio";
+import { READABILITY_RULES } from "./leitura";
 import { TRADE_SCALE_RULES } from "./escala";
 
 export const OUTREACH_SYSTEM_PROMPT = [
@@ -19,8 +21,12 @@ export const OUTREACH_SYSTEM_PROMPT = [
   // coisa que o enchia era um projeto concluído com efeito de favor, e nenhum
   // jamais concluiu. A carta é a torneira natural: é assim que dívida política
   // nasce numa mesa de verdade.
-  'Responda SOMENTE com JSON: { "carta": "o texto da carta", "oferta": "o que você oferece, em poucas palavras", "pedido": "o que você quer em troca, em poucas palavras" }.',
-  'A "oferta" e o "pedido" precisam bater exatamente com o que a carta diz. São o que o destinatário vai aceitar ou recusar com um botão.',
+  'Responda SOMENTE com JSON: { "carta": "o texto da carta", "troca": null ou { "oferta": "o que você oferece, em poucas palavras", "pedido": "o que você quer em troca, em poucas palavras" } }.',
+  'Preencha "troca" APENAS quando a carta propuser de fato um escambo. Carta de aviso, ameaça ou acusação tem "troca": null, e isso é o certo, não uma falha.',
+    "",
+  ...STAGE_RULES,
+  "",
+  ...READABILITY_RULES,
   "",
   ...VOICE_RULES,
   "",
