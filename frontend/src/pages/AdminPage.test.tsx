@@ -193,7 +193,7 @@ describe("AdminPage", () => {
     const client = makeClient();
     render(
       <ApiProvider client={client}>
-        <MemoryRouter initialEntries={["/admin?tab=turno"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=turno"]}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -213,7 +213,7 @@ describe("AdminPage", () => {
     const client = makeClient();
     render(
       <ApiProvider client={client}>
-        <MemoryRouter initialEntries={["/admin?tab=turno"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=turno"]}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -233,7 +233,7 @@ describe("AdminPage", () => {
     const client = makeClient();
     render(
       <ApiProvider client={client}>
-        <MemoryRouter initialEntries={["/admin?tab=turno"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=turno"]}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -259,7 +259,7 @@ describe("AdminPage", () => {
       .mockResolvedValue({ ...draftDashboard, publicEvent: "Evento salvo no servidor.", eventImageUrl: "https://img/uploaded.png" });
     render(
       <ApiProvider client={client}>
-        <MemoryRouter initialEntries={["/admin?tab=turno"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=turno"]}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -296,7 +296,7 @@ describe("AdminPage", () => {
       });
     render(
       <ApiProvider client={client}>
-        <MemoryRouter initialEntries={["/admin?tab=turno"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=turno"]}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -323,7 +323,7 @@ describe("AdminPage", () => {
     );
     render(
       <ApiProvider client={client}>
-        <MemoryRouter initialEntries={["/admin?tab=turno"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=turno"]}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -343,7 +343,7 @@ describe("AdminPage", () => {
     sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
       <ApiProvider client={client}>
-        <MemoryRouter initialEntries={["/admin?tab=turno"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=turno"]}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -362,7 +362,7 @@ describe("AdminPage", () => {
     sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
       <ApiProvider client={client}>
-        <MemoryRouter initialEntries={["/admin?tab=turno"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=turno"]}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -378,7 +378,7 @@ describe("AdminPage", () => {
     sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
       <ApiProvider client={client}>
-        <MemoryRouter initialEntries={["/admin?tab=turno"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=turno"]}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -399,7 +399,7 @@ describe("AdminPage", () => {
     sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
       <ApiProvider client={client}>
-        <MemoryRouter initialEntries={["/admin?tab=turno"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=turno"]}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -428,7 +428,7 @@ describe("AdminPage", () => {
     sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
       <ApiProvider client={client}>
-        <MemoryRouter initialEntries={["/admin?tab=turno"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=turno"]}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -453,7 +453,7 @@ describe("AdminPage", () => {
     sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
       <ApiProvider client={client}>
-        <MemoryRouter initialEntries={["/admin?tab=turno"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=turno"]}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -475,7 +475,7 @@ describe("AdminPage", () => {
     sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
       <ApiProvider client={client}>
-        <MemoryRouter initialEntries={["/admin?tab=turno"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=turno"]}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -504,7 +504,7 @@ describe("AdminPage", () => {
     sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
       <ApiProvider client={client}>
-        <MemoryRouter initialEntries={["/admin?tab=turno"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=turno"]}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -535,7 +535,7 @@ describe("AdminPage", () => {
     sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
       <ApiProvider client={client}>
-        <MemoryRouter initialEntries={["/admin?tab=turno"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=turno"]}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -561,7 +561,7 @@ describe("AdminPage", () => {
       sessionStorage.setItem("vampirorpg.admin", "admin-token");
       render(
         <ApiProvider client={client}>
-          <MemoryRouter initialEntries={[`/admin?tab=${tab}`]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <MemoryRouter initialEntries={[`/admin?tab=${tab}`]}>
             <AdminPage />
           </MemoryRouter>
         </ApiProvider>,
@@ -623,7 +623,7 @@ describe("AdminPage", () => {
     sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
       <ApiProvider client={client}>
-        <MemoryRouter initialEntries={["/admin?tab=casas"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=casas"]}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -638,7 +638,7 @@ describe("AdminPage", () => {
     sessionStorage.setItem("vampirorpg.admin", "admin-token");
     render(
       <ApiProvider client={client}>
-        <MemoryRouter initialEntries={["/admin?tab=galeria"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/admin?tab=galeria"]}>
           <AdminPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -648,3 +648,4 @@ describe("AdminPage", () => {
     expect(await screen.findByLabelText(/nome da cidade/i)).toBeInTheDocument();
   });
 });
+

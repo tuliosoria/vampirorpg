@@ -26,7 +26,7 @@ async function setup() {
   await act(async () => {
     render(
       <ApiProvider client={new MockApiClient()}>
-        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter>
           <LandingPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -86,7 +86,7 @@ describe("LandingPage", () => {
     await act(async () => {
       render(
         <ApiProvider client={client}>
-          <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <MemoryRouter>
             <LandingPage />
           </MemoryRouter>
         </ApiProvider>,
@@ -125,3 +125,4 @@ describe("LandingPage", () => {
     expect(screen.getByText("Acompanhe a crônica")).toBeInTheDocument();
   });
 });
+

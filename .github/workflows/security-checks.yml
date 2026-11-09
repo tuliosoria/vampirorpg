@@ -1,0 +1,30 @@
+name: Security and regression checks
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run build:shared
+      - run: ./node_modules/.bin/tsc --noEmit -p shared && ./node_modules/.bin/tsc --noEmit -p backend && ./node_modules/.bin/tsc --noEmit -p frontend
+      - run: npm run test --workspace shared -- --maxWorkers=2 --minWorkers=1
+      - run: npm run test --workspace backend -- --maxWorkers=2 --minWorkers=1
+      - run: npm run test --workspace frontend -- --maxWorkers=1 --minWorkers=1
+      - run: npm run build --workspace backend
+      - run: npm run build --workspace frontend
+        env:
+          VITE_API_BASE_URL: https://example.invalid
+      - run: npm audit --omit=dev --audit-level=high
+      - run: npm sbom --sbom-format=cyclonedx > security-sbom.cdx.json

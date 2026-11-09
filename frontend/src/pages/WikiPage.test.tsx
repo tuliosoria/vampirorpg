@@ -12,7 +12,7 @@ async function setup(client: MockApiClient, path = "/cidade/clas") {
   await act(async () => {
     render(
       <ApiProvider client={client}>
-        <MemoryRouter initialEntries={[path]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={[path]}>
           <Routes>
             <Route path="/cidade/:section" element={<WikiPage />} />
             {/* O destino do redirecionamento precisa existir no harness, senão
@@ -310,3 +310,4 @@ A Casa protege **rotas antigas**.
     });
   });
 });
+

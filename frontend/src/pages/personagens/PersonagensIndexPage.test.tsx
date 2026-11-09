@@ -11,7 +11,7 @@ async function setup(client: ApiClient = new MockApiClient()) {
   await act(async () => {
     render(
       <ApiProvider client={client}>
-        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter>
           <PersonagensIndexPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -73,3 +73,4 @@ describe("PersonagensIndexPage", () => {
     expect(within(casca).getByRole("link", { name: "Os Clãs" })).toHaveAttribute("href", "/clas");
   });
 });
+

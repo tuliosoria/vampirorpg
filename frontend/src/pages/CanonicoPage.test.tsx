@@ -38,7 +38,7 @@ async function renderPage(api: MockApiClient) {
   await act(async () => {
     render(
       <ApiProvider client={api}>
-        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter>
           <CanonicoPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -106,7 +106,7 @@ describe("CanonicoPage", () => {
         <ApiProvider client={api}>
           <MemoryRouter
             initialEntries={["/canonico"]}
-            future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+           
           >
             <Routes>
               <Route path="/canonico" element={<CanonicoPage />} />
@@ -121,3 +121,4 @@ describe("CanonicoPage", () => {
     expect(loadPlayerSession()).toBeNull();
   });
 });
+

@@ -1,3 +1,8 @@
+import { transferableAbortController } from "node:util";
+// React Router creates Node's native Request in this test environment. Its
+// signal must come from the same realm, not jsdom's AbortController.
+globalThis.AbortController = transferableAbortController().constructor as typeof AbortController;
+
 import "@testing-library/jest-dom/vitest";
 import { beforeEach, afterEach } from "vitest";
 import { semearCanon, limparCanon } from "@vampiro/content/test-fixtures";
@@ -28,3 +33,4 @@ Object.defineProperty(HTMLCanvasElement.prototype, "getContext", {
     fillStyle: "",
   }),
 });
+

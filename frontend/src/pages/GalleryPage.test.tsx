@@ -10,7 +10,7 @@ async function setup(client: MockApiClient) {
   await act(async () => {
     render(
       <ApiProvider client={client}>
-        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter>
           <GalleryPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -38,3 +38,4 @@ describe("GalleryPage", () => {
     expect(screen.getByText(/Evento/)).toBeInTheDocument();
   });
 });
+

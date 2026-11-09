@@ -9,7 +9,7 @@ describe("App routing", () => {
   it("renders the landing page at /", async () => {
     render(
       <ApiProvider client={new MockApiClient()}>
-        <MemoryRouter initialEntries={["/"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><AppRoutes /></MemoryRouter>
+        <MemoryRouter initialEntries={["/"]}><AppRoutes /></MemoryRouter>
       </ApiProvider>,
     );
     await waitFor(() =>
@@ -21,7 +21,7 @@ describe("App routing", () => {
     sessionStorage.clear();
     render(
       <ApiProvider client={new MockApiClient()}>
-        <MemoryRouter initialEntries={["/game"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><AppRoutes /></MemoryRouter>
+        <MemoryRouter initialEntries={["/game"]}><AppRoutes /></MemoryRouter>
       </ApiProvider>,
     );
     await waitFor(() =>
@@ -29,3 +29,4 @@ describe("App routing", () => {
     );
   });
 });
+
