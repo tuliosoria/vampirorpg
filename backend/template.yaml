@@ -3,6 +3,23 @@ Transform: AWS::Serverless-2016-10-31
 Description: vampirorpg - backend da cronica
 
 Parameters:
+  AiBudgetEnabled:
+    Type: String
+    Default: "false"
+    AllowedValues: ["false", "true"]
+    Description: "Opt-in only, after owner approval of the cap and conservative request pricing."
+  AiBudgetMonthlyMicros:
+    Type: String
+    Default: ""
+    Description: "Approved USD micro-units per UTC month. No monetary default."
+  AiBudgetScope:
+    Type: String
+    Default: ""
+    Description: "Stable shared scope for every API and worker using the same allowance."
+  AiBudgetPolicyJson:
+    Type: String
+    Default: ""
+    Description: "Reviewed worst-case request reservations and input/output bounds; required before activation."
   AdminCodeHash:
     Type: String
     NoEcho: true
@@ -66,6 +83,12 @@ Globals:
     Timeout: 30
     MemorySize: 256
     Runtime: nodejs22.x
+    Environment:
+      Variables:
+        AI_BUDGET_ENABLED: !Ref AiBudgetEnabled
+        AI_BUDGET_MONTHLY_MICROS: !Ref AiBudgetMonthlyMicros
+        AI_BUDGET_SCOPE: !Ref AiBudgetScope
+        AI_BUDGET_POLICY_JSON: !Ref AiBudgetPolicyJson
 
 Resources:
   GameTable:
@@ -306,3 +329,4 @@ Outputs:
     Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com"
   TableName:
     Value: !Ref GameTable
+

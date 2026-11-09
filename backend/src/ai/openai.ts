@@ -1,3 +1,4 @@
+import { budgetFromEnvironment, type AiBudget } from "./budget";
 import OpenAI from "openai";
 import { ATTRIBUTE_KEYS, type AttributeKey, type TurnResult } from "@vampiro/content";
 import { HttpError } from "../types/domain";
@@ -58,13 +59,14 @@ export function timeoutFor(model: string): number {
   return /^(gpt-5|o[1-9])/i.test(model) ? 180_000 : 12_000;
 }
 
-export function makeChatFn(apiKey: string, model: string): ChatFn {
+export function makeChatFn(apiKey: string, model: string, budget: AiBudget | undefined = budgetFromEnvironment()): ChatFn {
   const client = new OpenAI({ apiKey, timeout: timeoutFor(model), maxRetries: 0 });
   return async (system, user, jsonMode, maxTokens) => {
     try {
+      const outputLimit = budget ? await budget.beforeChat(model, system, user, maxTokens) : maxTokens;
       const res = await client.chat.completions.create({
         model,
-        ...chatParamsFor(model, maxTokens, 0.7),
+        ...chatParamsFor(model, outputLimit, 0.7),
         response_format: jsonMode ? { type: "json_object" } : undefined,
         messages: [{ role: "system", content: system }, { role: "user", content: user }],
       });
@@ -172,3 +174,4 @@ function parseAiStringArray(raw: unknown): string[] {
   }
   return raw;
 }
+

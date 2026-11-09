@@ -1,3 +1,4 @@
+import { budgetFromEnvironment, type AiBudget } from "./budget";
 import OpenAI, { toFile } from "openai";
 import { mapOpenAiError } from "./openai";
 import { HttpError } from "../types/domain";
@@ -24,10 +25,11 @@ export const DEFAULT_IMAGE_OPTIONS: ImageOptions = {
   inputFidelity: "high",
 };
 
-export function makeImageFn(apiKey: string, timeoutMs = 28000, opts: ImageOptions = DEFAULT_IMAGE_OPTIONS): ImageFn {
+export function makeImageFn(apiKey: string, timeoutMs = 28000, opts: ImageOptions = DEFAULT_IMAGE_OPTIONS, budget: AiBudget | undefined = budgetFromEnvironment()): ImageFn {
   const client = new OpenAI({ apiKey, timeout: timeoutMs, maxRetries: 0 });
   return async (prompt) => {
     try {
+      await budget?.beforeImage(opts, prompt, []);
       const res = await client.images.generate({
         model: opts.model,
         prompt,
@@ -47,10 +49,11 @@ export function makeImageFn(apiKey: string, timeoutMs = 28000, opts: ImageOption
 
 export type ImageEditFn = (prompt: string, references: Buffer[]) => Promise<Buffer>;
 
-export function makeImageEditFn(apiKey: string, timeoutMs = 120000, opts: ImageOptions = DEFAULT_IMAGE_OPTIONS): ImageEditFn {
+export function makeImageEditFn(apiKey: string, timeoutMs = 120000, opts: ImageOptions = DEFAULT_IMAGE_OPTIONS, budget: AiBudget | undefined = budgetFromEnvironment()): ImageEditFn {
   const client = new OpenAI({ apiKey, timeout: timeoutMs, maxRetries: 0 });
   return async (prompt, references) => {
     try {
+      await budget?.beforeImage(opts, prompt, references);
       const files = await Promise.all(
         references.map((buf, i) => toFile(buf, `ref-${i}.png`, { type: "image/png" })),
       );
@@ -72,3 +75,4 @@ export function makeImageEditFn(apiKey: string, timeoutMs = 120000, opts: ImageO
     }
   };
 }
+
