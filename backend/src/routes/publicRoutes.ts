@@ -1,3 +1,4 @@
+import { enforceLoginLimits } from "../auth/loginLimits";
 import { EXEMPLO_DE_PERSONAGEM } from "@vampiro/content";
 import type { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import type { ChatFn } from "../ai/openai";
@@ -97,6 +98,7 @@ export async function createAccountAndHouse(deps: Deps, req: HandlerRequest): Pr
 
 export async function login(deps: Deps, req: HandlerRequest): Promise<HandlerResponse> {
   const { playerCode } = parseLoginBody(req.body);
+  await enforceLoginLimits(deps, req, "player");
   const profile = await getPlayerByCodeHash(deps.doc, deps.config.tableName, hashCode(playerCode));
   if (!profile) throw new HttpError(401, "INVALID_CODE", "Código inválido.");
   const token = playerToken(deps.config, profile.houseId, profile.displayName);
@@ -157,3 +159,4 @@ export async function generateHouseImage(deps: Deps, req: HandlerRequest): Promi
   const buffer = await deps.image(prompt);
   return { status: 200, body: { image: `data:image/png;base64,${buffer.toString("base64")}` } };
 }
+

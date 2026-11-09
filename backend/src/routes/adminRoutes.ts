@@ -1,3 +1,4 @@
+import { enforceLoginLimits } from "../auth/loginLimits";
 import {
   ATTRIBUTE_KEYS, SEATS, briefingsDoPorto, describeFacts, selectFactsForTurn,
   bonusDeRotas, motivoDasRotas, rotasAbertasDe,
@@ -46,6 +47,7 @@ import { buildProjectCanon, buildProjectResolutionPrompt, parseProjectResolution
 
 export async function adminLogin(deps: Deps, req: HandlerRequest): Promise<HandlerResponse> {
   const { adminCode } = parseAdminLoginBody(req.body);
+  await enforceLoginLimits(deps, req, "admin");
   if (hashCode(adminCode) !== deps.config.adminCodeHash) {
     throw new HttpError(401, "INVALID_CODE", "Código de admin inválido.");
   }
@@ -940,3 +942,4 @@ export async function adminResumeProject(deps: Deps, req: HandlerRequest): Promi
   await putProject(deps.doc, deps.config.tableName, deps.config.campaignId, project);
   return { status: 200, body: project };
 }
+
