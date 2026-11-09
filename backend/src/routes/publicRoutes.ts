@@ -155,6 +155,13 @@ export async function generateHouseImage(deps: Deps, req: HandlerRequest): Promi
     throw new HttpError(429, "RATE_LIMITED", "Limite de gerações por hora atingido. Tente novamente mais tarde.");
   }
   const { name, description, emblem } = parseHouseImageGenerateBody(req.body);
+  // Signup intentionally permits a preview before a player has an account.
+  // Its tiny campaign-wide allowance cannot be bypassed by rotating IPs.
+  // Reserve before the provider call, including calls that time out or fail.
+  const daily = await hitRateLimit(deps.doc, deps.config.tableName, `house-image-public-daily#${deps.config.campaignId}`, 86400);
+  if (daily > 5) {
+    throw new HttpError(429, "RATE_LIMITED", "O limite diário de imagens para novos cadastros foi atingido. Você pode continuar sem imagem ou tentar amanhã.");
+  }
   const prompt = buildHouseImagePrompt(name, description, emblem);
   const buffer = await deps.image(prompt);
   return { status: 200, body: { image: `data:image/png;base64,${buffer.toString("base64")}` } };
