@@ -17,7 +17,7 @@ async function montar(no: React.ReactNode) {
   await act(async () => {
     render(
       <ApiProvider client={new MockApiClient()}>
-        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>{no}</MemoryRouter>
+        <MemoryRouter>{no}</MemoryRouter>
       </ApiProvider>,
     );
   });
@@ -44,3 +44,4 @@ describe("ferramentas visuais do Mestre", () => {
     await waitFor(() => expect(screen.getByAltText("Imagem gerada.")).toBeInTheDocument(), { timeout: 8000 });
   });
 });
+

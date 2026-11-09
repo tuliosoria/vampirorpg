@@ -18,7 +18,7 @@ async function montar(client: MockApiClient) {
   await act(async () => {
     render(
       <ApiProvider client={client}>
-        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter>
           <CorrespondenceBell />
           <Onde />
         </MemoryRouter>
@@ -95,3 +95,4 @@ describe("o clique leva à conversa", () => {
     expect(rota.textContent).toContain("casa=cla-gangrel");
   });
 });
+

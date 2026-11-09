@@ -34,7 +34,7 @@ describe("HistoriasPage", () => {
   it("lista as histórias com um player de áudio", () => {
     const { container } = render(
       <ApiProvider client={new MockApiClient()}>
-        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter>
         <HistoriasPage />
       </MemoryRouter>
     </ApiProvider>,
@@ -52,7 +52,7 @@ describe("HistoriasPage", () => {
   it("avisa e oferece o arquivo direto quando o áudio não carrega", () => {
     const { container } = render(
       <ApiProvider client={new MockApiClient()}>
-        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter>
         <HistoriasPage />
       </MemoryRouter>
     </ApiProvider>,
@@ -70,7 +70,7 @@ describe("HistoriasPage", () => {
   it("leva ao verbete de origem na Enciclopédia", () => {
     render(
       <ApiProvider client={new MockApiClient()}>
-        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter>
         <HistoriasPage />
       </MemoryRouter>
     </ApiProvider>,
@@ -97,7 +97,7 @@ describe("HistoriasPage", () => {
       <ApiProvider client={new MockApiClient()}>
         <MemoryRouter
         initialEntries={[`/historias#${alvo.id}`]}
-        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+       
       >
         <HistoriasPage />
       </MemoryRouter>
@@ -107,3 +107,4 @@ describe("HistoriasPage", () => {
     expect(rolou).toContain(alvo.id);
   });
 });
+

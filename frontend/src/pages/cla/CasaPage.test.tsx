@@ -28,7 +28,7 @@ async function setup(chave: string, chronicle = ASTERIA) {
   await act(async () => {
     render(
       <ApiProvider client={clientWith(chronicle)}>
-        <MemoryRouter initialEntries={[`/cla/${chave}`]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={[`/cla/${chave}`]}>
           <Routes>
             <Route path="/cla/:chave" element={<CasaPage />} />
             <Route path="/clas" element={<p>lista de Casas</p>} />
@@ -106,3 +106,4 @@ describe("CasaPage", () => {
     expect(item).toHaveClass("Mui-selected");
   });
 });
+

@@ -11,7 +11,7 @@ async function setup(path: string, client: ApiClient = new MockApiClient()) {
   await act(async () => {
     render(
       <ApiProvider client={client}>
-        <MemoryRouter initialEntries={[path]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={[path]}>
           <Routes>
             <Route path="/personagens/:id" element={<PersonagemPage />} />
           </Routes>
@@ -92,7 +92,7 @@ describe("PersonagemPage", () => {
     await act(async () => {
       render(
         <ApiProvider client={client}>
-          <RouterProvider router={router} future={{ v7_startTransition: true }} />
+          <RouterProvider router={router} />
         </ApiProvider>,
       );
     });
@@ -125,3 +125,4 @@ describe("PersonagemPage", () => {
     expect(link).toHaveAttribute("href", "/cla/cla-ventrue");
   });
 });
+

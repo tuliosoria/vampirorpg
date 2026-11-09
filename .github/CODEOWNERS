@@ -1,0 +1,6 @@
+# Routing only; approval requirements need separate branch protection.
+/backend/src/auth/ @tuliosoria
+/backend/src/ai/ @tuliosoria
+/backend/src/routes/ @tuliosoria
+/backend/template.yaml @tuliosoria
+/.github/ @tuliosoria

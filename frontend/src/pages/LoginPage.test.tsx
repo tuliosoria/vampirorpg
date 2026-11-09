@@ -30,7 +30,7 @@ async function renderAt(api: MockApiClient, path: string) {
       <ApiProvider client={api}>
         <MemoryRouter
           initialEntries={[path]}
-          future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+         
         >
           <AppRoutes />
         </MemoryRouter>
@@ -84,3 +84,4 @@ describe("entrada do jogador", () => {
     expect(screen.getByRole("tab", { name: /Noites/i })).toBeInTheDocument();
   });
 });
+

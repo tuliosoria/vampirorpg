@@ -43,7 +43,7 @@ async function montarJogo(client: MockApiClient) {
   await act(async () => {
     render(
       <ApiProvider client={client}>
-        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter>
           <GamePage />
         </MemoryRouter>
       </ApiProvider>,
@@ -62,7 +62,7 @@ async function setup(rota = "/game") {
   await act(async () => {
     render(
       <ApiProvider client={client}>
-        <MemoryRouter initialEntries={[rota]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={[rota]}>
           <GamePage />
         </MemoryRouter>
       </ApiProvider>,
@@ -127,7 +127,7 @@ describe("GamePage", () => {
     await act(async () => {
       render(
         <ApiProvider client={client}>
-          <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <MemoryRouter>
             <GamePage />
           </MemoryRouter>
         </ApiProvider>,
@@ -157,7 +157,7 @@ describe("GamePage", () => {
     await act(async () => {
       render(
         <ApiProvider client={client}>
-          <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <MemoryRouter>
             <GamePage />
           </MemoryRouter>
         </ApiProvider>,
@@ -194,7 +194,7 @@ describe("GamePage", () => {
     await act(async () => {
       render(
         <ApiProvider client={client}>
-          <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <MemoryRouter>
             <GamePage />
           </MemoryRouter>
         </ApiProvider>,
@@ -239,7 +239,7 @@ describe("GamePage", () => {
     await act(async () => {
       render(
         <ApiProvider client={client}>
-          <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <MemoryRouter>
             <GamePage />
           </MemoryRouter>
         </ApiProvider>,
@@ -283,7 +283,7 @@ describe("GamePage", () => {
     await act(async () => {
       render(
         <ApiProvider client={client}>
-          <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <MemoryRouter>
             <GamePage />
           </MemoryRouter>
         </ApiProvider>,
@@ -323,7 +323,7 @@ describe("GamePage", () => {
     await act(async () => {
       render(
         <ApiProvider client={client}>
-          <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <MemoryRouter>
             <GamePage />
           </MemoryRouter>
         </ApiProvider>,
@@ -383,7 +383,7 @@ describe("GamePage", () => {
     await act(async () => {
       render(
         <ApiProvider client={client}>
-          <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <MemoryRouter>
             <GamePage />
           </MemoryRouter>
         </ApiProvider>,
@@ -400,3 +400,4 @@ describe("GamePage", () => {
     expect(await screen.findByRole("tab", { name: /Noites/i, selected: true })).toBeInTheDocument();
   });
 });
+

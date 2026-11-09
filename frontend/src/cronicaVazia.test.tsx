@@ -24,7 +24,7 @@ async function abrir(rota: string) {
   await act(async () => {
     render(
       <ApiProvider client={new MockApiClient()}>
-        <MemoryRouter initialEntries={[rota]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={[rota]}>
           <AppRoutes />
         </MemoryRouter>
       </ApiProvider>,
@@ -53,3 +53,4 @@ describe("a crônica vazia", () => {
     expect(await screen.findByText(/Ainda não há personagem nenhum/i)).toBeInTheDocument();
   });
 });
+

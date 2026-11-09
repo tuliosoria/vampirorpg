@@ -24,7 +24,7 @@ async function setup(client = new MockApiClient()) {
   await act(async () => {
     render(
       <ApiProvider client={client}>
-        <MemoryRouter initialEntries={["/cidade"]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter initialEntries={["/cidade"]}>
           <WikiIndexPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -69,7 +69,7 @@ describe("índice da crônica", () => {
     await act(async () => {
       render(
         <ApiProvider client={new MockApiClient()}>
-          <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <MemoryRouter>
             <WikiIndexPage />
           </MemoryRouter>
         </ApiProvider>,
@@ -83,3 +83,4 @@ describe("índice da crônica", () => {
     );
   });
 });
+

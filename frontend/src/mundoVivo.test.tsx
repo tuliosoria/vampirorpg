@@ -23,7 +23,7 @@ async function comCanonCarregado(client: MockApiClient, rota: string) {
     render(
       <ApiProvider client={client}>
         <CanonProvider>
-          <MemoryRouter initialEntries={[rota]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <MemoryRouter initialEntries={[rota]}>
             <AppRoutes />
           </MemoryRouter>
         </CanonProvider>
@@ -111,3 +111,4 @@ describe("o mundo que o Narrador escreve", () => {
     expect(SEATS).toHaveLength(0);
   });
 });
+

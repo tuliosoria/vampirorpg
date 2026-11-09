@@ -12,7 +12,7 @@ async function setup(client: MockApiClient) {
   await act(async () => {
     render(
       <ApiProvider client={client}>
-        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter>
           <EnciclopediaPage />
         </MemoryRouter>
       </ApiProvider>,
@@ -52,3 +52,4 @@ describe("EnciclopediaPage", () => {
     expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Acervo", "Imagens"]);
   });
 });
+

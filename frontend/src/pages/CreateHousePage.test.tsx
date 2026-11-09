@@ -14,7 +14,7 @@ vi.mock("../utils/imageResize", () => ({
 function renderPage(client: MockApiClient) {
   render(
     <ApiProvider client={client}>
-      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <MemoryRouter>
         <CreateHousePage />
       </MemoryRouter>
     </ApiProvider>,
@@ -107,3 +107,4 @@ describe("CreateHousePage", () => {
     expect(await screen.findByAltText("Imagem 1 da Casa")).toBeInTheDocument();
   }, 15000);
 });
+
